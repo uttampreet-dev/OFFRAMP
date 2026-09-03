@@ -28,6 +28,7 @@ function Countdown({ closesAt, anchorNow }: { closesAt: number; anchorNow: numbe
 
 function Inner() {
   const params = useSearchParams();
+  const caseParam = params.get("case") ?? "";
   const [mode, setMode] = useState<"demo" | "live">("demo");
   const [address, setAddress] = useState("");
   const [amount, setAmount] = useState("");
@@ -47,7 +48,7 @@ function Inner() {
         const r = await fetch("/api/intercept", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(m === "demo" ? { demo: true } : { address: a.trim(), amount: Number(amt) || 0, symbol: sym }),
+          body: JSON.stringify(m === "demo" ? { demo: true } : { address: a.trim(), amount: Number(amt) || 0, symbol: sym, caseId: caseParam || undefined }),
         });
         const body = await r.json();
         if (!r.ok) throw new Error(body.error ?? "intercept failed");

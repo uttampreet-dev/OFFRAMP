@@ -326,11 +326,13 @@ function TraceInner() {
             <Section title="Next">
               <div className="flex flex-col gap-2">
                 {[
-                  ["/bridge", "Cross the seam in Bridge", "match the cash-out to an INR credit"],
-                  ["/red-flags", "Run the ten detectors", "named FATF rules with reasons"],
-                  ["/intercept", "Open Intercept", "compose the freeze packet"],
+                  ["/bridge?address={a}", "Cross the seam in Bridge", "match the cash-out to an INR credit"],
+                  ["/red-flags?address={a}", "Run the ten detectors", "named FATF rules with reasons"],
+                  ["/intercept?address={a}", "Open Intercept", "compose the freeze packet"],
+                  ["/cases?address={a}", "Open a case on this wallet", "case file with timeline and hand-offs"],
+                  ["/live-board?watch={a}", "Watch on the Live Board", "re-evaluated against live chain state"],
                 ].map(([href, t, d]) => (
-                  <Link key={href} href={`${href}?address=${encodeURIComponent(res.seed)}`} className="group flex items-center justify-between border border-line px-3.5 py-2.5 hover:border-amber/60 transition-colors">
+                  <Link key={href} href={href.replace("{a}", encodeURIComponent(res.seed))} className="group flex items-center justify-between border border-line px-3.5 py-2.5 hover:border-amber/60 transition-colors">
                     <span>
                       <span className="block text-[13px] font-semibold group-hover:text-amber transition-colors">{t}</span>
                       <span className="block c-note">{d}</span>
