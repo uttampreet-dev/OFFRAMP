@@ -32,13 +32,14 @@ function layout(res: TraceResult, W: number, H: number) {
   for (const n of res.nodes) byHop.set(n.hop, [...(byHop.get(n.hop) ?? []), n]);
   const maxHop = Math.max(...byHop.keys());
   const pos = new Map<string, { x: number; y: number }>();
-  const padX = 150;
+  const padL = 150;
+  const padR = 250;
   const padY = 56;
-  const colGap = maxHop === 0 ? 0 : (W - padX * 2) / maxHop;
+  const colGap = maxHop === 0 ? 0 : (W - padL - padR) / maxHop;
   for (const [hop, list] of byHop) {
     list.sort((a, b) => b.inValue + b.outValue - (a.inValue + a.outValue));
     const gap = (H - padY * 2) / (list.length + 1);
-    list.forEach((n, i) => pos.set(n.address, { x: padX + hop * colGap, y: padY + gap * (i + 1) }));
+    list.forEach((n, i) => pos.set(n.address, { x: padL + hop * colGap, y: padY + gap * (i + 1) }));
   }
   const maxEdge = Math.max(1e-9, ...res.edges.map((e) => e.value));
   return { pos, maxHop, maxEdge };
@@ -91,8 +92,8 @@ function Flow({ res, selected, onSelect }: { res: TraceResult; selected: string 
           const stroke = n.sanctioned ? "#e5484d" : n.entity ? "#46a5bf" : isSeed ? "#e8b23a" : "#9fb0c1";
           const isSel = selected === n.address;
           const dim = selected !== null && !isSel && !adjacent.has(n.address);
-          const right = p.x < size.w - 190;
-          const lx = right ? p.x + r + 9 : p.x - r - 9;
+          const right = true;
+          const lx = p.x + r + 9;
           return (
             <g key={n.address} onClick={() => onSelect(n.address)} style={{ cursor: "pointer", opacity: dim ? 0.5 : 1, transition: "opacity .2s" }}>
               {(n.sanctioned || isSel) && <circle cx={p.x} cy={p.y} r={r + 7} fill="none" stroke={isSel ? "#e8b23a" : "#e5484d"} strokeOpacity="0.5" strokeWidth="1.2" />}
