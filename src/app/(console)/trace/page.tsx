@@ -141,8 +141,14 @@ function TraceInner() {
   useEffect(() => {
     const a = params.get("address");
     if (a) {
+      const d = Math.min(4, Math.max(1, Number(params.get("depth") ?? 2) || 2));
+      const f = [3, 5, 8].includes(Number(params.get("fanout"))) ? Number(params.get("fanout")) : 5;
+      const dr = params.get("dir") === "in" ? "in" : "out";
       setAddress(a);
-      run(a);
+      setDepth(d);
+      setFanout(f);
+      setDir(dr);
+      run(a, d, f, dr);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -184,6 +190,8 @@ function TraceInner() {
         </form>
       </div>
 
+      {!res && (
+        <div className="flex-1 min-h-0">
       {error && <div className="mx-5 mt-4 border border-[#652225] bg-[#1a0c0e] text-red px-4 py-3 text-[12px] max-w-xl">{error}</div>}
 
       {!res && !error && !loading && (
@@ -195,6 +203,8 @@ function TraceInner() {
 
       {loading && !res && (
         <div className="p-6 mono text-[11px] text-faint">querying chain — {depth} hop{depth > 1 ? "s" : ""}, up to {fanout} counterparties each…</div>
+      )}
+        </div>
       )}
 
       {res && (
