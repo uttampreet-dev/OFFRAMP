@@ -42,6 +42,8 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string 
       caseId: m.caseId,
       packId: id,
       rootHash: m.rootHash,
+      hash: m.rootHash,
+      hashAlgorithm: "SHA-256",
       artefacts: m.artefacts.map((a) => a.name).join(", "),
       recordDescription: `Evidence pack for case ${m.caseId}: ${m.artefacts.length} artefacts (trace, detector findings, correlation, freeze packet)`,
       deviceProcess: "OFFRAMP investigation console — Node.js application; artefacts serialised canonically and hashed with SHA-256; hashes chained in sequence to a root hash",
