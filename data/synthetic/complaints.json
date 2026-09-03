@@ -1,0 +1,475 @@
+{
+  "synthetic": true,
+  "records": [
+    {
+      "id": "2026-CHD-0417",
+      "date": "2026-08-14",
+      "city": "Chandigarh",
+      "amountInr": 800020,
+      "paidAs": "USDT-TRC20",
+      "paidTo": "TqNCVh8BD4MLQRUam51rX65FGqfvaBWhER",
+      "cashOutWallet": "TA3rH2A7iHnm6pKH8gr9cK1EZnShnmZdFg",
+      "notes": "Digital arrest extortion via fake police threat; funds converted to USDT and routed to fast cash-out wallet."
+    },
+    {
+      "id": "2026-MOH-0418",
+      "date": "2026-08-04",
+      "city": "Mohali",
+      "amountInr": 520000,
+      "paidAs": "USDT-TRC20",
+      "paidTo": "TdE5nauZiJQ2hixXuuAQJ4dZdy6GtJQmeT",
+      "cashOutWallet": "TA3rH2A7iHnm6pKH8gr9cK1EZnShnmZdFg",
+      "notes": "Telegram part-time task scam promising daily ROI; funds layered into shared P2P off-ramp cluster."
+    },
+    {
+      "id": "2026-CHA-0419",
+      "date": "2026-08-07",
+      "city": "Chandigarh",
+      "amountInr": 610000,
+      "paidAs": "USDT-TRC20",
+      "paidTo": "T2Vq6JxPTGJP8HW1jFJ41RhCn4GpZbvbdY",
+      "cashOutWallet": "TA3rH2A7iHnm6pKH8gr9cK1EZnShnmZdFg",
+      "notes": "Fake investment scheme on fraudulent trading app; victim lured with simulated profits."
+    },
+    {
+      "id": "2026-PAN-0420",
+      "date": "2026-08-09",
+      "city": "Panchkula",
+      "amountInr": 440000,
+      "paidAs": "USDT-TRC20",
+      "paidTo": "Tcm42RvE2XezHijdqfzRCktmLfmBAdgomG",
+      "cashOutWallet": "TA3rH2A7iHnm6pKH8gr9cK1EZnShnmZdFg",
+      "notes": "Job recruitment fraud requiring advance security deposit in crypto."
+    },
+    {
+      "id": "2026-LUD-0421",
+      "date": "2026-08-11",
+      "city": "Ludhiana",
+      "amountInr": 395000,
+      "paidAs": "USDT-TRC20",
+      "paidTo": "TycM8YLg1f2RkbCznjo3UdmprPBvJ1EwfD",
+      "cashOutWallet": "TA3rH2A7iHnm6pKH8gr9cK1EZnShnmZdFg",
+      "notes": "Loan approval fee scam directing victim to purchase USDT."
+    },
+    {
+      "id": "2026-CHA-0422",
+      "date": "2026-08-12",
+      "city": "Chandigarh",
+      "amountInr": 480000,
+      "paidAs": "USDT-TRC20",
+      "paidTo": "ThcG2FpK1H1H6VVdC4MXRevxvn7dYHAbux",
+      "cashOutWallet": "TA3rH2A7iHnm6pKH8gr9cK1EZnShnmZdFg",
+      "notes": "Cryptocurrency arbitrage fraud promising guaranteed spread earnings."
+    },
+    {
+      "id": "2026-MOH-0423",
+      "date": "2026-08-13",
+      "city": "Mohali",
+      "amountInr": 560000,
+      "paidAs": "USDT-TRC20",
+      "paidTo": "TNNQH8wkaxB8uzCAcECTcNwk9U7uU45N36",
+      "cashOutWallet": "TA3rH2A7iHnm6pKH8gr9cK1EZnShnmZdFg",
+      "notes": "FedEx package impersonation scam demanding immediate clearance transfer."
+    },
+    {
+      "id": "2026-PAN-0424",
+      "date": "2026-08-15",
+      "city": "Panchkula",
+      "amountInr": 314980,
+      "paidAs": "USDT-TRC20",
+      "paidTo": "TZUMUkGXJG8ZmhuBeovRdRQo51mJgvYqgC",
+      "cashOutWallet": "TA3rH2A7iHnm6pKH8gr9cK1EZnShnmZdFg",
+      "notes": "Online rating review task fraud with escalated deposit tiers."
+    },
+    {
+      "id": "2026-LUD-0430",
+      "date": "2026-08-03",
+      "city": "Ludhiana",
+      "amountInr": 420000,
+      "paidAs": "USDT-TRC20",
+      "paidTo": "TrUgBhQEnoR9GACEtN8y4LtgJ1gSkS9ZQr",
+      "cashOutWallet": "TA82wQ77kb9DieW4C8q7C4KwMfnCzfziqN",
+      "notes": "Fake stock market advisory group channeling funds into 2-hop layered mule infrastructure."
+    },
+    {
+      "id": "2026-MOH-0431",
+      "date": "2026-08-06",
+      "city": "Mohali",
+      "amountInr": 380000,
+      "paidAs": "USDT-TRC20",
+      "paidTo": "Tryy1ZvVb8gVz1fwtXNjVjyzR1RrGDTAne",
+      "cashOutWallet": "TA82wQ77kb9DieW4C8q7C4KwMfnCzfziqN",
+      "notes": "Pre-IPO share allotment fraud on fake web portal."
+    },
+    {
+      "id": "2026-LUD-0432",
+      "date": "2026-08-08",
+      "city": "Ludhiana",
+      "amountInr": 490000,
+      "paidAs": "USDT-TRC20",
+      "paidTo": "T7ZpYvRqKqTAWnsrFqGGWBFH1daBop5CRA",
+      "cashOutWallet": "TA82wQ77kb9DieW4C8q7C4KwMfnCzfziqN",
+      "notes": "Institutional trading account scam with frozen withdrawal pretext."
+    },
+    {
+      "id": "2026-CHA-0433",
+      "date": "2026-08-10",
+      "city": "Chandigarh",
+      "amountInr": 310000,
+      "paidAs": "USDT-TRC20",
+      "paidTo": "TFopLNTtYXLkR5PaYuP9gGK9fSjxxqbGty",
+      "cashOutWallet": "TA82wQ77kb9DieW4C8q7C4KwMfnCzfziqN",
+      "notes": "Commodity trading tip scam requiring crypto wallet transfer."
+    },
+    {
+      "id": "2026-PAN-0434",
+      "date": "2026-08-12",
+      "city": "Panchkula",
+      "amountInr": 520000,
+      "paidAs": "USDT-TRC20",
+      "paidTo": "ToJXzUeDrmuqJVqgNJJzcajCw2UoHrawmg",
+      "cashOutWallet": "TA82wQ77kb9DieW4C8q7C4KwMfnCzfziqN",
+      "notes": "Deepfake executive impersonation demanding urgent vendor settlement."
+    },
+    {
+      "id": "2026-LUD-0435",
+      "date": "2026-08-14",
+      "city": "Ludhiana",
+      "amountInr": 410000,
+      "paidAs": "USDT-TRC20",
+      "paidTo": "TQcX5qYPp9k1kbnkKcbLrg6ySyNGQTcper",
+      "cashOutWallet": "TA82wQ77kb9DieW4C8q7C4KwMfnCzfziqN",
+      "notes": "High-yield forex trading bot scam with fabricated performance dashboard."
+    },
+    {
+      "id": "2026-MOH-0436",
+      "date": "2026-08-16",
+      "city": "Mohali",
+      "amountInr": 330000,
+      "paidAs": "USDT-TRC20",
+      "paidTo": "TcMRC2k13FUqKypPwQso2By6kr1ytDGT65",
+      "cashOutWallet": "TA82wQ77kb9DieW4C8q7C4KwMfnCzfziqN",
+      "notes": "Crypto mining pool deposit scam with locked principal."
+    },
+    {
+      "id": "2026-CHA-0440",
+      "date": "2026-08-05",
+      "city": "Chandigarh",
+      "amountInr": 350000,
+      "paidAs": "BTC",
+      "paidTo": "1z6ovcrf5ecucDW9rJhyhey8SGzTJiATiw",
+      "cashOutWallet": "TASWbk6X1wiTku5TMmMQYqYFvshVEtfJy8",
+      "notes": "Cross-chain ransomware payment converted from BTC into consolidated TRON cash-out."
+    },
+    {
+      "id": "2026-PAN-0441",
+      "date": "2026-08-07",
+      "city": "Panchkula",
+      "amountInr": 280000,
+      "paidAs": "BTC",
+      "paidTo": "1ARDrDQvYwopCtSdcreQTfee6ntMEZrQ62",
+      "cashOutWallet": "TASWbk6X1wiTku5TMmMQYqYFvshVEtfJy8",
+      "notes": "Blackmail extortion paid in Bitcoin, tracked hopping to TRC-20 off-ramp."
+    },
+    {
+      "id": "2026-MOH-0442",
+      "date": "2026-08-10",
+      "city": "Mohali",
+      "amountInr": 410000,
+      "paidAs": "BTC",
+      "paidTo": "1huHYQ2N1ga9gbDRpeLhrpcGJ1GCHKwsnu",
+      "cashOutWallet": "TASWbk6X1wiTku5TMmMQYqYFvshVEtfJy8",
+      "notes": "Fake crypto recovery agent demanding upfront fee in Bitcoin."
+    },
+    {
+      "id": "2026-CHA-0443",
+      "date": "2026-08-13",
+      "city": "Chandigarh",
+      "amountInr": 320000,
+      "paidAs": "USDT-TRC20",
+      "paidTo": "TA8ZckHb3VZTduQ64HKRXhSYeVkc2ZySQB",
+      "cashOutWallet": "TASWbk6X1wiTku5TMmMQYqYFvshVEtfJy8",
+      "notes": "Cross-chain pig butchering investment scam hopping across chains."
+    },
+    {
+      "id": "2026-LUD-0444",
+      "date": "2026-08-15",
+      "city": "Ludhiana",
+      "amountInr": 290000,
+      "paidAs": "BTC",
+      "paidTo": "1AhdbqkBFwJNeQaFuLBB1sh4iqt93taiXR",
+      "cashOutWallet": "TASWbk6X1wiTku5TMmMQYqYFvshVEtfJy8",
+      "notes": "Phishing compromise of victim seed phrase; BTC liquidated to TRON."
+    },
+    {
+      "id": "2026-PAN-0445",
+      "date": "2026-08-17",
+      "city": "Panchkula",
+      "amountInr": 290000,
+      "paidAs": "USDT-TRC20",
+      "paidTo": "TGA68F2hCcRRHhMSvNXZvwzR6dGRvtKFiD",
+      "cashOutWallet": "TASWbk6X1wiTku5TMmMQYqYFvshVEtfJy8",
+      "notes": "Tech support fraud coercing Bitcoin ATM deposit, settled to TRON."
+    },
+    {
+      "id": "2026-CHA-0450",
+      "date": "2026-08-02",
+      "city": "Chandigarh",
+      "amountInr": 45000,
+      "paidAs": "BTC",
+      "paidTo": "149YmbgkV5UF9LGHjzv7pUtBMSUzE8nfaA",
+      "cashOutWallet": "T8CX5RKvgw4PouwLunxTK4yw5s7SaDYWgo",
+      "notes": "Fake credit card limit upgrade phishing scam."
+    },
+    {
+      "id": "2026-LUD-0451",
+      "date": "2026-08-03",
+      "city": "Ludhiana",
+      "amountInr": 78000,
+      "paidAs": "USDT-TRC20",
+      "paidTo": "T4ufgLWmPmkSr2xC1KC9xHqJsVjMXhBNcm",
+      "cashOutWallet": "TStW9vpuA981sEsSeBFnMj4oHtwLgCJrxc",
+      "notes": "Electricity bill disconnection threat fraud."
+    },
+    {
+      "id": "2026-MOH-0452",
+      "date": "2026-08-04",
+      "city": "Mohali",
+      "amountInr": 112000,
+      "paidAs": "USDT-TRC20",
+      "paidTo": "Tqge3kstbfneT9HePyhw5yD4vdKxbGUXKv",
+      "cashOutWallet": "TrthyQDKHtJwAKnRqF6DjcueNKSnsVHyEH",
+      "notes": "Online gaming tournament registration fraud."
+    },
+    {
+      "id": "2026-PAN-0453",
+      "date": "2026-08-05",
+      "city": "Panchkula",
+      "amountInr": 145000,
+      "paidAs": "USDT-TRC20",
+      "paidTo": "T36CWVSmoSFVbNxLYc4BsDiACYtR6UKnLH",
+      "cashOutWallet": "T2tkEZ9qkrEsKrNx7dAR6NCAzsFSqn9XBW",
+      "notes": "E-commerce parcel customs duty impersonation scam."
+    },
+    {
+      "id": "2026-CHA-0454",
+      "date": "2026-08-06",
+      "city": "Chandigarh",
+      "amountInr": 189000,
+      "paidAs": "USDT-TRC20",
+      "paidTo": "TMrxjCu6gkpfwNct8uyXyfyELt7Sh1MoMX",
+      "cashOutWallet": "TdYNb2H7BhcT3UGhA1747gbzqB4zEjYBSw",
+      "notes": "Matrimonial profile romance scam with hospital emergency pretext."
+    },
+    {
+      "id": "2026-LUD-0455",
+      "date": "2026-08-07",
+      "city": "Ludhiana",
+      "amountInr": 210000,
+      "paidAs": "USDT-TRC20",
+      "paidTo": "TSabQbuWsHAqBnvyoX7d5zfy3Lff4YHG2L",
+      "cashOutWallet": "TLXCjUKqH65Nxs9Ke3boTCkoYwX4k1AcgG",
+      "notes": "Unauthorized remote access app fraud via fake banking helpline."
+    },
+    {
+      "id": "2026-MOH-0456",
+      "date": "2026-08-08",
+      "city": "Mohali",
+      "amountInr": 235000,
+      "paidAs": "USDT-TRC20",
+      "paidTo": "TwymAH7h3hwfxKZHG88AqsT3xZCmsimp1L",
+      "cashOutWallet": "TpWuJbtfihKHmihVEQJJnbMHpnJN1GfUb8",
+      "notes": "Fake airline ticket refund helpline scam."
+    },
+    {
+      "id": "2026-PAN-0457",
+      "date": "2026-08-09",
+      "city": "Panchkula",
+      "amountInr": 260000,
+      "paidAs": "BTC",
+      "paidTo": "1ZhAhzDKtfppxdBV9Qgoux26jCQRmET91D",
+      "cashOutWallet": "Tj89y3fF8B1q7easbksFnY35JQ5YiCiSpC",
+      "notes": "Cryptocurrency trading bot subscription fraud."
+    },
+    {
+      "id": "2026-CHA-0458",
+      "date": "2026-08-10",
+      "city": "Chandigarh",
+      "amountInr": 295000,
+      "paidAs": "USDT-TRC20",
+      "paidTo": "TwQSgLr33qUxpMTD8zTDyv2p5xvJTj2uee",
+      "cashOutWallet": "Tk6cQULHDDnjfMS8Nk1J6hWseTXGXSxA3A",
+      "notes": "Fake work-from-home data entry job deposit fraud."
+    },
+    {
+      "id": "2026-LUD-0459",
+      "date": "2026-08-11",
+      "city": "Ludhiana",
+      "amountInr": 320000,
+      "paidAs": "USDT-TRC20",
+      "paidTo": "TmmGk1hYCtYkFC4Bta64hS7rdUS3Zt8mcJ",
+      "cashOutWallet": "TY2xHZYQcTLb7VxwG5L7QkRKZcHC7g6Lvf",
+      "notes": "Insurance policy bonus release fee scam."
+    },
+    {
+      "id": "2026-MOH-0460",
+      "date": "2026-08-12",
+      "city": "Mohali",
+      "amountInr": 345000,
+      "paidAs": "USDT-TRC20",
+      "paidTo": "TgTJbgSU1Vjssof16pJ1kBzt3ScLmNTQap",
+      "cashOutWallet": "TmdrFyyJzaK86joxwQZMMLR6gY228anb8N",
+      "notes": "Pre-approved personal loan processing fee scam."
+    },
+    {
+      "id": "2026-PAN-0461",
+      "date": "2026-08-13",
+      "city": "Panchkula",
+      "amountInr": 380000,
+      "paidAs": "USDT-TRC20",
+      "paidTo": "TN9Ds1iW9JgyPqvPPPijonJZ2V7qkrfUCt",
+      "cashOutWallet": "T6Zx1NGd3FQzJjdr2NKie8CsguSPEngdLy",
+      "notes": "Fake hotel booking voucher fraud."
+    },
+    {
+      "id": "2026-CHA-0462",
+      "date": "2026-08-14",
+      "city": "Chandigarh",
+      "amountInr": 410000,
+      "paidAs": "USDT-TRC20",
+      "paidTo": "TVUgFeDJGz5kSzWySwztVwhaDKbEAyRe8B",
+      "cashOutWallet": "TBUwBS75R8GqPB7JEgJqvoQHDMAx8zT6B7",
+      "notes": "Lottery prize tax deduction scam."
+    },
+    {
+      "id": "2026-LUD-0463",
+      "date": "2026-08-15",
+      "city": "Ludhiana",
+      "amountInr": 450000,
+      "paidAs": "USDT-TRC20",
+      "paidTo": "Ti9MPJaY4EZqit5SwAq8XJsaHbjAgRPa4L",
+      "cashOutWallet": "Th4UTpBGntZL1iwxCyAPs2i2ybtRSsmgMT",
+      "notes": "Fake franchise fee fraud for courier agency."
+    },
+    {
+      "id": "2026-MOH-0464",
+      "date": "2026-08-16",
+      "city": "Mohali",
+      "amountInr": 485000,
+      "paidAs": "BTC",
+      "paidTo": "1iouybWsAgpvsEJTYhtAYZVEtxDJysExe4",
+      "cashOutWallet": "TLxDWC8uoCwAr3jWbvZ38UnmcFGRr4J2Xh",
+      "notes": "Counterfeit digital currency investment scheme."
+    },
+    {
+      "id": "2026-PAN-0465",
+      "date": "2026-08-17",
+      "city": "Panchkula",
+      "amountInr": 520000,
+      "paidAs": "USDT-TRC20",
+      "paidTo": "T97zfDdyG1WfZgrgvDocDMCDi5fLhycSZy",
+      "cashOutWallet": "TjqqzEce9i7zanCb6CBTNnJAn2yd3EioMU",
+      "notes": "Rental property advance token amount scam."
+    },
+    {
+      "id": "2026-CHA-0466",
+      "date": "2026-08-18",
+      "city": "Chandigarh",
+      "amountInr": 560000,
+      "paidAs": "USDT-TRC20",
+      "paidTo": "TgjK7peX1tJjUuPoiQHBCMgBRenuWQDgUn",
+      "cashOutWallet": "TZP1aaKAU7hUqdztNTgKHevtBZfjf5ggVU",
+      "notes": "SIM card KYC update phishing trap."
+    },
+    {
+      "id": "2026-LUD-0467",
+      "date": "2026-08-19",
+      "city": "Ludhiana",
+      "amountInr": 610000,
+      "paidAs": "USDT-TRC20",
+      "paidTo": "TyNWz6CA6ysnFZbTdvyWCEbpgKDg7phM28",
+      "cashOutWallet": "TVFPwwt6T4QGKFm45NjHWiJbTX2NQErKdL",
+      "notes": "Fake educational admission processing scam."
+    },
+    {
+      "id": "2026-MOH-0468",
+      "date": "2026-08-20",
+      "city": "Mohali",
+      "amountInr": 640000,
+      "paidAs": "USDT-TRC20",
+      "paidTo": "TieFzgyaAxsWbK7KJRYGqgcm9meM8tj9uh",
+      "cashOutWallet": "TC7ejw29nDs4gJCntdz1jg7xHbhDtPuQSm",
+      "notes": "Overseas job visa clearance fee fraud."
+    },
+    {
+      "id": "2026-PAN-0469",
+      "date": "2026-08-21",
+      "city": "Panchkula",
+      "amountInr": 690000,
+      "paidAs": "USDT-TRC20",
+      "paidTo": "TYFCkGdRtUyY9qd4Qae8oKPiVdkZGJygn8",
+      "cashOutWallet": "TLeTdGMx5GmWaTyjTr7BcB3eKSNxpCWaZP",
+      "notes": "Vehicle resale token advance scam on OLX."
+    },
+    {
+      "id": "2026-CHA-0470",
+      "date": "2026-08-22",
+      "city": "Chandigarh",
+      "amountInr": 720000,
+      "paidAs": "USDT-TRC20",
+      "paidTo": "T9r2wWpNwCqZZnoMd4ymmqcKNcAzAg6gK8",
+      "cashOutWallet": "TaUUHaaD3rmHhPiYUkoTptjKEihErLKYfu",
+      "notes": "Government subsidy clearance fee fraud."
+    },
+    {
+      "id": "2026-LUD-0471",
+      "date": "2026-08-23",
+      "city": "Ludhiana",
+      "amountInr": 765000,
+      "paidAs": "BTC",
+      "paidTo": "1C7QE5E5zo9FYrJscXBqNvwFUMZHVjmmBK",
+      "cashOutWallet": "TaKNPZMZLeY3hk8ubyhV1Vrfh6LjeT1vSx",
+      "notes": "Counterfeit gold coin investment scam."
+    },
+    {
+      "id": "2026-MOH-0472",
+      "date": "2026-08-24",
+      "city": "Mohali",
+      "amountInr": 810000,
+      "paidAs": "USDT-TRC20",
+      "paidTo": "TLgzJdWEgxZGjgnF2fwzKC2ATYc9v6ec2Q",
+      "cashOutWallet": "T2opasKgcKkUEDrUUBUxsd5KNFy6tEFRXE",
+      "notes": "Fake social media influencer brand sponsorship advance."
+    },
+    {
+      "id": "2026-PAN-0473",
+      "date": "2026-08-25",
+      "city": "Panchkula",
+      "amountInr": 850000,
+      "paidAs": "USDT-TRC20",
+      "paidTo": "TFFToqMViKjGowvBY7uwFNZjzp1C8TQuX2",
+      "cashOutWallet": "TadVYABEYY4DzSawn3oX3z4yvqH2EMhgcP",
+      "notes": "High-return real estate tokenization scam."
+    },
+    {
+      "id": "2026-CHA-0474",
+      "date": "2026-08-26",
+      "city": "Chandigarh",
+      "amountInr": 895000,
+      "paidAs": "USDT-TRC20",
+      "paidTo": "TbVUQPQWiaLvQJPLpZkKq5BdjsP9mUiJMs",
+      "cashOutWallet": "TtR2w7btoz9xd7xwDELsDDVH2Wu9LS2NM5",
+      "notes": "Unregistered offshore crypto derivative trading loss fraud."
+    },
+    {
+      "id": "2026-LUD-0475",
+      "date": "2026-08-27",
+      "city": "Ludhiana",
+      "amountInr": 940000,
+      "paidAs": "USDT-TRC20",
+      "paidTo": "T33hmuLyPN3uESrMYf8nkzaXMMQdWpETBb",
+      "cashOutWallet": "Tdt7TNCK4JeMpsf9QRke3z2vLxWAsCuARz",
+      "notes": "Impersonation of customs officer demanding penalty payment."
+    }
+  ]
+}
