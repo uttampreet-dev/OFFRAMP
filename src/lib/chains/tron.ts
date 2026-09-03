@@ -15,16 +15,31 @@ interface Trc20Resp {
   data: Trc20Tx[];
 }
 
+/** Canonical USDT (TRC-20). Airdrop spam tokens are everywhere on TRON, so the
+ *  summary is computed on USDT first and only falls back to other tokens when
+ *  an address has never touched USDT. */
+const USDT_CONTRACT = "TR7NHqjeKQxGTCi8q8ZY4pL8otSzgjLj6t";
+
 export async function lookupTron(address: string): Promise<LookupResult> {
   const headers: Record<string, string> = {};
   if (process.env.TRONGRID_API_KEY) headers["TRON-PRO-API-KEY"] = process.env.TRONGRID_API_KEY;
 
-  const t = await cachedJson<Trc20Resp>(
-    `${BASE}/v1/accounts/${address}/transactions/trc20?limit=50`,
+  let t = await cachedJson<Trc20Resp>(
+    `${BASE}/v1/accounts/${address}/transactions/trc20?limit=50&contract_address=${USDT_CONTRACT}`,
     { headers },
   );
+  let dominantSymbol = "USDT";
+  if (!t.data.data?.length) {
+    t = await cachedJson<Trc20Resp>(`${BASE}/v1/accounts/${address}/transactions/trc20?limit=50`, { headers });
+    const counts = new Map<string, number>();
+    for (const tx of t.data.data ?? []) {
+      const sym = tx.token_info?.symbol ?? "TRC20";
+      counts.set(sym, (counts.get(sym) ?? 0) + 1);
+    }
+    dominantSymbol = [...counts.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? "TRC20";
+  }
 
-  const transfers: Transfer[] = t.data.data.map((tx) => {
+  const transfers: Transfer[] = (t.data.data ?? []).filter((tx) => (tx.token_info?.symbol ?? "TRC20") === dominantSymbol).map((tx) => {
     const value = Number(tx.value) / 10 ** (tx.token_info?.decimals ?? 6);
     const direction = tx.from === address ? ("out" as const) : tx.to === address ? ("in" as const) : ("self" as const);
     return {
@@ -50,7 +65,7 @@ export async function lookupTron(address: string): Promise<LookupResult> {
       receivedTotal: inSum,
       sentTotal: outSum,
       balance: inSum - outSum,
-      symbol: transfers[0]?.symbol ?? "USDT",
+      symbol: dominantSymbol,
       firstSeen: times.length ? Math.min(...times) : null,
       lastSeen: times.length ? Math.max(...times) : null,
     },
