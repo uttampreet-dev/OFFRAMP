@@ -4,7 +4,7 @@ import { lookupAddress, detectChain } from "../chains";
 import type { Transfer } from "../chains/types";
 import { isSanctioned, ofacIndex } from "../ofac";
 import { knownEntity } from "../trace/labels";
-import { listWatch, markWatchSeen, recentAudit, listCases, allPackets, countPackets, type CaseRow, type WatchRow } from "../db";
+import { listWatch, markWatchSeen, recentAudit, listCases, allPackets, countPackets, raiseAlert, openAlerts, type CaseRow, type WatchRow, type AlertRow } from "../db";
 import { POLICY_WINDOW_S } from "../intercept";
 
 const LOOKUP_TIMEOUT_MS = 10_000;
@@ -34,6 +34,7 @@ export interface BoardSnapshot {
   watched: BoardAddress[];
   events: BoardEvent[];
   windows: BoardWindow[];
+  alerts: AlertRow[];
   cases: CaseRow[];
   stats: { watched: number; openCases: number; packets: number; ofac: { total: number; syncedAt: string | null }; reported: number | null };
 }
@@ -148,6 +149,20 @@ export async function boardSnapshot(): Promise<BoardSnapshot> {
       /* skip malformed */
     }
   }
+  /* alert rules — each raised once per key, so a re-poll never duplicates */
+  for (const a of watched) {
+    for (const t of a.newTransfers) {
+      if (t.direction === "out") raiseAlert({ key: `out:${a.address}:${t.txid}`, level: a.sanctioned ? "red" : "amber", kind: "outflow", address: a.address, case_id: a.cases[0] ?? null, title: `outflow from watched ${a.sanctioned ? "sanctioned " : ""}address`, detail: `${t.value.toLocaleString("en-IN", { maximumFractionDigits: 4 })} ${t.symbol} → ${t.to.slice(0, 10)}… · ${t.txid.slice(0, 12)}…` });
+      const cp = t.direction === "in" ? t.from : t.to;
+      if (cp && isSanctioned(cp)) raiseAlert({ key: `sdn:${a.address}:${t.txid}`, level: "red", kind: "sanctions-contact", address: a.address, case_id: a.cases[0] ?? null, title: "transfer with an OFAC-listed counterparty", detail: `${cp.slice(0, 12)}… · ${t.txid.slice(0, 12)}…` });
+    }
+    if (a.reported && a.newTransfers.length) raiseAlert({ key: `rep:${a.address}:${a.latestTx}`, level: "amber", kind: "reported-active", address: a.address, case_id: a.cases[0] ?? null, title: "activity on a community-reported address", detail: `${a.reported.category} · ${a.newTransfers.length} new transfer(s)` });
+  }
+  for (const w of windows) {
+    if (w.replayNow) continue;
+    const rem = (w.closesAt - Date.now()) / 1000;
+    if (rem > 0 && rem < 900) raiseAlert({ key: `win:${w.packetId}`, level: "red", kind: "window-closing", address: w.address, case_id: w.caseId, title: `freeze window under 15 minutes · ${w.caseId}`, detail: `${w.packetId} · closes ${new Date(w.closesAt).toISOString().slice(11, 19)} UTC` });
+  }
   const ofac = ofacIndex();
   const reportedCount = scamIndex().size || null;
   return {
@@ -155,6 +170,7 @@ export async function boardSnapshot(): Promise<BoardSnapshot> {
     watched,
     events: events.slice(0, 40),
     windows,
+    alerts: openAlerts(),
     cases,
     stats: { watched: watched.length, openCases: cases.filter((c) => c.status !== "closed").length, packets: countPackets(), ofac: { total: ofac.set.size, syncedAt: ofac.syncedAt }, reported: reportedCount },
   };

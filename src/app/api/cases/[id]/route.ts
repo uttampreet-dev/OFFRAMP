@@ -18,6 +18,7 @@ export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: strin
   const { id } = await ctx.params;
   const body = (await req.json()) as { status?: string; notes?: string; title?: string };
   const status = body.status && STATUSES.includes(body.status as CaseStatus) ? (body.status as CaseStatus) : undefined;
+  if (status === "closed" && s.role !== "supervisor") return NextResponse.json({ error: "only a supervisor can close a case" }, { status: 403 });
   const c = updateCase(id, { status, notes: body.notes, title: body.title });
   if (!c) return NextResponse.json({ error: "case not found" }, { status: 404 });
   audit(s.u, "case.updated", `case=${id}${status ? ` status=${status}` : ""}${body.notes !== undefined ? " notes" : ""}`);

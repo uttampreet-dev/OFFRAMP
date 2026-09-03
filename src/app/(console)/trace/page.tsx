@@ -6,8 +6,9 @@ import type { TraceResult, TraceNode, TraceEdge } from "@/lib/trace/engine";
 import type { LookupResult } from "@/lib/chains/types";
 import { TopBar, AddressInput, Seg, Primary, Chip, Section, KV, Flag, StatusBar, Empty } from "@/components/console";
 
-type Lookup = LookupResult & { screening: { ofacSanctioned: boolean; listSize: number; listSyncedAt: string | null } };
+type Lookup = LookupResult & { screening: { ofacSanctioned: boolean; listSize: number; listSyncedAt: string | null; reported: { source: string; category: string } | null; entity: { entity: string; type: string; source: string } | null } };
 
+type BookEntry = { address: string; chain: string; txCount: number; received: number; symbol: string; verifiedOn: string; why: string };
 const DEMO = [
   { address: "12HQDsicffSBaYdJ6BhnE22sfjTESmmzKx", chain: "btc", why: "OFAC SDN · 1,335 tx · reaches Binance at hop 1" },
   { address: "1295rkVyNfFpqZpXvKGhDqwhP1jZcNNDMV", chain: "btc", why: "OFAC SDN · 3,377 BTC received" },
@@ -123,6 +124,10 @@ function Flow({ res, selected, onSelect }: { res: TraceResult; selected: string 
 function TraceInner() {
   const params = useSearchParams();
   const [address, setAddress] = useState("");
+  const [book, setBook] = useState<BookEntry[]>([]);
+  useEffect(() => {
+    fetch("/api/addresses").then((r) => r.json()).then((b) => setBook(b.addresses ?? [])).catch(() => {});
+  }, []);
   const [depth, setDepth] = useState(2);
   const [fanout, setFanout] = useState(5);
   const [dir, setDir] = useState<"out" | "in">("out");
@@ -231,7 +236,7 @@ function TraceInner() {
                   </p>
                   <div className="c-label mt-8">Verified demonstration wallets</div>
                   <div className="mt-3 flex flex-col gap-2">
-                    {DEMO.map((d) => (
+                    {(book.length ? book.slice(0, 8).map((b) => ({ address: b.address, chain: b.chain, why: `${b.txCount.toLocaleString()} tx · ${b.received.toLocaleString("en-IN", { maximumFractionDigits: 2 })} ${b.symbol} · verified ${b.verifiedOn}` })) : DEMO).map((d) => (
                       <button
                         key={d.address}
                         onClick={() => {
@@ -292,6 +297,8 @@ function TraceInner() {
             </Section>
             <Section title="Screening">
               <Flag on={!!seedInfo?.screening.ofacSanctioned} onText="OFAC SDN — sanctioned address" offText="Not on the OFAC SDN list" tone="red" />
+              <Flag on={!!seedInfo?.screening.reported} onText={`Community report — ${seedInfo?.screening.reported?.category ?? "reported"} (a report, not a finding)`} offText="No community report on this address" tone="red" />
+              {seedInfo?.screening.entity && <Flag on onText={`Known entity — ${seedInfo.screening.entity.entity} · ${seedInfo.screening.entity.type} · public source`} offText="" tone="teal" />}
               <Flag on={sanctionedBeyond > 0} onText={`${sanctionedBeyond} sanctioned wallet${sanctionedBeyond === 1 ? "" : "s"} within ${res.stats.hopsReached} hop${res.stats.hopsReached === 1 ? "" : "s"}`} offText="No sanctioned wallets in the traced neighbourhood" tone="red" />
               <Flag on={entities.length > 0} onText={entities.map((n) => `${n.entity!.entity} reached at hop ${n.hop} · ${fmtV(n.inValue)} ${n.symbol}`).join(" · ")} offText="No known exchange or mixer reached" tone="teal" />
               <div className="c-note mt-2">{seedInfo?.screening.listSize.toLocaleString()} SDN addresses · attribution only where publicly documented</div>

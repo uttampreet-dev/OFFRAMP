@@ -155,6 +155,11 @@ function Inner() {
             <div className="px-8 pt-6 pb-4 border-b border-line flex items-end gap-8">
               <div>
                 <div className="c-label">Detectors fired</div>
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {(rep as RedFlagReport & { screening?: { sanctioned: boolean; reported: { category: string } | null; entity: { entity: string; type: string } | null } }).screening?.sanctioned && <Chip tone="red">OFAC SDN</Chip>}
+                  {(rep as RedFlagReport & { screening?: { reported: { category: string } | null } }).screening?.reported && <Chip tone="amber">community report · {(rep as RedFlagReport & { screening?: { reported: { category: string } | null } }).screening!.reported!.category}</Chip>}
+                  {(rep as RedFlagReport & { screening?: { entity: { entity: string; type: string } | null } }).screening?.entity && <Chip tone="teal">{(rep as RedFlagReport & { screening?: { entity: { entity: string; type: string } | null } }).screening!.entity!.entity} · public source</Chip>}
+                </div>
                 <div className="mono text-[40px] font-extrabold leading-none mt-1">
                   <span className={rep.fired ? "text-red" : "text-green"}>{rep.fired}</span>
                   <span className="text-faint text-[22px]"> / 10</span>

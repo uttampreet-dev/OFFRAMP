@@ -25,7 +25,7 @@ export const DEMO_CHAIN_EVENTS: ChainEvent[] = [
 
 export const DEMO_CASHOUT_WALLET = "TVd6jP2Lm7Kf3Qa9Rc1Xe5Hb8Nd4Wg0Lm7";
 
-export const DEMO_STATEMENT_CSV = `date,time,narration,ref,debit,credit,balance,channel
+const INLINE_STATEMENT_CSV = `date,time,narration,ref,debit,credit,balance,channel
 2026-08-13,09:12:40,UPI/collect/…1180,,,1200,19650,UPI
 2026-08-13,19:44:03,UPI/pay/…3391,,350,,19300,UPI
 2026-08-14,08:01:22,MOBILE RECHARGE,,299,,19001,OTHER
@@ -38,3 +38,24 @@ export const DEMO_STATEMENT_CSV = `date,time,narration,ref,debit,credit,balance,
 2026-08-15,10:20:05,UPI/pay/…7712,,1450,,247231,UPI
 2026-08-16,13:05:47,ELECTRICITY BILL,,2310,,244921,OTHER
 `;
+
+import { existsSync, readFileSync, readdirSync } from "fs";
+import path from "path";
+const STATEMENT_DIR = path.join(process.cwd(), "data", "synthetic", "statements");
+/** The demonstration statement: the richer synthetic file under data/synthetic when present, else the inline sample. */
+export const DEMO_STATEMENT_CSV: string = (() => {
+  const f = path.join(STATEMENT_DIR, "demo-case-4471.csv");
+  return existsSync(f) ? readFileSync(f, "utf8") : INLINE_STATEMENT_CSV;
+})();
+/** Synthetic statements available as samples (name → csv). */
+export function sampleStatements(): { name: string; account: string; rows: number; csv: string }[] {
+  if (!existsSync(STATEMENT_DIR)) return [{ name: "demo-case-4471.csv", account: "XXXXXX4471", rows: INLINE_STATEMENT_CSV.split("\n").length - 1, csv: INLINE_STATEMENT_CSV }];
+  return readdirSync(STATEMENT_DIR)
+    .filter((f) => f.endsWith(".csv"))
+    .sort()
+    .map((f) => {
+      const csv = readFileSync(path.join(STATEMENT_DIR, f), "utf8");
+      const m = /(\d{4})\.csv$/.exec(f);
+      return { name: f, account: m ? `XXXXXX${m[1]}` : "XXXXXXXXXX", rows: csv.trim().split("\n").length - 1, csv };
+    });
+}

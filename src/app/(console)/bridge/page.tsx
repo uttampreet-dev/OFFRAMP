@@ -17,6 +17,11 @@ function Inner() {
   const [mode, setMode] = useState<"demo" | "live">("demo");
   const [address, setAddress] = useState("");
   const [csv, setCsv] = useState<string | null>(null);
+  const [sample, setSample] = useState("demo-case-4471.csv");
+  const [samples, setSamples] = useState<{ name: string; account: string; rows: number }[]>([{ name: "demo-case-4471.csv", account: "XXXXXX4471", rows: 0 }]);
+  useEffect(() => {
+    fetch("/api/statements").then((r) => r.json()).then((b) => b.statements?.length && setSamples(b.statements)).catch(() => {});
+  }, []);
   const [csvName, setCsvName] = useState<string | null>(null);
   const [tol, setTol] = useState(5);
   const [win, setWin] = useState(6);
@@ -34,7 +39,7 @@ function Inner() {
         const r = await fetch("/api/bridge", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ mode: m, address: a.trim() || undefined, statementCsv: c ?? undefined, tolerancePct: t, windowHours: w }),
+          body: JSON.stringify({ mode: m, sample, address: a.trim() || undefined, statementCsv: c ?? undefined, tolerancePct: t, windowHours: w }),
         });
         const body = await r.json();
         if (!r.ok) throw new Error(body.error ?? "bridge failed");
@@ -78,7 +83,7 @@ function Inner() {
         subtitle="on-chain → INR · amount × FX × time window"
         secondRow={
           <>
-            <Seg label="statement" value={csv ? "upload" : "sample"} options={[["sample", "sample · synthetic"], ["upload", csvName ? csvName.slice(0, 22) : "upload CSV"]]} onChange={(v) => (v === "upload" ? fileRef.current?.click() : (setCsv(null), setCsvName(null)))} />
+            <Seg label="statement" value={csv ? "upload" : sample} options={[...samples.map((x) => [x.name, `${x.name.replace(".csv", "")} · ${x.rows} rows`] as [string, string]), ["upload", csvName ? csvName.slice(0, 22) : "upload CSV"]]} onChange={(v) => (v === "upload" ? fileRef.current?.click() : (setCsv(null), setCsvName(null), setSample(v)))} />
             <input ref={fileRef} type="file" accept=".csv,text/csv" className="hidden" onChange={(e) => onFile(e.target.files?.[0])} />
             <Seg label="tolerance" value={String(tol)} options={[["2", "2%"], ["5", "5%"], ["10", "10%"]]} onChange={(v) => setTol(Number(v))} />
             <Seg label="window" value={String(win)} options={[["2", "2 h"], ["6", "6 h"], ["24", "24 h"]]} onChange={(v) => setWin(Number(v))} />

@@ -8,7 +8,7 @@ interface Ev {
   caseId: string;
   demo: boolean;
   artefacts: Art[];
-  packets: { id: string; sha256: string; by: string; at: number; address: string }[];
+  packets: { id: string; sha256: string; by: string; at: number; address: string; approvedBy: string | null; approvedAt: number | null }[];
   packs: { id: string; rootHash: string; by: string; at: number; artefacts: number }[];
   audit: { at: number; username: string; action: string; detail: string }[];
 }
@@ -68,6 +68,14 @@ function Inner() {
     } finally {
       setSealing(false);
     }
+  }
+  const [approveMsg, setApproveMsg] = useState<string | null>(null);
+  async function approve(id: string) {
+    setApproveMsg(null);
+    const r = await fetch("/api/intercept/approve", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id }) });
+    const b = await r.json();
+    if (!r.ok) return setApproveMsg(b.error ?? "sign-off failed");
+    await load();
   }
   async function verifyPack(id: string) {
     const r = await fetch(`/api/evidence/${id}/export?format=json`);
@@ -183,9 +191,17 @@ function Inner() {
               {ev.packets.map((p) => (
                 <div key={p.id} className="py-2 border-b border-line2 last:border-0">
                   <div className="mono text-[12px]">{p.id} <span className="text-faint">· {p.sha256.slice(0, 12)}…</span></div>
-                  <div className="mono text-[10.5px] text-faint">{ist(p.at)} · {p.by}</div>
+                  <div className="mono text-[10.5px] text-faint">{ist(p.at)} · sealed by {p.by}</div>
+                  <div className="mt-1.5 flex items-center gap-2">
+                    {p.approvedBy ? (
+                      <Chip tone="green">signed off · {p.approvedBy} · {p.approvedAt ? ist(p.approvedAt) : ""}</Chip>
+                    ) : (
+                      <button onClick={() => approve(p.id)} className="mono text-[10px] tracking-[0.1em] uppercase font-bold text-mut border border-line px-2 py-1 hover:text-ink">supervisor sign-off</button>
+                    )}
+                  </div>
                 </div>
               ))}
+              {approveMsg && <p className="c-note mt-2 text-red">{approveMsg}</p>}
               <p className="c-note mt-4 leading-relaxed">The STR is a draft until a principal officer signs it. The s.63 document states the matters a certificate must address; it has no effect until signed by the persons the section requires.</p>
             </div>
           </aside>

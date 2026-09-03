@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { parseStatement } from "@/lib/bridge/parse";
 import { correlate } from "@/lib/bridge/correlate";
-import { DEMO_CHAIN_EVENTS, DEMO_STATEMENT_CSV } from "@/lib/bridge/sample";
+import { DEMO_CHAIN_EVENTS, DEMO_STATEMENT_CSV, sampleStatements } from "@/lib/bridge/sample";
 import { lookupAddress } from "@/lib/chains";
 import type { ChainEvent } from "@/lib/bridge/sample";
 
@@ -10,6 +10,7 @@ export const maxDuration = 60;
 
 interface Body {
   mode: "demo" | "live";
+  sample?: string;
   address?: string;
   statementCsv?: string;
   tolerancePct?: number;
@@ -20,9 +21,12 @@ export async function POST(req: NextRequest) {
   const body = (await req.json().catch(() => null)) as Body | null;
   if (!body?.mode) return NextResponse.json({ error: "mode is required" }, { status: 400 });
   try {
+    const sample = body.sample ? sampleStatements().find((x) => x.name === body.sample) : undefined;
     const statement = body.statementCsv?.trim()
       ? parseStatement(body.statementCsv, { synthetic: true, source: "uploaded statement (treated as synthetic)" })
-      : parseStatement(DEMO_STATEMENT_CSV, { account: "XXXXXX4471", synthetic: true, source: "demonstration statement" });
+      : sample
+        ? parseStatement(sample.csv, { account: sample.account, synthetic: true, source: `synthetic statement ${sample.name}` })
+        : parseStatement(DEMO_STATEMENT_CSV, { account: "XXXXXX4471", synthetic: true, source: "demonstration statement" });
 
     let events: ChainEvent[];
     let chainSynthetic = false;

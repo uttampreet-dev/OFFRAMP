@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { lookupAddress, detectChain } from "@/lib/chains";
 import { isSanctioned, ofacIndex } from "@/lib/ofac";
+import { isReported } from "@/lib/board";
+import { knownEntity } from "@/lib/trace/labels";
 
 export const runtime = "nodejs";
 
@@ -18,6 +20,8 @@ export async function GET(req: NextRequest) {
         ofacSanctioned: isSanctioned(address),
         listSize: idx.set.size,
         listSyncedAt: idx.syncedAt,
+        reported: isReported(address),
+        entity: knownEntity(address) ? { entity: knownEntity(address)!.entity, type: knownEntity(address)!.type, source: knownEntity(address)!.source } : null,
       },
     });
   } catch (err) {

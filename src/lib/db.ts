@@ -59,6 +59,18 @@ export function getDb(): Database.Database {
       last_txcount INTEGER,
       last_symbol TEXT
     );
+    CREATE TABLE IF NOT EXISTS alerts (
+      key TEXT PRIMARY KEY,
+      at INTEGER NOT NULL,
+      level TEXT NOT NULL CHECK (level IN ('red','amber')),
+      kind TEXT NOT NULL,
+      address TEXT,
+      case_id TEXT,
+      title TEXT NOT NULL,
+      detail TEXT NOT NULL DEFAULT '',
+      acked_by TEXT,
+      acked_at INTEGER
+    );
     CREATE TABLE IF NOT EXISTS audit (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       at INTEGER NOT NULL,
@@ -69,6 +81,9 @@ export function getDb(): Database.Database {
   `);
   for (const col of ["last_balance REAL", "last_txcount INTEGER", "last_symbol TEXT"]) {
     try { db.exec(`ALTER TABLE watch ADD COLUMN ${col}`); } catch { /* column already present */ }
+  }
+  for (const col of ["approved_by TEXT", "approved_at INTEGER"]) {
+    try { db.exec(`ALTER TABLE packets ADD COLUMN ${col}`); } catch { /* column already present */ }
   }
   seedUsers(db);
   seedCases(db);
@@ -125,7 +140,7 @@ export function audit(username: string, action: string, detail = ""): void {
   getDb().prepare("INSERT INTO audit (at, username, action, detail) VALUES (?, ?, ?, ?)").run(Date.now(), username, action, detail);
 }
 
-export interface PacketRow { id: string; case_id: string; address: string; body: string; sha256: string; created_by: string; created_at: number }
+export interface PacketRow { id: string; case_id: string; address: string; body: string; sha256: string; created_by: string; created_at: number; approved_by?: string | null; approved_at?: number | null }
 export interface PackRow { id: string; case_id: string; manifest: string; root_hash: string; created_by: string; created_at: number }
 
 export function savePacket(p: PacketRow): void {
@@ -209,4 +224,25 @@ export function countPackets(): number {
 }
 export function allPackets(): PacketRow[] {
   return getDb().prepare("SELECT * FROM packets ORDER BY created_at DESC").all() as PacketRow[];
+}
+
+export function packetById(id: string): PacketRow | undefined {
+  return getDb().prepare("SELECT * FROM packets WHERE id = ?").get(id) as PacketRow | undefined;
+}
+export function approvePacket(id: string, by: string): PacketRow | undefined {
+  getDb().prepare("UPDATE packets SET approved_by = ?, approved_at = ? WHERE id = ? AND approved_by IS NULL").run(by, Date.now(), id);
+  return packetById(id);
+}
+
+/* ── alerts: raised once per key, acknowledged by an officer ── */
+export interface AlertRow { key: string; at: number; level: "red" | "amber"; kind: string; address: string | null; case_id: string | null; title: string; detail: string; acked_by: string | null; acked_at: number | null }
+export function raiseAlert(a: Omit<AlertRow, "at" | "acked_by" | "acked_at">): boolean {
+  const r = getDb().prepare("INSERT OR IGNORE INTO alerts (key, at, level, kind, address, case_id, title, detail) VALUES (?, ?, ?, ?, ?, ?, ?, ?)").run(a.key, Date.now(), a.level, a.kind, a.address, a.case_id, a.title, a.detail);
+  return r.changes > 0;
+}
+export function openAlerts(limit = 30): AlertRow[] {
+  return getDb().prepare("SELECT * FROM alerts WHERE acked_by IS NULL ORDER BY at DESC LIMIT ?").all(limit) as AlertRow[];
+}
+export function ackAlert(key: string, by: string): void {
+  getDb().prepare("UPDATE alerts SET acked_by = ?, acked_at = ? WHERE key = ?").run(by, Date.now(), key);
 }

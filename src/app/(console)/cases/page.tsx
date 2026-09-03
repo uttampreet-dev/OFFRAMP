@@ -68,7 +68,8 @@ function Inner() {
   }
   async function patch(p: { status?: string; notes?: string }) {
     if (!sel) return;
-    await fetch(`/api/cases/${sel}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(p) });
+    const r = await fetch(`/api/cases/${sel}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(p) });
+    if (!r.ok) setMsg((await r.json()).error ?? "update failed");
     await loadList();
     loadDetail(sel);
   }

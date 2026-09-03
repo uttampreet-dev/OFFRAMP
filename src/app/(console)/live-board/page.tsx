@@ -78,6 +78,10 @@ function Inner() {
     setLabel("");
     poll();
   }
+  async function ack(key: string) {
+    await fetch("/api/alerts", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ key }) });
+    poll();
+  }
   async function unwatch(a: string) {
     await fetch(`/api/watch?address=${encodeURIComponent(a)}`, { method: "DELETE" });
     poll();
@@ -138,6 +142,20 @@ function Inner() {
         </form>
       </TopBar>
 
+      {snap && snap.alerts.length > 0 && (
+        <div className="border-b border-line bg-[#120c0e] px-6 py-2 flex items-center gap-3 overflow-x-auto">
+          <span className="mono text-[10px] tracking-[0.14em] uppercase font-bold text-red shrink-0">alerts · {snap.alerts.length}</span>
+          {snap.alerts.map((a) => (
+            <div key={a.key} className={`shrink-0 flex items-center gap-2 border px-2.5 py-1.5 ${a.level === "red" ? "border-[#652225]" : "border-[#4a3a12]"}`}>
+              <span className={`w-1.5 h-1.5 rounded-full ${a.level === "red" ? "bg-red" : "bg-amber"}`} />
+              <span className="mono text-[11px] text-ink/90">{a.title}</span>
+              <span className="mono text-[10px] text-faint">{a.detail}</span>
+              {a.address && <Link href={`/trace?address=${a.address}`} className="mono text-[10px] text-amber underline underline-offset-2">trace</Link>}
+              <button onClick={() => ack(a.key)} className="mono text-[10px] text-faint hover:text-ink">ack</button>
+            </div>
+          ))}
+        </div>
+      )}
       {snap && (
         <div className="flex-1 min-h-0 grid grid-cols-[1.35fr_1fr_400px] overflow-hidden">
           {/* watched */}

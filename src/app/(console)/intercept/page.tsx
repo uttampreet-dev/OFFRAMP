@@ -44,6 +44,7 @@ function Inner() {
       setLoading(true);
       setError(null);
       setSeal(null);
+      setApproved(null);
       try {
         const r = await fetch("/api/intercept", {
           method: "POST",
@@ -77,6 +78,14 @@ function Inner() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const [approved, setApproved] = useState<string | null>(null);
+  async function approve() {
+    if (!seal) return;
+    const r = await fetch("/api/intercept/approve", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: seal.id }) });
+    const b = await r.json();
+    if (!r.ok) return setError(b.error ?? "sign-off failed");
+    setApproved(b.approvedBy);
+  }
   async function doSeal() {
     if (!v) return;
     setSealing(true);
@@ -248,6 +257,10 @@ function Inner() {
                   {seal ? "sealed" : sealing ? "sealing…" : "seal packet · sha-256"}
                 </button>
                 {seal && <span className="mono text-[11px] text-mut">{seal.id} · by {seal.by} · {seal.sealedAt.replace("T", " ").slice(0, 19)} UTC</span>}
+                {seal && !approved && (
+                  <button onClick={approve} className="mono text-[10px] tracking-[0.1em] uppercase font-bold text-mut border border-line px-2.5 py-2 hover:text-ink">supervisor sign-off</button>
+                )}
+                {approved && <Chip tone="green">signed off · {approved}</Chip>}
               </div>
               {seal && (
                 <Link href={`/evidence?case=${v.caseId}${v.replay.enabled ? "&demo=1" : `&address=${v.address}`}`} className="mt-3 inline-block mono text-[11px] tracking-[0.1em] uppercase font-bold text-amber border border-amber/50 px-3 py-2 hover:bg-amber hover:text-[#12100c] transition-colors">
