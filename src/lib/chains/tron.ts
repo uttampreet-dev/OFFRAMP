@@ -39,7 +39,16 @@ export async function lookupTron(address: string): Promise<LookupResult> {
     dominantSymbol = [...counts.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] ?? "TRC20";
   }
 
-  const transfers: Transfer[] = (t.data.data ?? []).filter((tx) => (tx.token_info?.symbol ?? "TRC20") === dominantSymbol).map((tx) => {
+  // Spam tokens emit fake transfers with uint256-max "values"; anything past a
+  // trillion units is not money, it is noise.
+  const SANE_MAX = 1e12;
+  const transfers: Transfer[] = (t.data.data ?? [])
+    .filter((tx) => (tx.token_info?.symbol ?? "TRC20") === dominantSymbol)
+    .filter((tx) => {
+      const v = Number(tx.value) / 10 ** (tx.token_info?.decimals ?? 6);
+      return Number.isFinite(v) && v > 0 && v < SANE_MAX;
+    })
+    .map((tx) => {
     const value = Number(tx.value) / 10 ** (tx.token_info?.decimals ?? 6);
     const direction = tx.from === address ? ("out" as const) : tx.to === address ? ("in" as const) : ("self" as const);
     return {
