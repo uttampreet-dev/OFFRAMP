@@ -1,0 +1,191 @@
+<!-- Source: https://www.indiacode.gov.in (BSA 2023, Section 63 and the Schedule certificate form) -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Certificate under Section 63 - Bharatiya Sakshya Adhiniyam, 2023</title>
+  <style>
+    @media print {
+      body { margin: 0; padding: 12mm; font-size: 11pt; }
+      .no-print { display: none; }
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      color: #111827;
+      background: #ffffff;
+      margin: 24px auto;
+      padding: 32px;
+      max-width: 800px;
+      line-height: 1.5;
+    }
+    .caution-banner {
+      background: #fef2f2;
+      border: 1px solid #f87171;
+      color: #991b1b;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 8px 12px;
+      border-radius: 4px;
+      margin-bottom: 24px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    h1 {
+      font-size: 18px;
+      margin: 0 0 4px 0;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+    }
+    .subtitle {
+      color: #4b5563;
+      font-size: 13px;
+      margin-bottom: 24px;
+    }
+    fieldset {
+      border: 1px solid #d1d5db;
+      border-radius: 4px;
+      margin-bottom: 20px;
+      padding: 16px 20px 20px 20px;
+    }
+    legend {
+      font-weight: 600;
+      font-size: 13px;
+      color: #1f2937;
+      padding: 0 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    .field-grid {
+      display: grid;
+      grid-template-columns: 190px 1fr;
+      row-gap: 10px;
+      column-gap: 16px;
+      font-size: 13px;
+    }
+    .field-label {
+      color: #4b5563;
+      font-weight: 500;
+    }
+    .field-value {
+      color: #111827;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      word-break: break-all;
+    }
+    .statutory-conditions {
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 4px;
+      padding: 14px 16px;
+      font-size: 12px;
+      color: #374151;
+      margin-top: 12px;
+    }
+    .statutory-conditions ol {
+      margin: 8px 0 0 16px;
+      padding: 0;
+    }
+    .statutory-conditions li {
+      margin-bottom: 6px;
+    }
+    .content-block {
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 4px;
+      padding: 10px 14px;
+      font-size: 13px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      word-break: break-all;
+    }
+    .signatures {
+      margin-top: 36px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+    }
+    .signature-box {
+      border-top: 1px solid #111827;
+      padding-top: 8px;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="caution-banner">
+    Certificate content — unsigned; no effect until signed by the persons the section requires.
+  </div>
+
+  <h1>Certificate of Electronic Evidence</h1>
+  <div class="subtitle">Under Section 63 of the Bharatiya Sakshya Adhiniyam, 2023 (Admissibility of Electronic Records)</div>
+
+  <fieldset>
+    <legend>1. Identification of Electronic Record</legend>
+    <div class="field-grid">
+      <div class="field-label">Record Description:</div>
+      <div class="field-value">{{recordDescription}}</div>
+
+      <div class="field-label">Case Reference:</div>
+      <div class="field-value">{{caseId}}</div>
+
+      <div class="field-label">Evidence Pack ID:</div>
+      <div class="field-value">{{packId}}</div>
+
+      <div class="field-label">Included Artefacts:</div>
+      <div class="field-value">{{artefacts}}</div>
+
+      <div class="field-label">Cryptographic Hash:</div>
+      <div class="field-value">{{hash}}</div>
+
+      <div class="field-label">Hash Algorithm:</div>
+      <div class="field-value">{{hashAlgorithm}}</div>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>2. Device and Production Process</legend>
+    <div class="field-grid">
+      <div class="field-label">System / Device Process:</div>
+      <div class="field-value">{{deviceProcess}}</div>
+
+      <div class="field-label">Produced On:</div>
+      <div class="field-value">{{date}}</div>
+
+      <div class="field-label">Produced By:</div>
+      <div class="field-value">{{officerName}}</div>
+    </div>
+
+    <div class="statutory-conditions">
+      <strong>Statement of Compliance with Conditions Specified under Section 63(2) of the Bharatiya Sakshya Adhiniyam, 2023:</strong>
+      <ol type="a">
+        <li>The computer output containing the information was produced by the computer during the period over which the computer was used regularly to store or process information for the purposes of any activities regularly carried on over that period by the person having lawful control over the use of the computer.</li>
+        <li>During the said period, information of the kind contained in the electronic record or of the kind from which the information so contained is derived was regularly fed into the computer in the ordinary course of the said activities.</li>
+        <li>Throughout the material part of the said period, the computer was operating properly or, if not, then in respect of any period in which it was not operating properly or was out of operation during that part of the period, was not such as to affect the electronic record or the accuracy of its contents.</li>
+        <li>The information contained in the electronic record reproduces or is derived from such information fed into the computer in the ordinary course of the said activities.</li>
+      </ol>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>3. Integrity & Verification</legend>
+    <div class="content-block">
+      Hashes recomputed and verified: {{verified}}
+    </div>
+  </fieldset>
+
+  <div class="signatures">
+    <div class="signature-box">
+      <div><strong>Person in charge of the system:</strong></div>
+      <div style="height: 36px;"></div>
+      <div>Name: {{officerName}}</div>
+      <div>Date: {{date}}</div>
+    </div>
+    <div class="signature-box">
+      <div><strong>Expert (where applicable):</strong></div>
+      <div style="height: 36px;"></div>
+      <div>Name: _______________________________</div>
+      <div>Date: {{date}}</div>
+    </div>
+  </div>
+
+</body>
+</html>
