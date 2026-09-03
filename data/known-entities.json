@@ -1,0 +1,296 @@
+[
+  {
+    "address": "1NDyJtNTjmwk5xPNhjgAMu4HDHigtobu1s",
+    "chain": "btc",
+    "entity": "Binance",
+    "type": "exchange",
+    "source": "https://www.blockchair.com/bitcoin/address/1NDyJtNTjmwk5xPNhjgAMu4HDHigtobu1s"
+  },
+  {
+    "address": "3MCMZjWAMdGqAhi1iF1oyiiE2jY5yBAYzV",
+    "chain": "btc",
+    "entity": "Kraken",
+    "type": "exchange",
+    "source": "https://www.walletexplorer.com/address/3MCMZjWAMdGqAhi1iF1oyiiE2jY5yBAYzV"
+  },
+  {
+    "address": "19VNw8EQWKTmN7u1X15hqyWHrymrCCVWdK",
+    "chain": "btc",
+    "entity": "Bitfinex",
+    "type": "exchange",
+    "source": "https://www.walletexplorer.com/address/19VNw8EQWKTmN7u1X15hqyWHrymrCCVWdK"
+  },
+  {
+    "address": "19hx1B4pTDsBAYJJYYrj1t6bcVw1e9omuH",
+    "chain": "btc",
+    "entity": "Huobi",
+    "type": "exchange",
+    "source": "https://www.walletexplorer.com/address/19hx1B4pTDsBAYJJYYrj1t6bcVw1e9omuH"
+  },
+  {
+    "address": "3Lpoy53K625zVeE47ZasiG5jGkAxJ27kh1",
+    "chain": "btc",
+    "entity": "Garantex",
+    "type": "exchange",
+    "source": "https://ofac.treasury.gov/recent-actions/20220405"
+  },
+  {
+    "address": "14gM1HuLVDELNHaFU22qpabjtiWek4HhV1",
+    "chain": "btc",
+    "entity": "Garantex",
+    "type": "exchange",
+    "source": "https://ofac.treasury.gov/recent-actions/20220405"
+  },
+  {
+    "address": "3K35dyL85fR9ht7UgzPfd1gLRRXQtNTqE3",
+    "chain": "btc",
+    "entity": "Blender.io",
+    "type": "mixer",
+    "source": "https://ofac.treasury.gov/recent-actions/20220506"
+  },
+  {
+    "address": "3Q5dGfLKkWqWSwYtbMUyc8xGjN5LrRviK4",
+    "chain": "btc",
+    "entity": "Blender.io",
+    "type": "mixer",
+    "source": "https://ofac.treasury.gov/recent-actions/20220506"
+  },
+  {
+    "address": "3EPqGUw2q89pwPZ1UF8FJspE2AyojSTjdu",
+    "chain": "btc",
+    "entity": "Blender.io",
+    "type": "mixer",
+    "source": "https://ofac.treasury.gov/recent-actions/20220506"
+  },
+  {
+    "address": "3LhnVMcBq4gsR7aDaRr9XmUo17CuYBV4FN",
+    "chain": "btc",
+    "entity": "Blender.io",
+    "type": "mixer",
+    "source": "https://ofac.treasury.gov/recent-actions/20220506"
+  },
+  {
+    "address": "bc1qq7p0es3dv5hcynjjf40f2xjjr6qp5py47d2f6n847vduuq9gvnyq7y9ecd",
+    "chain": "btc",
+    "entity": "Sinbad.io",
+    "type": "mixer",
+    "source": "https://ofac.treasury.gov/recent-actions/20231129"
+  },
+  {
+    "address": "1JHdQHkBZiim1cb4hyUh2PbzEbbg6z2TrF",
+    "chain": "btc",
+    "entity": "Sinbad.io",
+    "type": "mixer",
+    "source": "https://ofac.treasury.gov/recent-actions/20231129"
+  },
+  {
+    "address": "0x28C6c06298d514Db089934071355E5743bf21d60",
+    "chain": "eth",
+    "entity": "Binance",
+    "type": "exchange",
+    "source": "https://etherscan.io/address/0x28C6c06298d514Db089934071355E5743bf21d60"
+  },
+  {
+    "address": "0x2910543Af39abA0Cd09dBb2D50200b3E800A63D2",
+    "chain": "eth",
+    "entity": "Kraken",
+    "type": "exchange",
+    "source": "https://etherscan.io/address/0x2910543Af39abA0Cd09dBb2D50200b3E800A63D2"
+  },
+  {
+    "address": "0xA090e606E30bD747d4E6245a1517EbE430F0057e",
+    "chain": "eth",
+    "entity": "Coinbase",
+    "type": "exchange",
+    "source": "https://etherscan.io/address/0xA090e606E30bD747d4E6245a1517EbE430F0057e"
+  },
+  {
+    "address": "0x4D24EecEcb86041F47bca41265319e9f06aE2Fcb",
+    "chain": "eth",
+    "entity": "CoinDCX",
+    "type": "exchange",
+    "source": "https://etherscan.io/address/0x4D24EecEcb86041F47bca41265319e9f06aE2Fcb"
+  },
+  {
+    "address": "0x27fd43babfbe83a81d14665b1a6fb8030a60c9b4",
+    "chain": "eth",
+    "entity": "WazirX",
+    "type": "exchange",
+    "source": "https://etherscan.io/address/0x27fd43babfbe83a81d14665b1a6fb8030a60c9b4"
+  },
+  {
+    "address": "0x7FF9cFad3877F21d41Da833E2F775dB0569eE3D9",
+    "chain": "eth",
+    "entity": "Garantex",
+    "type": "exchange",
+    "source": "https://ofac.treasury.gov/recent-actions/20220405"
+  },
+  {
+    "address": "0x8589427373D6D84E98730D7795D8f6f8731FDA16",
+    "chain": "eth",
+    "entity": "Tornado Cash",
+    "type": "mixer",
+    "source": "https://ofac.treasury.gov/recent-actions/20220808"
+  },
+  {
+    "address": "0x722122dF12D4e14e13Ac3b6895a86e84145b6967",
+    "chain": "eth",
+    "entity": "Tornado Cash",
+    "type": "mixer",
+    "source": "https://ofac.treasury.gov/recent-actions/20220808"
+  },
+  {
+    "address": "0xDD4c48C0B24039969fC16D1cdF626eaB821d3384",
+    "chain": "eth",
+    "entity": "Tornado Cash",
+    "type": "mixer",
+    "source": "https://ofac.treasury.gov/recent-actions/20220808"
+  },
+  {
+    "address": "0xd90e2f925DA726b50C4Ed8D0Fb90Ad053324F31b",
+    "chain": "eth",
+    "entity": "Tornado Cash",
+    "type": "mixer",
+    "source": "https://ofac.treasury.gov/recent-actions/20220808"
+  },
+  {
+    "address": "0xd96f2B1c14Db8458374d9Aca76E26c3D18364307",
+    "chain": "eth",
+    "entity": "Tornado Cash",
+    "type": "mixer",
+    "source": "https://ofac.treasury.gov/recent-actions/20220808"
+  },
+  {
+    "address": "0x4736dCf1b7A3d580672CcE6E7c65cd5cc9cFBa9D",
+    "chain": "eth",
+    "entity": "Tornado Cash",
+    "type": "mixer",
+    "source": "https://ofac.treasury.gov/recent-actions/20220808"
+  },
+  {
+    "address": "0xD4B88Df4D29F5CedD6857912842cff3b20C8Cfa3",
+    "chain": "eth",
+    "entity": "Tornado Cash",
+    "type": "mixer",
+    "source": "https://ofac.treasury.gov/recent-actions/20220808"
+  },
+  {
+    "address": "0x910Cbd523D972eb0a6f4cAe4618aD62622b39DbF",
+    "chain": "eth",
+    "entity": "Tornado Cash",
+    "type": "mixer",
+    "source": "https://ofac.treasury.gov/recent-actions/20220808"
+  },
+  {
+    "address": "0xBA214C1c1928a32Bffe790263E38B4Af9bFCD659",
+    "chain": "eth",
+    "entity": "Tornado Cash",
+    "type": "mixer",
+    "source": "https://ofac.treasury.gov/recent-actions/20220808"
+  },
+  {
+    "address": "0xb1C8094B234DcE6e03f10a5b673c1d8C69739A00",
+    "chain": "eth",
+    "entity": "Tornado Cash",
+    "type": "mixer",
+    "source": "https://ofac.treasury.gov/recent-actions/20220808"
+  },
+  {
+    "address": "0x527653eA119F3E6a1F5BD18fbF4714081D7B31ce",
+    "chain": "eth",
+    "entity": "Tornado Cash",
+    "type": "mixer",
+    "source": "https://ofac.treasury.gov/recent-actions/20220808"
+  },
+  {
+    "address": "0x0836222F2B2B24A3F36f98668Ed8F0B38D1a872f",
+    "chain": "eth",
+    "entity": "Tornado Cash",
+    "type": "mixer",
+    "source": "https://ofac.treasury.gov/recent-actions/20220808"
+  },
+  {
+    "address": "TYASr5UV6HEcXatwdFQfmLVUqQQQMUxHLS",
+    "chain": "tron",
+    "entity": "Binance",
+    "type": "exchange",
+    "source": "https://tronscan.org/#/address/TYASr5UV6HEcXatwdFQfmLVUqQQQMUxHLS"
+  },
+  {
+    "address": "TK4ykR48cQQoyFcZ5N4xZCbsBaHcg6n3gJ",
+    "chain": "tron",
+    "entity": "Binance",
+    "type": "exchange",
+    "source": "https://tronscan.org/#/address/TK4ykR48cQQoyFcZ5N4xZCbsBaHcg6n3gJ"
+  },
+  {
+    "address": "TJDENsfBJs4RFETt1X1W8wMDc8M5XnJhCe",
+    "chain": "tron",
+    "entity": "Binance",
+    "type": "exchange",
+    "source": "https://tronscan.org/#/address/TJDENsfBJs4RFETt1X1W8wMDc8M5XnJhCe"
+  },
+  {
+    "address": "TQrY8tryqsYVCYS3MFbtffiPp2ccyn4STm",
+    "chain": "tron",
+    "entity": "Binance",
+    "type": "exchange",
+    "source": "https://tronscan.org/#/address/TQrY8tryqsYVCYS3MFbtffiPp2ccyn4STm"
+  },
+  {
+    "address": "TCLgK89AnXbC9rewvhNb9UgXCc2qJJpBXh",
+    "chain": "tron",
+    "entity": "Binance",
+    "type": "exchange",
+    "source": "https://tronscan.org/#/address/TCLgK89AnXbC9rewvhNb9UgXCc2qJJpBXh"
+  },
+  {
+    "address": "TDqSquXBgUCLYvYC4XZgrprLK589dkhSCf",
+    "chain": "tron",
+    "entity": "Binance",
+    "type": "exchange",
+    "source": "https://tronscan.org/#/address/TDqSquXBgUCLYvYC4XZgrprLK589dkhSCf"
+  },
+  {
+    "address": "TAzsQ9Gx8eqFNFSKbeXrbi45CuVPHzA8wr",
+    "chain": "tron",
+    "entity": "Binance",
+    "type": "exchange",
+    "source": "https://tronscan.org/#/address/TAzsQ9Gx8eqFNFSKbeXrbi45CuVPHzA8wr"
+  },
+  {
+    "address": "TJ5usJLLwjwn7Pw3TPbdzreG7dvgKzfQ5y",
+    "chain": "tron",
+    "entity": "Binance",
+    "type": "exchange",
+    "source": "https://tronscan.org/#/address/TJ5usJLLwjwn7Pw3TPbdzreG7dvgKzfQ5y"
+  },
+  {
+    "address": "TNXoiAJ3dct8Fjg4M9fkLFh9S2v9TXc32G",
+    "chain": "tron",
+    "entity": "Binance",
+    "type": "exchange",
+    "source": "https://tronscan.org/#/address/TNXoiAJ3dct8Fjg4M9fkLFh9S2v9TXc32G"
+  },
+  {
+    "address": "TLaGjwhvA8XQYSxFAcAXy7Dvuue9eGYitv",
+    "chain": "tron",
+    "entity": "OKX",
+    "type": "exchange",
+    "source": "https://tronscan.org/#/address/TLaGjwhvA8XQYSxFAcAXy7Dvuue9eGYitv"
+  },
+  {
+    "address": "TU4vEruvZwLLkSfV9bNw12EJTPvNr7Pvaa",
+    "chain": "tron",
+    "entity": "Bybit",
+    "type": "exchange",
+    "source": "https://tronscan.org/#/address/TU4vEruvZwLLkSfV9bNw12EJTPvNr7Pvaa"
+  },
+  {
+    "address": "TG2CMGxnTPgQ6V58kiKd7wbyN8ewtAmY76",
+    "chain": "tron",
+    "entity": "Kraken",
+    "type": "exchange",
+    "source": "https://tronscan.org/#/address/TG2CMGxnTPgQ6V58kiKd7wbyN8ewtAmY76"
+  }
+]
