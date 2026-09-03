@@ -1,0 +1,92 @@
+[
+  {
+    "address": "1295rkVyNfFpqZpXvKGhDqwhP1jZcNNDMV",
+    "chain": "btc",
+    "txCount": 980,
+    "received": 3377.60306909,
+    "symbol": "BTC",
+    "verifiedOn": "2026-09-03",
+    "why": "OFAC SDN-listed Bitcoin address with 980 confirmed transactions and over 3,377 BTC in cumulative receipts."
+  },
+  {
+    "address": "12HQDsicffSBaYdJ6BhnE22sfjTESmmzKx",
+    "chain": "btc",
+    "txCount": 1335,
+    "received": 5254.26320627,
+    "symbol": "BTC",
+    "verifiedOn": "2026-09-03",
+    "why": "OFAC SDN-listed high-volume Bitcoin deposit address with over 1,300 transactions totaling 5,254 BTC."
+  },
+  {
+    "address": "12aNKp2iDKuhEde2YfPdd4DFGenRUTKupL",
+    "chain": "btc",
+    "txCount": 102,
+    "received": 0.05372299,
+    "symbol": "BTC",
+    "verifiedOn": "2026-09-03",
+    "why": "OFAC-listed Bitcoin address meeting the 100+ transaction threshold with 102 confirmed transactions."
+  },
+  {
+    "address": "134r8iHv69xdT6p5qVKTsHrcUEuBVZAYak",
+    "chain": "btc",
+    "txCount": 250,
+    "received": 1538.4185634,
+    "symbol": "BTC",
+    "verifiedOn": "2026-09-03",
+    "why": "Sanctioned Bitcoin address exhibiting substantial inflows of 1,538 BTC across 250 on-chain transactions."
+  },
+  {
+    "address": "13RH4JaFhaCxDGPyYE9emjp2aDxdX18uBA",
+    "chain": "btc",
+    "txCount": 434,
+    "received": 112.66511572,
+    "symbol": "BTC",
+    "verifiedOn": "2026-09-03",
+    "why": "OFAC-listed Bitcoin address with 434 transactions and over 112 BTC transferred on-chain."
+  },
+  {
+    "address": "13hfsQm6oCaDZehfYBSMFiJVAi1jsL6sQd",
+    "chain": "btc",
+    "txCount": 157,
+    "received": 257.14583212,
+    "symbol": "BTC",
+    "verifiedOn": "2026-09-03",
+    "why": "Sanctioned Bitcoin address recorded with 157 transactions and 257 BTC received."
+  },
+  {
+    "address": "13mnk8SvDGqsQTHbiGiHBXqtaQCUKfcsnP",
+    "chain": "btc",
+    "txCount": 593,
+    "received": 1305.09751946,
+    "symbol": "BTC",
+    "verifiedOn": "2026-09-03",
+    "why": "OFAC-designated Bitcoin address involved in extensive consolidation activity totaling 1,305 BTC."
+  },
+  {
+    "address": "TA3rH2A7iHnm6pKH8gr9cK1EZnShnmZdFg",
+    "chain": "tron",
+    "txCount": 3,
+    "received": 20281.78,
+    "symbol": "USDT",
+    "verifiedOn": "2026-09-03",
+    "why": "OFAC SDN-listed TRON address with confirmed inbound and outbound TRC-20 USDT transactions."
+  },
+  {
+    "address": "TA82wQ77kb9DieW4C8q7C4KwMfnCzfziqN",
+    "chain": "tron",
+    "txCount": 38,
+    "received": 23158.94,
+    "symbol": "USDT",
+    "verifiedOn": "2026-09-03",
+    "why": "Sanctioned TRON address with 38 recent TRC-20 USDT transfers totaling over 23,000 USDT."
+  },
+  {
+    "address": "TASWbk6X1wiTku5TMmMQYqYFvshVEtfJy8",
+    "chain": "tron",
+    "txCount": 50,
+    "received": 2056017.94,
+    "symbol": "USDT",
+    "verifiedOn": "2026-09-03",
+    "why": "OFAC SDN-listed TRON address actively used for high-value TRC-20 USDT transfers exceeding 2M USDT."
+  }
+]
