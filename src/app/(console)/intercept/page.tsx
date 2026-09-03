@@ -1,4 +1,4 @@
 import Stub from "@/components/Stub";
 export default function Page() {
-  return <Stub title="Intercept" note="Withdrawal-window estimate and sealed freeze-request packet for the authorised officer." />;
+  return <Stub title="Intercept" subtitle="golden hour" k="intercept" note="Withdrawal-window estimate from measured hop timings and a sealed freeze-request packet for the authorised officer. OFFRAMP does not freeze funds." />;
 }

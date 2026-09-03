@@ -2,14 +2,17 @@ import type { ReactNode } from "react";
 
 /* Chrome shared by every console module — one type scale, one set of surfaces. */
 
-export function TopBar({ title, subtitle, children }: { title: string; subtitle?: string; children?: ReactNode }) {
+export function TopBar({ title, subtitle, children, secondRow }: { title: string; subtitle?: string; children?: ReactNode; secondRow?: ReactNode }) {
   return (
-    <div className="h-[66px] shrink-0 border-b border-line bg-rail flex items-center px-6 gap-4">
-      <div className="shrink-0 min-w-[150px]">
-        <div className="text-[16px] font-bold leading-tight">{title}</div>
-        {subtitle && <div className="mono text-[11px] text-[#657a8e] mt-0.5">{subtitle}</div>}
+    <div className="shrink-0 border-b border-line bg-rail">
+      <div className="h-[66px] flex items-center px-6 gap-4">
+        <div className="shrink-0 min-w-[150px]">
+          <div className="text-[16px] font-bold leading-tight">{title}</div>
+          {subtitle && <div className="mono text-[11px] text-[#657a8e] mt-0.5">{subtitle}</div>}
+        </div>
+        {children}
       </div>
-      {children}
+      {secondRow && <div className="h-[44px] border-t border-line/70 flex items-center px-6 gap-5">{secondRow}</div>}
     </div>
   );
 }

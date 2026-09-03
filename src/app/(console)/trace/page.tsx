@@ -8,6 +8,13 @@ import { TopBar, AddressInput, Seg, Primary, Chip, Section, KV, Flag, StatusBar,
 
 type Lookup = LookupResult & { screening: { ofacSanctioned: boolean; listSize: number; listSyncedAt: string | null } };
 
+const DEMO = [
+  { address: "12HQDsicffSBaYdJ6BhnE22sfjTESmmzKx", chain: "btc", why: "OFAC SDN · 1,335 tx · reaches Binance at hop 1" },
+  { address: "1295rkVyNfFpqZpXvKGhDqwhP1jZcNNDMV", chain: "btc", why: "OFAC SDN · 3,377 BTC received" },
+  { address: "TA82wQ77kb9DieW4C8q7C4KwMfnCzfziqN", chain: "tron", why: "OFAC SDN · USDT · sanctioned neighbours" },
+  { address: "0x0330070FD38Ec3bB94F58FA55D40368271E9e54A", chain: "eth", why: "OFAC SDN · ETH" },
+] as const;
+
 const short = (a: string) => (a.length > 18 ? `${a.slice(0, 8)}…${a.slice(-6)}` : a);
 const fmtV = (v: number) => v.toLocaleString("en-IN", { maximumFractionDigits: v < 1 ? 5 : 2 });
 const fmtT = (t: number | null) =>
@@ -184,7 +191,18 @@ function TraceInner() {
 
   return (
     <div className="flex flex-col h-screen">
-      <TopBar title="Trace" subtitle="BTC · ETH · TRON — auto-detected">
+      <TopBar
+        title="Trace"
+        subtitle="BTC · ETH · TRON — auto-detected"
+        secondRow={
+          <>
+            <Seg label="direction" value={dir} options={[["out", "where it went"], ["in", "where it came from"]]} onChange={(v) => setDir(v as "out" | "in")} />
+            <Seg label="depth" value={String(depth)} options={[["1", "1"], ["2", "2"], ["3", "3"], ["4", "4"]]} onChange={(v) => setDepth(Number(v))} />
+            <Seg label="fan-out" value={String(fanout)} options={[["3", "3"], ["5", "5"], ["8", "8"]]} onChange={(v) => setFanout(Number(v))} />
+            <span className="ml-auto c-note">each hop follows the largest counterparties · stops at known entities</span>
+          </>
+        }
+      >
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -193,23 +211,67 @@ function TraceInner() {
           className="flex-1 flex items-center gap-3 min-w-0"
         >
           <AddressInput value={address} onChange={setAddress} />
-          <Seg label="dir" value={dir} options={[["out", "where it went"], ["in", "where it came from"]]} onChange={(v) => setDir(v as "out" | "in")} />
-          <Seg label="depth" value={String(depth)} options={[["1", "1"], ["2", "2"], ["3", "3"], ["4", "4"]]} onChange={(v) => setDepth(Number(v))} />
-          <Seg label="fan-out" value={String(fanout)} options={[["3", "3"], ["5", "5"], ["8", "8"]]} onChange={(v) => setFanout(Number(v))} />
           <Primary disabled={loading}>{loading ? "tracing…" : "trace"}</Primary>
         </form>
       </TopBar>
 
       {!res && (
-        <div className="flex-1 min-h-0">
-          {error && <div className="mx-6 mt-5 border border-[#652225] bg-[#1a0c0e] text-red px-4 py-3 text-[13px] max-w-xl">{error}</div>}
+        <div className="flex-1 min-h-0 overflow-y-auto">
+          {error && <div className="mx-8 mt-6 border border-[#652225] bg-[#1a0c0e] text-red px-4 py-3 text-[13px] max-w-xl">{error}</div>}
+          {loading && <div className="px-8 pt-6 mono text-[12px] text-faint">querying chain — {depth} hop{depth > 1 ? "s" : ""}, up to {fanout} counterparties each…</div>}
           {!error && !loading && (
-            <Empty>
-              Paste an address and trace where the money went. Each hop follows the largest counterparties; the trail stops at a known exchange or
-              mixer. Everything shown comes from live public chain data.
-            </Empty>
+            <div className="px-8 py-8 max-w-[1100px]">
+              <div className="grid lg:grid-cols-[1fr_1fr] gap-10">
+                <div>
+                  <div className="c-label">Start a trace</div>
+                  <h2 className="text-[22px] font-bold mt-2 leading-tight">Paste a wallet. Follow the money until it turns into cash.</h2>
+                  <p className="c-body mt-3 max-w-md">
+                    Each hop follows the largest counterparties on live public chain data. The trail stops at a known exchange or mixer — that is
+                    where Intercept takes over. Every address on the OFAC SDN list is flagged on sight.
+                  </p>
+                  <div className="c-label mt-8">Verified demonstration wallets</div>
+                  <div className="mt-3 flex flex-col gap-2">
+                    {DEMO.map((d) => (
+                      <button
+                        key={d.address}
+                        onClick={() => {
+                          setAddress(d.address);
+                          run(d.address);
+                        }}
+                        className="group flex items-center gap-4 border border-line bg-rail px-4 py-3 text-left hover:border-amber/60 transition-colors"
+                      >
+                        <Chip tone={d.chain === "btc" ? "amber" : d.chain === "tron" ? "teal" : "mut"}>{d.chain}</Chip>
+                        <span className="mono text-[12.5px] text-ink/90 truncate flex-1">{d.address}</span>
+                        <span className="c-note shrink-0">{d.why}</span>
+                        <span className="mono text-amber opacity-0 group-hover:opacity-100 transition-opacity">→</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div className="border border-line bg-rail">
+                  <div className="h-[46px] border-b border-line flex items-center px-5 gap-3">
+                    <span className="c-label">What you will get</span>
+                    <span className="ml-auto"><Chip tone="green">live public chain data</Chip></span>
+                  </div>
+                  <div className="p-5 grid grid-cols-[1fr_1fr] gap-x-6 gap-y-5">
+                    {[
+                      ["Flow graph", "hop-layered, edge width ∝ value, sanctioned nodes ringed red"],
+                      ["Screening", "OFAC SDN on the seed and every wallet reached"],
+                      ["Known entities", "the trail stops at a publicly attributed exchange or mixer"],
+                      ["Counterparties", "largest destinations with share of traced value"],
+                      ["Trace from here", "re-seed from any intermediary in one click"],
+                      ["Hand-off", "send the wallet to Bridge, Red Flags or Intercept"],
+                    ].map(([t, d]) => (
+                      <div key={t}>
+                        <div className="text-[13px] font-semibold">{t}</div>
+                        <div className="c-note mt-1">{d}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
           )}
-          {loading && <div className="p-8 mono text-[12px] text-faint">querying chain — {depth} hop{depth > 1 ? "s" : ""}, up to {fanout} counterparties each…</div>}
         </div>
       )}
 

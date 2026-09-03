@@ -3,6 +3,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { AddressSummary, Transfer } from "@/lib/chains/types";
 import NetGraph, { type HoverInfo } from "./NetGraph";
+import { ModulePreview, type ModuleKey } from "@/components/console/previews";
 
 /* ───────────── reveal on scroll ───────────── */
 function useReveal() {
@@ -327,7 +328,6 @@ const MODULES = [
   { g: "ACT", key: "intercept", name: "Intercept", n: 1, sub: "case 2026-CHD-0417 · trigger fired 11:43:09", chip: ["c-red", "window open"] },
   { g: "ACT", key: "evidence", name: "Evidence", n: 0, sub: "evidence pack · 6 artefacts · hash chain intact", chip: ["c-live", "sealed"] },
 ] as const;
-type ModuleKey = (typeof MODULES)[number]["key"];
 
 const chipCls: Record<string, string> = {
   "c-live": "text-green border-[#1c5943] bg-[#08170f]",
@@ -335,138 +335,6 @@ const chipCls: Record<string, string> = {
   "c-amb": "text-amber border-[#66501e] bg-[#17130a]",
   "c-mut": "text-mut border-line bg-panel2",
 };
-
-function Row({ l, m, r, tone }: { l: string; m: string; r: string; tone?: "red" | "amber" | "hit" }) {
-  const cls = tone === "hit" ? "bg-[#2a1f0a] text-[#fbe9bc] shadow-[inset_2px_0_0_#e8b23a] -mx-2 px-2" : "";
-  return (
-    <div className={`mono flex justify-between gap-3 text-[10.5px] border-b border-line2 py-2 ${cls}`}>
-      <span className="text-faint shrink-0">{l}</span>
-      <span className={`truncate ${tone === "red" ? "text-red" : tone === "amber" ? "text-amber" : "text-ink/85"}`}>{m}</span>
-      <span className="font-bold shrink-0">{r}</span>
-    </div>
-  );
-}
-function Pill({ t, tone }: { t: string; tone: "red" | "amber" | "mut" }) {
-  const c = tone === "red" ? "bg-[#2e1418] text-red" : tone === "amber" ? "bg-[#2c2410] text-amber" : "bg-[#161f2a] text-mut";
-  return <span className={`mono text-[8.5px] px-1.5 py-0.5 rounded-sm ${c}`}>{t}</span>;
-}
-
-function Preview({ k }: { k: ModuleKey }) {
-  switch (k) {
-    case "live-board":
-      return (
-        <>
-          <div className="hlabel text-[8px] mb-2">Active cases</div>
-          <Row l="2026-CHD-0417" m="TRON · CASH-OUT" r="₹8.00L" tone="hit" />
-          <Row l="2026-CHD-0391" m="TRON · TRACING" r="₹3.10L" />
-          <Row l="2026-LDH-0122" m="BTC · INTAKE" r="₹5.75L" />
-          <div className="mt-4 flex items-center justify-between">
-            <span className="hlabel text-[8px]">Open windows</span>
-            <span className="mono text-[13px] font-bold text-red">01:47:22</span>
-          </div>
-          <div className="mt-3 flex flex-wrap gap-1.5">
-            <Pill t="rapid layering 14" tone="red" /><Pill t="P2P off-ramp 22" tone="amber" /><Pill t="sanctions hit 1" tone="red" /><Pill t="mixer 3" tone="mut" />
-          </div>
-        </>
-      );
-    case "cases":
-      return (
-        <>
-          <div className="hlabel text-[8px] mb-2">Watchlist</div>
-          <Row l="TVd6j…2Lm7" m="TRON · P2P off-ramp · NEW ACTIVITY" r="11:43" tone="amber" />
-          <Row l="TQr7x…9Kp3" m="TRON · layered cluster" r="04 Aug" />
-          <Row l="bc1q8…4mz2" m="BTC → TRON bridge" r="09 Aug" />
-          <div className="mono text-[9px] text-faint mt-4">re-evaluated every 10 minutes against live chain state</div>
-        </>
-      );
-    case "trace":
-      return (
-        <>
-          <Row l="0 · 11:02:16" m="TKx9c…7Ha2 · victim payment" r="9,412 USDT" />
-          <Row l="1 · 11:09:44" m="TQm4v…1Bd8 · split ×3" r="9,410 USDT" tone="amber" />
-          <Row l="2 · 11:16:02" m="TZp8s…4Kf1 · rapid layering" r="9,404 USDT" tone="red" />
-          <Row l="3 · 11:28:31" m="TBn2w…9Rc5 · pass-through" r="9,398 USDT" />
-          <Row l="4 · 11:43:09" m="TVd6j…2Lm7 · CASH-OUT" r="9,398 USDT" tone="amber" />
-        </>
-      );
-    case "bridge":
-      return (
-        <div className="grid grid-cols-2 gap-5 relative">
-          <div>
-            <div className="hlabel text-[8px] mb-2">On-chain</div>
-            <Row l="11:43:09" m="TVd6j…2Lm7 → sold" r="9,398 USDT" />
-            <Row l="11:28:31" m="TBn2w…9Rc5" r="9,398 USDT" />
-          </div>
-          <div className="cash-paper -my-2 py-2 px-3 rounded-sm">
-            <div className="hlabel text-[8px] mb-2 text-cashmut">Bank statement · synthetic</div>
-            <Row l="11:38:52" m="IMPS/P2P/ref 88120" r="₹1,15,000" />
-            <Row l="11:49:20" m="IMPS/P2P/ref 88147" r="₹7,98,180" tone="hit" />
-          </div>
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 border border-[#8a6f26] bg-[#0e0c08] px-3 py-1.5 text-center">
-            <div className="mono text-[7px] tracking-[0.18em] font-extrabold text-amber">SEAM MATCH</div>
-            <div className="mono text-[16px] font-bold text-amber2 leading-tight">97.4%</div>
-          </div>
-        </div>
-      );
-    case "red-flags":
-      return (
-        <>
-          <div className="hlabel text-[8px] mb-2">Detectors · 4 of 10 fired</div>
-          <div className="flex flex-wrap gap-1.5">
-            <Pill t="rapid layering" tone="red" /><Pill t="structuring" tone="red" /><Pill t="P2P off-ramp" tone="amber" /><Pill t="velocity spike" tone="amber" />
-            <Pill t="mixer — none" tone="mut" /><Pill t="sanctions — clear" tone="mut" /><Pill t="bridge hop — none" tone="mut" /><Pill t="dormant — no" tone="mut" />
-            <Pill t="peel chain — none" tone="mut" /><Pill t="round-number — none" tone="mut" />
-          </div>
-          <div className="mt-4 border-t border-line2 pt-3">
-            <div className="hlabel text-[8px] mb-1.5">Why rapid layering fired</div>
-            <div className="mono text-[10px] text-ink/85 leading-relaxed">3 outputs reconsolidated within 13 min · FATF VA red-flag 2020 §layering</div>
-          </div>
-        </>
-      );
-    case "syndicates":
-      return (
-        <>
-          <div className="flex items-baseline gap-3 mb-3">
-            <span className="mono text-[26px] font-extrabold text-mut">47</span>
-            <span className="text-amber">→</span>
-            <span className="mono text-[26px] font-extrabold text-amber">3</span>
-            <span className="text-[9.5px] text-faint">complaints collapse into networks by shared cash-out wallet</span>
-          </div>
-          <Row l="SYN-A" m="P2P off-ramp cluster · 8 victims" r="₹41.2L" tone="red" />
-          <Row l="SYN-B" m="layered, 2 hops deep · 7 victims" r="₹28.6L" tone="amber" />
-          <Row l="SYN-C" m="cross-chain BTC→TRON · 6 victims" r="₹19.4L" />
-        </>
-      );
-    case "intercept":
-      return (
-        <>
-          <div className="flex items-baseline justify-between">
-            <span className="hlabel text-[8px]">Est. window before withdrawal</span>
-            <span className="mono text-[26px] font-extrabold text-red leading-none">01:47:22</span>
-          </div>
-          <div className="mt-3">
-            <Row l="EXCHANGE" m="Known VASP · deposit cluster #DC-2210" r="" />
-            <Row l="DEPOSIT" m="TVd6j…2Lm7" r="" />
-            <Row l="AMOUNT" m="9,398 USDT · ≈ ₹7,99,960" r="" />
-            <Row l="EVIDENCE" m="sha256 3f9a…c710 · BSA s.63 attached" r="" />
-          </div>
-          <div className="mono text-[9px] text-faint mt-3">OFFRAMP does not freeze funds — it composes the request an authorised officer sends.</div>
-        </>
-      );
-    case "evidence":
-      return (
-        <>
-          <div className="hlabel text-[8px] mb-2">Pack contents</div>
-          <Row l="trace_graph.json" m="" r="3f9a…c710" />
-          <Row l="hop_log.csv" m="" r="88b1…4de2" />
-          <Row l="detector_findings" m="" r="c04f…91aa" />
-          <Row l="freeze_packet" m="" r="4e51…07c9" />
-          <Row l="str_draft (FIU-IND)" m="" r="7c23…b108" />
-          <div className="mono text-[9px] text-faint mt-3">hash chain verified · 0 modifications since seal</div>
-        </>
-      );
-  }
-}
 
 function ConsolePreview() {
   const [active, setActive] = useState<ModuleKey>("bridge");
@@ -522,7 +390,7 @@ function ConsolePreview() {
           <span className={`mono ml-auto text-[8.5px] tracking-[0.08em] uppercase font-bold border px-2 py-0.5 ${chipCls[mod.chip[0]]}`}>{mod.chip[1]}</span>
         </div>
         <div key={active} className="row-in p-5 flex-1">
-          <Preview k={active} />
+          <ModulePreview k={active} />
         </div>
         <div className="border-t border-line px-5 h-[38px] flex items-center justify-between">
           <span className="mono text-[8.5px] text-faint">{touched ? "hover a module on the left" : "cycling · hover to take control"}</span>
