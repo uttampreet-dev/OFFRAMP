@@ -1,101 +1,113 @@
 "use client";
-import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import type { TraceResult, TraceNode, TraceEdge } from "@/lib/trace/engine";
 import type { LookupResult } from "@/lib/chains/types";
+import { TopBar, AddressInput, Seg, Primary, Chip, Section, KV, Flag, StatusBar, Empty } from "@/components/console";
 
 type Lookup = LookupResult & { screening: { ofacSanctioned: boolean; listSize: number; listSyncedAt: string | null } };
 
-const short = (a: string) => (a.length > 16 ? `${a.slice(0, 7)}…${a.slice(-5)}` : a);
+const short = (a: string) => (a.length > 18 ? `${a.slice(0, 8)}…${a.slice(-6)}` : a);
 const fmtV = (v: number) => v.toLocaleString("en-IN", { maximumFractionDigits: v < 1 ? 5 : 2 });
 const fmtT = (t: number | null) =>
   t ? new Date(t).toLocaleString("en-IN", { day: "2-digit", month: "short", year: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false }) : "—";
 
-/* ───────────── layout: nodes in hop columns, ordered by value ───────────── */
+/* ───────────── flow graph: fills its container, hop columns, value-weighted edges ───────────── */
+function useSize<T extends HTMLElement>() {
+  const ref = useRef<T>(null);
+  const [size, setSize] = useState({ w: 1000, h: 600 });
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const ro = new ResizeObserver(([e]) => setSize({ w: Math.max(400, e.contentRect.width), h: Math.max(300, e.contentRect.height) }));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+  return { ref, size };
+}
+
 function layout(res: TraceResult, W: number, H: number) {
   const byHop = new Map<number, TraceNode[]>();
   for (const n of res.nodes) byHop.set(n.hop, [...(byHop.get(n.hop) ?? []), n]);
   const maxHop = Math.max(...byHop.keys());
   const pos = new Map<string, { x: number; y: number }>();
-  const padX = 90;
+  const padX = 150;
+  const padY = 56;
   const colGap = maxHop === 0 ? 0 : (W - padX * 2) / maxHop;
   for (const [hop, list] of byHop) {
     list.sort((a, b) => b.inValue + b.outValue - (a.inValue + a.outValue));
-    const gap = H / (list.length + 1);
-    list.forEach((n, i) => pos.set(n.address, { x: padX + hop * colGap, y: gap * (i + 1) }));
+    const gap = (H - padY * 2) / (list.length + 1);
+    list.forEach((n, i) => pos.set(n.address, { x: padX + hop * colGap, y: padY + gap * (i + 1) }));
   }
   const maxEdge = Math.max(1e-9, ...res.edges.map((e) => e.value));
   return { pos, maxHop, maxEdge };
 }
 
 function Flow({ res, selected, onSelect }: { res: TraceResult; selected: string | null; onSelect: (a: string) => void }) {
-  const W = 1000;
-  const H = 560;
-  const { pos, maxEdge } = useMemo(() => layout(res, W, H), [res]);
-  const byAddr = useMemo(() => new Map(res.nodes.map((n) => [n.address, n])), [res]);
-  const sel = selected ? byAddr.get(selected) : null;
+  const { ref, size } = useSize<HTMLDivElement>();
+  const { pos, maxEdge } = useMemo(() => layout(res, size.w, size.h), [res, size]);
+  const adjacent = useMemo(() => {
+    const s = new Set<string>();
+    if (!selected) return s;
+    for (const e of res.edges) {
+      if (e.from === selected) s.add(e.to);
+      if (e.to === selected) s.add(e.from);
+    }
+    return s;
+  }, [res, selected]);
   const touches = (e: TraceEdge) => selected !== null && (e.from === selected || e.to === selected);
 
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} className="w-full h-full" preserveAspectRatio="xMidYMid meet">
-      {/* edges */}
-      {res.edges.map((e, i) => {
-        const a = pos.get(e.from);
-        const b = pos.get(e.to);
-        if (!a || !b) return null;
-        const w = 1 + 3.2 * (Math.log10(1 + e.value) / Math.log10(1 + maxEdge));
-        const hi = touches(e);
-        const dim = selected !== null && !hi;
-        const mx = (a.x + b.x) / 2;
-        return (
-          <path
-            key={i}
-            d={`M ${a.x} ${a.y} C ${mx} ${a.y}, ${mx} ${b.y}, ${b.x} ${b.y}`}
-            fill="none"
-            stroke={hi ? "#e8b23a" : "#6b7f94"}
-            strokeOpacity={dim ? 0.3 : hi ? 0.95 : 0.6}
-            strokeWidth={w}
-          />
-        );
-      })}
-      {/* edge value labels for the largest few / selected */}
-      {res.edges
-        .filter((e) => touches(e) || e.value >= maxEdge * 0.35)
-        .slice(0, 14)
-        .map((e, i) => {
+    <div ref={ref} className="absolute inset-0">
+      <svg width={size.w} height={size.h} className="block">
+        {res.edges.map((e, i) => {
           const a = pos.get(e.from);
           const b = pos.get(e.to);
           if (!a || !b) return null;
+          const w = 1.2 + 4 * (Math.log10(1 + e.value) / Math.log10(1 + maxEdge));
+          const hi = touches(e);
+          const dim = selected !== null && !hi;
+          const mx = (a.x + b.x) / 2;
+          return <path key={i} d={`M ${a.x} ${a.y} C ${mx} ${a.y}, ${mx} ${b.y}, ${b.x} ${b.y}`} fill="none" stroke={hi ? "#e8b23a" : "#7a8ea3"} strokeOpacity={dim ? 0.28 : hi ? 0.95 : 0.6} strokeWidth={w} />;
+        })}
+        {res.edges
+          .filter((e) => touches(e) || e.value >= maxEdge * 0.3)
+          .slice(0, 16)
+          .map((e, i) => {
+            const a = pos.get(e.from);
+            const b = pos.get(e.to);
+            if (!a || !b) return null;
+            return (
+              <text key={"l" + i} x={(a.x + b.x) / 2} y={(a.y + b.y) / 2 - 7} textAnchor="middle" fontSize="11" fill={touches(e) ? "#e8b23a" : "#9fb0c1"} style={{ fontFamily: "var(--font-mono)" }}>
+                {fmtV(e.value)}
+              </text>
+            );
+          })}
+        {res.nodes.map((n) => {
+          const p = pos.get(n.address)!;
+          const isSeed = n.hop === 0;
+          const r = isSeed ? 13 : n.entity ? 10 : 8;
+          const stroke = n.sanctioned ? "#e5484d" : n.entity ? "#46a5bf" : isSeed ? "#e8b23a" : "#9fb0c1";
+          const isSel = selected === n.address;
+          const dim = selected !== null && !isSel && !adjacent.has(n.address);
+          const right = p.x < size.w - 190;
+          const lx = right ? p.x + r + 9 : p.x - r - 9;
           return (
-            <text key={"l" + i} x={(a.x + b.x) / 2} y={(a.y + b.y) / 2 - 5} textAnchor="middle" fontSize="9" fill={touches(e) ? "#e8b23a" : "#8598aa"} style={{ fontFamily: "var(--font-mono)" }}>
-              {fmtV(e.value)}
-            </text>
+            <g key={n.address} onClick={() => onSelect(n.address)} style={{ cursor: "pointer", opacity: dim ? 0.5 : 1, transition: "opacity .2s" }}>
+              {(n.sanctioned || isSel) && <circle cx={p.x} cy={p.y} r={r + 7} fill="none" stroke={isSel ? "#e8b23a" : "#e5484d"} strokeOpacity="0.5" strokeWidth="1.2" />}
+              <circle cx={p.x} cy={p.y} r={r} fill={n.sanctioned ? "#12080a" : n.entity ? "#0a1a1f" : "#0b1119"} stroke={stroke} strokeWidth={isSel ? 2.5 : 1.8} />
+              <text x={lx} y={p.y - 3} textAnchor={right ? "start" : "end"} fontSize="12.5" fill="#e3ebf2" style={{ fontFamily: "var(--font-mono)" }}>
+                {short(n.address)}
+              </text>
+              <text x={lx} y={p.y + 12} textAnchor={right ? "start" : "end"} fontSize="10.5" fill={n.entity ? "#46a5bf" : n.sanctioned ? "#e5484d" : "#7a8ea3"} style={{ fontFamily: "var(--font-mono)" }}>
+                {n.entity ? `${n.entity.entity} · ${n.entity.type}` : n.sanctioned ? "OFAC SDN" : n.expanded ? `${fmtV(n.inValue || n.outValue)} ${n.symbol}` : "not expanded"}
+              </text>
+            </g>
           );
         })}
-      {/* nodes */}
-      {res.nodes.map((n) => {
-        const p = pos.get(n.address)!;
-        const isSeed = n.hop === 0;
-        const r = isSeed ? 10 : n.entity ? 8 : 6;
-        const stroke = n.sanctioned ? "#e5484d" : n.entity ? "#46a5bf" : isSeed ? "#e8b23a" : "#8598aa";
-        const isSel = selected === n.address;
-        const dim = selected !== null && !isSel && !res.edges.some((e) => (e.from === selected && e.to === n.address) || (e.to === selected && e.from === n.address));
-        const labelRight = p.x < W - 150;
-        return (
-          <g key={n.address} onClick={() => onSelect(n.address)} style={{ cursor: "pointer", opacity: dim ? 0.55 : 1, transition: "opacity .2s" }}>
-            {(n.sanctioned || isSel) && <circle cx={p.x} cy={p.y} r={r + 6} fill="none" stroke={isSel ? "#e8b23a" : "#e5484d"} strokeOpacity="0.45" strokeWidth="1" />}
-            <circle cx={p.x} cy={p.y} r={r} fill={n.sanctioned ? "#12080a" : n.entity ? "#0a1a1f" : "#0b1119"} stroke={stroke} strokeWidth={isSel ? 2.2 : 1.6} />
-            <text x={labelRight ? p.x + r + 7 : p.x - r - 7} y={p.y - 2} textAnchor={labelRight ? "start" : "end"} fontSize="10" fill="#dbe4ec" style={{ fontFamily: "var(--font-mono)" }}>
-              {short(n.address)}
-            </text>
-            <text x={labelRight ? p.x + r + 7 : p.x - r - 7} y={p.y + 10} textAnchor={labelRight ? "start" : "end"} fontSize="8.5" fill={n.entity ? "#46a5bf" : n.sanctioned ? "#e5484d" : "#6b7f94"} style={{ fontFamily: "var(--font-mono)" }}>
-              {n.entity ? `${n.entity.entity} · ${n.entity.type}` : n.sanctioned ? "OFAC SDN" : n.expanded ? `${fmtV(n.inValue || n.outValue)} ${n.symbol}` : "not expanded"}
-            </text>
-          </g>
-        );
-      })}
-      {sel && null}
-    </svg>
+      </svg>
+    </div>
   );
 }
 
@@ -124,7 +136,7 @@ function TraceInner() {
           fetch(`/api/trace?address=${encodeURIComponent(a)}&depth=${d}&fanout=${f}&dir=${dr}`).then(async (r) => ({ ok: r.ok, body: await r.json() })),
           fetch(`/api/lookup?address=${encodeURIComponent(a)}`).then(async (r) => ({ ok: r.ok, body: await r.json() })),
         ]);
-        if (!t.ok) throw new Error(t.body.error ?? `HTTP error`);
+        if (!t.ok) throw new Error(t.body.error ?? "HTTP error");
         setRes(t.body as TraceResult);
         setSeedInfo(l.ok ? (l.body as Lookup) : null);
         setSelected(a);
@@ -158,140 +170,176 @@ function TraceInner() {
   const s = seedInfo?.summary;
   const sanctionedBeyond = res ? res.nodes.filter((n) => n.sanctioned && n.hop > 0).length : 0;
   const entities = res ? res.nodes.filter((n) => n.entity) : [];
+  const topCounterparties = useMemo(() => {
+    if (!res) return [];
+    const m = new Map<string, number>();
+    for (const e of res.edges) {
+      const other = e.from === res.seed ? e.to : e.to === res.seed ? e.from : null;
+      if (other) m.set(other, (m.get(other) ?? 0) + e.value);
+    }
+    const total = [...m.values()].reduce((a, b) => a + b, 0) || 1;
+    return [...m.entries()].sort((a, b) => b[1] - a[1]).slice(0, 6).map(([addr, v]) => ({ addr, v, share: v / total, node: res.nodes.find((n) => n.address === addr) }));
+  }, [res]);
 
   return (
     <div className="flex flex-col h-screen">
-      {/* top bar */}
-      <div className="h-[58px] shrink-0 border-b border-line bg-rail flex items-center px-5 gap-3">
-        <div className="shrink-0">
-          <div className="text-[13.5px] font-bold">Trace</div>
-          <div className="mono text-[10px] text-[#657a8e]">BTC · ETH · TRON — auto-detected</div>
-        </div>
+      <TopBar title="Trace" subtitle="BTC · ETH · TRON — auto-detected">
         <form
           onSubmit={(e) => {
             e.preventDefault();
             run();
           }}
-          className="flex-1 flex items-center gap-2 min-w-0"
+          className="flex-1 flex items-center gap-3 min-w-0"
         >
-          <input
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
-            placeholder="Paste a wallet address…"
-            spellCheck={false}
-            className="mono flex-1 min-w-0 bg-panel border border-line px-3 py-1.5 text-[12px] placeholder:text-faint outline-none focus:border-[#3a4e63]"
-          />
+          <AddressInput value={address} onChange={setAddress} />
           <Seg label="dir" value={dir} options={[["out", "where it went"], ["in", "where it came from"]]} onChange={(v) => setDir(v as "out" | "in")} />
           <Seg label="depth" value={String(depth)} options={[["1", "1"], ["2", "2"], ["3", "3"], ["4", "4"]]} onChange={(v) => setDepth(Number(v))} />
           <Seg label="fan-out" value={String(fanout)} options={[["3", "3"], ["5", "5"], ["8", "8"]]} onChange={(v) => setFanout(Number(v))} />
-          <button className="mono text-[10px] tracking-[0.12em] uppercase font-extrabold bg-amber text-[#12100c] px-4 py-2 hover:brightness-110 disabled:opacity-50" disabled={loading}>
-            {loading ? "tracing…" : "trace"}
-          </button>
+          <Primary disabled={loading}>{loading ? "tracing…" : "trace"}</Primary>
         </form>
-      </div>
+      </TopBar>
 
       {!res && (
         <div className="flex-1 min-h-0">
-      {error && <div className="mx-5 mt-4 border border-[#652225] bg-[#1a0c0e] text-red px-4 py-3 text-[12px] max-w-xl">{error}</div>}
-
-      {!res && !error && !loading && (
-        <div className="p-6 text-mut text-[12px] max-w-md leading-relaxed">
-          Paste an address and trace where the money went. Each hop follows the largest counterparties; the trail stops at a known
-          exchange or mixer. Everything shown comes from live public chain data.
-        </div>
-      )}
-
-      {loading && !res && (
-        <div className="p-6 mono text-[11px] text-faint">querying chain — {depth} hop{depth > 1 ? "s" : ""}, up to {fanout} counterparties each…</div>
-      )}
+          {error && <div className="mx-6 mt-5 border border-[#652225] bg-[#1a0c0e] text-red px-4 py-3 text-[13px] max-w-xl">{error}</div>}
+          {!error && !loading && (
+            <Empty>
+              Paste an address and trace where the money went. Each hop follows the largest counterparties; the trail stops at a known exchange or
+              mixer. Everything shown comes from live public chain data.
+            </Empty>
+          )}
+          {loading && <div className="p-8 mono text-[12px] text-faint">querying chain — {depth} hop{depth > 1 ? "s" : ""}, up to {fanout} counterparties each…</div>}
         </div>
       )}
 
       {res && (
-        <div className="flex-1 min-h-0 grid grid-cols-[300px_1fr_320px]">
-          {/* summary */}
-          <aside className="border-r border-line overflow-y-auto">
-            <Section title="Address summary" tag={seedInfo?.fromCache ? "cached" : "live"} tagTone="green">
-              <div className="mono text-[11px] break-all text-ink/90">{res.seed}</div>
-              <div className="mt-2 grid grid-cols-2 gap-x-3 gap-y-2">
+        <div className="flex-1 min-h-0 grid grid-cols-[340px_1fr_360px]">
+          {/* left: summary */}
+          <aside className="border-r border-line bg-rail overflow-y-auto">
+            <Section title="Address summary" chip={<Chip tone="green">{seedInfo?.fromCache ? "cached" : "live"}</Chip>}>
+              <div className="mono text-[12.5px] break-all text-ink/90 leading-snug">{res.seed}</div>
+              <div className="mt-3 grid grid-cols-2 gap-x-4 gap-y-3">
                 <KV k="Chain" v={res.chain.toUpperCase()} />
-                <KV k="Transfers seen" v={s ? String(s.txCount) : "—"} />
-                <KV k={`Received`} v={s ? `${fmtV(s.receivedTotal)} ${s.symbol}` : "—"} />
-                <KV k={`Sent`} v={s ? `${fmtV(s.sentTotal)} ${s.symbol}` : "—"} />
+                <KV k="Transfers seen" v={s ? s.txCount.toLocaleString() : "—"} />
+                <KV k="Received" v={s ? `${fmtV(s.receivedTotal)} ${s.symbol}` : "—"} />
+                <KV k="Sent" v={s ? `${fmtV(s.sentTotal)} ${s.symbol}` : "—"} />
                 <KV k="First seen" v={fmtT(s?.firstSeen ?? null)} />
                 <KV k="Last seen" v={fmtT(s?.lastSeen ?? null)} />
               </div>
             </Section>
             <Section title="Screening">
-              <Flag on={!!seedInfo?.screening.ofacSanctioned} onText="OFAC SDN — sanctioned" offText="Not on OFAC SDN" tone="red" />
-              <Flag on={sanctionedBeyond > 0} onText={`${sanctionedBeyond} sanctioned wallet${sanctionedBeyond === 1 ? "" : "s"} within ${res.depth} hop${res.depth > 1 ? "s" : ""}`} offText="No sanctioned wallets in the traced neighbourhood" tone="red" />
+              <Flag on={!!seedInfo?.screening.ofacSanctioned} onText="OFAC SDN — sanctioned address" offText="Not on the OFAC SDN list" tone="red" />
+              <Flag on={sanctionedBeyond > 0} onText={`${sanctionedBeyond} sanctioned wallet${sanctionedBeyond === 1 ? "" : "s"} within ${res.stats.hopsReached} hop${res.stats.hopsReached === 1 ? "" : "s"}`} offText="No sanctioned wallets in the traced neighbourhood" tone="red" />
               <Flag on={entities.length > 0} onText={entities.map((n) => `${n.entity!.entity} reached at hop ${n.hop} · ${fmtV(n.inValue)} ${n.symbol}`).join(" · ")} offText="No known exchange or mixer reached" tone="teal" />
-              <div className="mono text-[8.5px] text-faint mt-2">{seedInfo?.screening.listSize.toLocaleString()} SDN addresses · attribution only where publicly documented</div>
+              <div className="c-note mt-2">{seedInfo?.screening.listSize.toLocaleString()} SDN addresses · attribution only where publicly documented</div>
+            </Section>
+            <Section title="Top counterparties">
+              {topCounterparties.map((c) => (
+                <button key={c.addr} onClick={() => setSelected(c.addr)} className="w-full text-left py-2 border-b border-line2 last:border-0 hover:bg-panel/60">
+                  <div className="flex items-center justify-between gap-3">
+                    <span className={`mono text-[12px] truncate ${c.node?.entity ? "text-teal" : c.node?.sanctioned ? "text-red" : "text-ink/90"}`}>
+                      {c.node?.entity ? `${short(c.addr)} · ${c.node.entity.entity}` : short(c.addr)}
+                    </span>
+                    <span className="mono text-[12px] font-bold shrink-0">{fmtV(c.v)}</span>
+                  </div>
+                  <div className="mt-1.5 h-[3px] bg-line2">
+                    <div className="h-full bg-amber/70" style={{ width: `${Math.max(2, c.share * 100)}%` }} />
+                  </div>
+                </button>
+              ))}
             </Section>
             <Section title="This trace">
-              <div className="grid grid-cols-2 gap-x-3 gap-y-2">
+              <div className="grid grid-cols-2 gap-x-4 gap-y-3">
                 <KV k="Hops reached" v={String(res.stats.hopsReached)} />
                 <KV k="Nodes / edges" v={`${res.nodes.length} / ${res.edges.length}`} />
-                <KV k="Chain requests" v={`${res.stats.requests} (${res.stats.fromCache} cached)`} />
+                <KV k="Chain requests" v={`${res.stats.requests} · ${res.stats.fromCache} cached`} />
                 <KV k="Time" v={`${(res.stats.ms / 1000).toFixed(1)} s`} />
               </div>
-              <div className="mono text-[8.5px] text-faint mt-3 leading-relaxed">
-                Follows the {res.fanout} largest counterparties per hop, {res.direction === "out" ? "downstream" : "upstream"}. Stops at known entities. Heuristic — an investigative lead, not proof.
+              <div className="c-note mt-3">
+                Follows the {res.fanout} largest counterparties per hop, {res.direction === "out" ? "downstream" : "upstream"}. Stops at known entities. Heuristic — an
+                investigative lead, not proof.
+              </div>
+            </Section>
+            <Section title="Next">
+              <div className="flex flex-col gap-2">
+                {[
+                  ["/bridge", "Cross the seam in Bridge", "match the cash-out to an INR credit"],
+                  ["/red-flags", "Run the ten detectors", "named FATF rules with reasons"],
+                  ["/intercept", "Open Intercept", "compose the freeze packet"],
+                ].map(([href, t, d]) => (
+                  <Link key={href} href={`${href}?address=${encodeURIComponent(res.seed)}`} className="group flex items-center justify-between border border-line px-3.5 py-2.5 hover:border-amber/60 transition-colors">
+                    <span>
+                      <span className="block text-[13px] font-semibold group-hover:text-amber transition-colors">{t}</span>
+                      <span className="block c-note">{d}</span>
+                    </span>
+                    <span className="mono text-amber">→</span>
+                  </Link>
+                ))}
               </div>
             </Section>
           </aside>
 
-          {/* flow */}
-          <div className="relative min-w-0 chain-grid">
-            <div className="absolute top-3 left-4 hlabel text-[8.5px] z-10">Flow · {res.direction === "out" ? "downstream" : "upstream"} · hop 0 → {res.stats.hopsReached}</div>
-            <div className="absolute top-3 right-4 mono text-[8.5px] text-faint z-10">click a node · edge width ∝ value</div>
-            <div className="absolute inset-0 pt-8 pb-2 px-2">
+          {/* centre: flow */}
+          <div className="relative min-w-0">
+            <div className="absolute top-4 left-5 c-label z-10">
+              Flow · {res.direction === "out" ? "downstream" : "upstream"} · hop 0 → {res.stats.hopsReached}
+            </div>
+            <div className="absolute top-4 right-5 c-note z-10">click a node · edge width ∝ value</div>
+            <div className="absolute inset-0 top-10">
               <Flow res={res} selected={selected} onSelect={setSelected} />
             </div>
           </div>
 
-          {/* selected node */}
-          <aside className="border-l border-line overflow-y-auto">
+          {/* right: selected node */}
+          <aside className="border-l border-line bg-rail overflow-y-auto">
             {selNode ? (
               <>
-                <Section title={selNode.hop === 0 ? "Seed wallet" : `Hop ${selNode.hop}`} tag={selNode.sanctioned ? "OFAC SDN" : selNode.entity ? selNode.entity.entity : undefined} tagTone={selNode.sanctioned ? "red" : "teal"}>
-                  <div className="mono text-[11px] break-all text-ink/90">{selNode.address}</div>
-                  <div className="mt-2 grid grid-cols-2 gap-x-3 gap-y-2">
+                <Section
+                  title={selNode.hop === 0 ? "Seed wallet" : `Hop ${selNode.hop}`}
+                  chip={selNode.sanctioned ? <Chip tone="red">OFAC SDN</Chip> : selNode.entity ? <Chip tone="teal">{selNode.entity.entity}</Chip> : undefined}
+                >
+                  <div className="mono text-[12.5px] break-all text-ink/90 leading-snug">{selNode.address}</div>
+                  <div className="mt-3 grid grid-cols-2 gap-x-4 gap-y-3">
                     <KV k="In (traced)" v={`${fmtV(selNode.inValue)} ${selNode.symbol}`} />
                     <KV k="Out (traced)" v={`${fmtV(selNode.outValue)} ${selNode.symbol}`} />
-                    <KV k="Transfers seen" v={selNode.txCount === null ? "not expanded" : String(selNode.txCount)} />
-                    <KV k="Expanded" v={selNode.expanded ? "yes" : "no"} />
+                    <KV k="Transfers seen" v={selNode.txCount === null ? "not expanded" : selNode.txCount.toLocaleString()} />
+                    <KV k="Role" v={selNode.entity ? `${selNode.entity.type}` : selNode.hop === 0 ? "seed" : "intermediary"} tone={selNode.entity ? "teal" : undefined} />
                   </div>
-                  {selNode.entity && (
-                    <a href={selNode.entity.source} target="_blank" rel="noreferrer" className="mono text-[9px] text-teal underline underline-offset-2 mt-2 inline-block">
-                      attribution source ↗
-                    </a>
-                  )}
-                  {selNode.hop > 0 && !selNode.entity && (
-                    <button
-                      onClick={() => {
-                        setAddress(selNode.address);
-                        run(selNode.address);
-                      }}
-                      className="mono mt-3 text-[9px] tracking-[0.12em] uppercase font-extrabold text-amber border border-amber/50 px-2.5 py-1 hover:bg-amber hover:text-[#12100c]"
-                    >
-                      Trace from here →
-                    </button>
-                  )}
+                  <div className="flex items-center gap-3 mt-4">
+                    {selNode.entity && (
+                      <a href={selNode.entity.source} target="_blank" rel="noreferrer" className="mono text-[10.5px] text-teal underline underline-offset-4">
+                        attribution source ↗
+                      </a>
+                    )}
+                    {selNode.hop > 0 && !selNode.entity && (
+                      <button
+                        onClick={() => {
+                          setAddress(selNode.address);
+                          run(selNode.address);
+                        }}
+                        className="mono text-[10.5px] tracking-[0.12em] uppercase font-extrabold text-amber border border-amber/50 px-3 py-1.5 hover:bg-amber hover:text-[#12100c]"
+                      >
+                        Trace from here →
+                      </button>
+                    )}
+                  </div>
                 </Section>
                 <Section title={`Edges · ${selEdges.length}`}>
                   {selEdges.map((e, i) => {
                     const outgoing = e.from === selected;
                     const other = outgoing ? e.to : e.from;
+                    const on = res.nodes.find((n) => n.address === other);
                     return (
-                      <button key={i} onClick={() => setSelected(other)} className="w-full text-left border-b border-line2 py-2 hover:bg-panel/60 px-1 -mx-1">
-                        <div className="flex items-center justify-between gap-2">
-                          <span className={`mono text-[8px] px-1.5 py-0.5 rounded-sm font-bold ${outgoing ? "bg-[#17130a] text-amber" : "bg-[#08170f] text-green"}`}>{outgoing ? "OUT" : "IN"}</span>
-                          <span className="mono text-[10.5px] text-ink/85 flex-1 truncate">{short(other)}</span>
-                          <span className="mono text-[10.5px] font-bold shrink-0">{fmtV(e.value)}</span>
+                      <button key={i} onClick={() => setSelected(other)} className="w-full text-left border-b border-line2 last:border-0 py-2.5 hover:bg-panel/60">
+                        <div className="flex items-center gap-3">
+                          <Chip tone={outgoing ? "amber" : "green"}>{outgoing ? "out" : "in"}</Chip>
+                          <span className={`mono text-[12.5px] flex-1 truncate ${on?.entity ? "text-teal" : on?.sanctioned ? "text-red" : "text-ink/90"}`}>{short(other)}</span>
+                          <span className="mono text-[13px] font-bold shrink-0">{fmtV(e.value)}</span>
                         </div>
-                        <div className="mono text-[8.5px] text-faint mt-0.5">
-                          {e.count} transfer{e.count === 1 ? "" : "s"} · {fmtT(e.firstTime)}{e.lastTime && e.lastTime !== e.firstTime ? ` → ${fmtT(e.lastTime)}` : ""}
+                        <div className="c-note mt-1">
+                          {e.count} transfer{e.count === 1 ? "" : "s"} · {fmtT(e.firstTime)}
+                          {e.lastTime && e.lastTime !== e.firstTime ? ` → ${fmtT(e.lastTime)}` : ""}
+                          {on?.entity ? ` · ${on.entity.entity}` : on?.sanctioned ? " · OFAC SDN" : ""}
                         </div>
                       </button>
                     );
@@ -299,64 +347,16 @@ function TraceInner() {
                 </Section>
               </>
             ) : (
-              <div className="p-4 text-[11px] text-faint">Select a node in the flow.</div>
+              <Empty>Select a node in the flow.</Empty>
             )}
           </aside>
         </div>
       )}
 
-      <div className="h-[32px] shrink-0 border-t border-line bg-rail flex items-center px-5 gap-5 mono text-[9.5px] text-faint">
-        <span><span className="inline-block w-1.5 h-1.5 rounded-full bg-green mr-1.5" />live public chain data</span>
-        {res && <span>{res.stats.hopsReached} hop{res.stats.hopsReached === 1 ? "" : "s"} resolved in {(res.stats.ms / 1000).toFixed(1)} s</span>}
-        <span className="ml-auto">counterparty grouping is heuristic · not proof of ownership</span>
-      </div>
-    </div>
-  );
-}
-
-function Seg({ label, value, options, onChange }: { label: string; value: string; options: [string, string][]; onChange: (v: string) => void }) {
-  return (
-    <div className="flex items-center gap-1 shrink-0">
-      <span className="mono text-[8px] tracking-[0.12em] uppercase text-faint">{label}</span>
-      {options.map(([v, t]) => (
-        <button
-          type="button"
-          key={v}
-          onClick={() => onChange(v)}
-          className={`mono text-[9px] px-2 py-1 border ${value === v ? "border-amber/70 text-amber bg-[#17130a]" : "border-line text-mut hover:text-ink"}`}
-        >
-          {t}
-        </button>
-      ))}
-    </div>
-  );
-}
-function Section({ title, tag, tagTone, children }: { title: string; tag?: string; tagTone?: "green" | "red" | "teal"; children: React.ReactNode }) {
-  const tone = tagTone === "red" ? "bg-[#1a0c0e] text-red" : tagTone === "teal" ? "bg-[#0a1a1f] text-teal" : "bg-[#08170f] text-green";
-  return (
-    <div className="px-4 py-3 border-b border-line">
-      <div className="flex items-center gap-2 mb-2">
-        <span className="hlabel text-[8.5px]">{title}</span>
-        {tag && <span className={`mono text-[8px] px-1.5 py-0.5 rounded-sm font-bold uppercase ${tone}`}>{tag}</span>}
-      </div>
-      {children}
-    </div>
-  );
-}
-function KV({ k, v }: { k: string; v: string }) {
-  return (
-    <div>
-      <div className="hlabel text-[7.5px]">{k}</div>
-      <div className="mono text-[11px] mt-0.5 break-words">{v}</div>
-    </div>
-  );
-}
-function Flag({ on, onText, offText, tone }: { on: boolean; onText: string; offText: string; tone: "red" | "teal" }) {
-  const c = !on ? "text-faint" : tone === "red" ? "text-red" : "text-teal";
-  return (
-    <div className={`flex items-start gap-2 text-[10.5px] leading-snug py-1 ${c}`}>
-      <span className={`mt-1.5 w-1.5 h-1.5 rounded-full shrink-0 ${!on ? "bg-[#26313f]" : tone === "red" ? "bg-red" : "bg-teal"}`} />
-      <span>{on ? onText : offText}</span>
+      <StatusBar
+        left={<>live public chain data{res ? ` · ${res.stats.hopsReached} hop${res.stats.hopsReached === 1 ? "" : "s"} resolved in ${(res.stats.ms / 1000).toFixed(1)} s` : ""}</>}
+        right="counterparty grouping is heuristic · not proof of ownership"
+      />
     </div>
   );
 }

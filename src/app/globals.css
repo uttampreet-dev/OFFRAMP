@@ -31,10 +31,20 @@ body {
 }
 
 .chain-grid {
-  background-image: linear-gradient(#161f2b 1px, transparent 1px),
-    linear-gradient(90deg, #161f2b 1px, transparent 1px);
-  background-size: 38px 38px;
+  background-color: #070a0f;
+  background-image: linear-gradient(rgba(22, 31, 43, 0.75) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(22, 31, 43, 0.75) 1px, transparent 1px);
+  background-size: 44px 44px;
 }
+/* ── console type scale ── */
+.c-label { font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase; font-weight: 800; color: var(--color-mut); }
+.c-kv { font-size: 9.5px; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 700; color: var(--color-faint); }
+.c-val { font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-size: 14px; color: var(--color-ink); }
+.c-body { font-size: 13px; line-height: 1.55; color: var(--color-mut); }
+.c-note { font-family: var(--font-mono); font-size: 10.5px; line-height: 1.55; color: var(--color-faint); }
+.c-input { font-family: var(--font-mono); font-size: 14.5px; }
+.c-input::placeholder { color: #6f8195; }
+.c-input:focus { border-color: rgba(232, 178, 58, 0.55); box-shadow: 0 0 0 3px rgba(232, 178, 58, 0.08); }
 .cash-paper {
   background-color: var(--color-cash);
   background-image: repeating-linear-gradient(180deg, rgba(255, 236, 200, 0.055) 0 1px, transparent 1px 26px),

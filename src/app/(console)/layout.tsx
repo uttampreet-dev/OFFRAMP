@@ -6,7 +6,7 @@ export default async function ConsoleLayout({ children }: { children: React.Reac
   return (
     <div className="flex min-h-screen">
       <Rail user={session?.u ?? null} role={session?.role ?? null} />
-      <main className="flex-1 min-w-0 chain-grid">{children}</main>
+      <main className="flex-1 min-w-0 chain-grid overflow-hidden">{children}</main>
     </div>
   );
 }
