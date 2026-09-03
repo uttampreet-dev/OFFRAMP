@@ -1,0 +1,204 @@
+<!-- Source: https://fiuindia.gov.in (Reporting formats → STR for reporting entities) -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Suspicious Transaction Report (STR) - FIU-IND Format</title>
+  <style>
+    @media print {
+      body { margin: 0; padding: 12mm; font-size: 11pt; }
+      .no-print { display: none; }
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      color: #111827;
+      background: #ffffff;
+      margin: 24px auto;
+      padding: 32px;
+      max-width: 800px;
+      line-height: 1.5;
+    }
+    .draft-badge {
+      display: inline-block;
+      background: #fee2e2;
+      color: #991b1b;
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 0.05em;
+      padding: 6px 14px;
+      border: 1px solid #f87171;
+      border-radius: 4px;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+    h1 {
+      font-size: 20px;
+      margin: 0 0 6px 0;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+    }
+    .subtitle {
+      color: #4b5563;
+      font-size: 13px;
+      margin-bottom: 24px;
+    }
+    fieldset {
+      border: 1px solid #d1d5db;
+      border-radius: 4px;
+      margin-bottom: 20px;
+      padding: 16px 20px 20px 20px;
+    }
+    legend {
+      font-weight: 600;
+      font-size: 14px;
+      color: #1f2937;
+      padding: 0 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    .field-grid {
+      display: grid;
+      grid-template-columns: 180px 1fr;
+      row-gap: 10px;
+      column-gap: 16px;
+      font-size: 13px;
+    }
+    .field-label {
+      color: #4b5563;
+      font-weight: 500;
+    }
+    .field-value {
+      color: #111827;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      word-break: break-all;
+    }
+    .content-block {
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 4px;
+      padding: 12px 14px;
+      font-size: 13px;
+      white-space: pre-wrap;
+      font-family: inherit;
+    }
+    .tag-candidate {
+      display: inline-block;
+      background: #fef3c7;
+      color: #92400e;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 1px 6px;
+      border-radius: 3px;
+      margin-left: 8px;
+      border: 1px solid #fcd34d;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    .signatures {
+      margin-top: 36px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+    }
+    .signature-box {
+      border-top: 1px solid #111827;
+      padding-top: 8px;
+      font-size: 13px;
+    }
+    .footer-note {
+      margin-top: 32px;
+      padding-top: 12px;
+      border-top: 1px dashed #d1d5db;
+      font-size: 11px;
+      color: #6b7280;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="draft-badge">DRAFT — requires principal officer signature</div>
+
+  <h1>Suspicious Transaction Report (STR)</h1>
+  <div class="subtitle">Financial Intelligence Unit – India (FIU-IND) Reporting Format · Case ID: <span class="field-value">{{caseId}}</span></div>
+
+  <fieldset>
+    <legend>1. Reporting Entity Details</legend>
+    <div class="field-grid">
+      <div class="field-label">Reporting Entity:</div>
+      <div class="field-value">{{reportingEntity}}</div>
+
+      <div class="field-label">Principal Officer:</div>
+      <div class="field-value">{{principalOfficer}}</div>
+
+      <div class="field-label">Reference Number:</div>
+      <div class="field-value">{{reference}}</div>
+
+      <div class="field-label">Report Date:</div>
+      <div class="field-value">{{date}}</div>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>2. Subject Information</legend>
+    <div class="field-grid">
+      <div class="field-label">Subject Wallet:</div>
+      <div class="field-value">{{subjectWallet}}</div>
+
+      <div class="field-label">Chain / Asset:</div>
+      <div class="field-value">{{chainAsset}}</div>
+
+      <div class="field-label">Linked Account:</div>
+      <div class="field-value">{{linkedAccount}} <span class="tag-candidate">candidate linkage</span></div>
+
+      <div class="field-label">Attribution / Entity:</div>
+      <div class="field-value">{{attribution}}</div>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>3. Transaction Summary</legend>
+    <div class="field-grid">
+      <div class="field-label">Crypto Amount:</div>
+      <div class="field-value">{{amount}}</div>
+
+      <div class="field-label">Estimated INR Value:</div>
+      <div class="field-value">{{inr}}</div>
+
+      <div class="field-label">Period of Activity:</div>
+      <div class="field-value">{{period}}</div>
+
+      <div class="field-label">Transaction ID (TxID):</div>
+      <div class="field-value">{{txid}}</div>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>4. Grounds for Suspicion</legend>
+    <div class="content-block">{{grounds}}</div>
+  </fieldset>
+
+  <fieldset>
+    <legend>5. Attached Evidence</legend>
+    <div class="content-block">{{evidence}}</div>
+  </fieldset>
+
+  <div class="signatures">
+    <div class="signature-box">
+      <div><strong>Principal Officer Signature:</strong></div>
+      <div style="height: 36px;"></div>
+      <div>{{principalOfficer}}</div>
+      <div style="font-size: 11px; color: #4b5563;">Principal Officer, {{reportingEntity}}</div>
+    </div>
+    <div class="signature-box">
+      <div><strong>Date of Signing:</strong></div>
+      <div style="height: 36px;"></div>
+      <div>{{date}}</div>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    Correlation between wallet and account is a candidate linkage by amount and timing; it is not evidence of ownership.
+  </div>
+
+</body>
+</html>
