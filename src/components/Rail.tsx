@@ -26,6 +26,10 @@ const GROUPS: { label: string; items: { name: string; href: string }[] }[] = [
       { name: "Evidence", href: "/evidence" },
     ],
   },
+  {
+    label: "System",
+    items: [{ name: "Access", href: "/access" }],
+  },
 ];
 
 export default function Rail({ user, role }: { user: string | null; role: string | null }) {

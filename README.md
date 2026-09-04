@@ -15,6 +15,7 @@ Everything on screen is either live public chain data or clearly labelled synthe
 | **Red Flags** | Ten explainable detectors grounded in FATF virtual-asset red-flag indicators: rapid layering, structuring, P2P off-ramp, velocity spike, mixer contact, sanctions hit, bridge hop, dormant reactivation, peel chain, round-number transfers. Each fires with evidence lines and a heuristic confidence. | live |
 | **Intercept** | Estimates the withdrawal window from the wallet's own inflow→outflow lag (three or more pairs, capped at 48 h), otherwise a stated 2-hour policy default. Composes and seals a freeze-request packet with SHA-256. A supervisor signs the sealed packet off as a separate audited step. | live · replay of the demonstration case |
 | **Evidence** | Serialises every artefact canonically, hashes it, chains the hashes to a root, verifies the chain on demand. Exports a JSON bundle, an STR draft in FIU-IND layout, and a Section 63 (Bharatiya Sakshya Adhiniyam, 2023) certificate. Documents are drafts until signed. | case artefacts |
+| **Access** | Your account (password change, active sessions, sign out everywhere) and, for a supervisor, account provisioning, roles, disable and reset, plus the access log. | live |
 | **Syndicates** | Groups complaints whose money reached the same cash-out wallet, joined transitively, into operator groups: loss, tempo, cities, rails, wallets with screening and hand-offs. | synthetic complaints, labelled |
 
 ## Against the brief
@@ -28,7 +29,7 @@ Everything on screen is either live public chain data or clearly labelled synthe
 | Automated alert generation | board rules raised once per event: outflow, sanctions contact, reported-address activity, abnormal velocity, window closing |
 | Search & investigation support | search by wallet, transaction hash, account number, case id, complaint, entity; every lookup cached; every action in the audit log |
 | Reporting & evidence management | hash-chained evidence packs, STR draft (FIU-IND layout), Section 63 certificate (BSA 2023), JSON bundle, chain of custody from the audit log |
-| Security & access control | scrypt passwords, HMAC-signed sessions, route middleware, three roles, supervisor-only sign-off and case closing, audit of every write |
+| Security & access control | no public sign-up: a supervisor provisions, disables and resets accounts on the Access screen; scrypt passwords; five failed logins lock an account for fifteen minutes; HMAC-signed sessions recorded server-side so sign-out and revocation are real; route middleware; three roles with supervisor-only sign-off and case closing; every login, failure, lockout and write audited |
 | Scalability | stateless engines, per-chain adapters behind one interface, disk cache with stale fallback; a new chain or list is one adapter or one file; SQLite → Postgres is a configuration change |
 
 ## Why this stack
@@ -75,7 +76,7 @@ node scripts/sync-ofac.mjs         # refresh the sanctions lists
 npm run dev
 ```
 
-Open http://localhost:3000. Demo logins:
+Open http://localhost:3000. Evaluation accounts (provisioned in the seed database; a supervisor can add, disable or reset accounts on the Access screen):
 
 | Login | Password | Role |
 |---|---|---|
@@ -87,4 +88,4 @@ Set `OFFRAMP_OFFLINE=1` to serve every chain lookup from the on-disk cache witho
 
 ## Stack
 
-Next.js 16 (App Router), React 19, TypeScript, Tailwind v4, better-sqlite3 for users, cases, watch list, alerts, packets, packs and the audit log. Sessions are HMAC-signed cookies with scrypt-hashed passwords. Roles: investigators and compliance officers work cases; only a supervisor can sign off a packet or close a case. Every write is audited under the officer's login.
+Next.js 16 (App Router), React 19, TypeScript, Tailwind v4, better-sqlite3 for users, cases, watch list, alerts, packets, packs and the audit log. Passwords are scrypt-hashed; sessions are HMAC-signed httpOnly cookies backed by a server-side session table, so logout, "sign out everywhere" and a supervisor disabling an account end access immediately. Five failed logins lock an account for fifteen minutes. There is no public sign-up: a supervisor provisions accounts on the Access screen. Roles: investigators and compliance officers work cases; only a supervisor can sign off a packet, close a case or manage accounts. Every login, failure, lockout, password change and write is audited under the login.

@@ -9,12 +9,14 @@ export interface Session {
   u: string;
   role: string;
   exp: number;
+  sid?: string;
 }
 
 const b64u = (buf: Buffer | string) => Buffer.from(buf).toString("base64url");
 
-export function signSession(u: string, role: string): string {
-  const payload = b64u(JSON.stringify({ u, role, exp: Date.now() + SESSION_HOURS * 3600_000 } satisfies Session));
+export const SESSION_HOURS_PUBLIC = SESSION_HOURS;
+export function signSession(u: string, role: string, sid?: string, exp?: number): string {
+  const payload = b64u(JSON.stringify({ u, role, exp: exp ?? Date.now() + SESSION_HOURS * 3600_000, sid } satisfies Session));
   const sig = createHmac("sha256", AUTH_SECRET).update(payload).digest("base64url");
   return `${payload}.${sig}`;
 }
@@ -34,7 +36,14 @@ export function verifySessionToken(token: string | undefined): Session | null {
   }
 }
 
+/** Signature + expiry (as the edge middleware checks) plus the server-side session record, so a revoked session is dead everywhere the data lives. */
 export async function getSession(): Promise<Session | null> {
   const jar = await cookies();
-  return verifySessionToken(jar.get(SESSION_COOKIE)?.value);
+  const s = verifySessionToken(jar.get(SESSION_COOKIE)?.value);
+  if (!s) return null;
+  if (s.sid) {
+    const { sessionAlive } = await import("./db");
+    if (!sessionAlive(s.sid)) return null;
+  }
+  return s;
 }
