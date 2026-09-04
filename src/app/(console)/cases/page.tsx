@@ -21,6 +21,14 @@ function Inner() {
   const [notes, setNotes] = useState("");
   const [msg, setMsg] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+  const [q, setQ] = useState("");
+  const [hits, setHits] = useState<{ kind: string; id: string; title: string; detail: string; href: string; synthetic?: boolean }[] | null>(null);
+  async function search() {
+    if (q.trim().length < 3) return setHits([]);
+    const r = await fetch(`/api/search?q=${encodeURIComponent(q.trim())}`);
+    const b = await r.json();
+    setHits(b.hits ?? []);
+  }
 
   const loadList = useCallback(async () => {
     const r = await fetch("/api/cases", { cache: "no-store" });
@@ -77,7 +85,25 @@ function Inner() {
   const c = detail?.c;
   return (
     <div className="flex flex-col h-screen">
-      <TopBar title="Cases" subtitle="case files · timeline · hand-offs" secondRow={<span className="c-note">a case is opened on a seed wallet; every module reached from it writes to the same audited timeline · the demonstration case is marked synthetic</span>}>
+      <TopBar
+        title="Cases"
+        subtitle="case files · timeline · hand-offs"
+        secondRow={
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              search();
+            }}
+            className="flex items-center gap-3 w-full"
+          >
+            <span className="mono text-[10px] tracking-[0.14em] uppercase font-bold text-faint shrink-0">search</span>
+            <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="case id · wallet · transaction hash · account · complaint · entity — everything the console holds" className="mono flex-1 min-w-0 h-[34px] bg-panel border border-line px-3 text-[12.5px] placeholder:text-faint outline-none focus:border-amber/60" />
+            <button className="mono text-[10.5px] tracking-[0.12em] uppercase font-bold text-amber border border-amber/50 px-3 py-1.5 hover:bg-amber hover:text-[#12100c]">find</button>
+            {hits !== null && <span className="c-note shrink-0">{hits.length} result{hits.length === 1 ? "" : "s"}</span>}
+            {hits !== null && <button type="button" onClick={() => { setHits(null); setQ(""); }} className="mono text-[10px] text-faint hover:text-ink">clear</button>}
+          </form>
+        }
+      >
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -94,6 +120,18 @@ function Inner() {
 
       <div className="flex-1 min-h-0 grid grid-cols-[440px_1fr] overflow-hidden">
         <div className="border-r border-line overflow-y-auto">
+          {hits !== null && (
+            <div className="border-b border-line bg-panel">
+              <div className="px-6 py-3 border-b border-line2 flex items-center gap-2"><span className="c-label">Search results</span><span className="c-note">{q}</span></div>
+              {hits.length === 0 && <p className="c-note px-6 py-4">Nothing matched. Addresses and transaction hashes are recognised even when no record exists yet.</p>}
+              {hits.map((h, i) => (
+                <Link key={i} href={h.href} className="block px-6 py-2.5 border-b border-line2 last:border-0 hover:bg-rail">
+                  <div className="flex items-center gap-2"><Chip tone={h.kind === "address" || h.kind === "transaction" ? "teal" : h.kind === "case" ? "amber" : "mut"}>{h.kind}</Chip><span className="mono text-[12px] font-bold truncate">{h.title}</span>{h.synthetic && <Chip tone="mut">synthetic</Chip>}</div>
+                  <div className="mono text-[10.5px] text-mut truncate mt-0.5">{h.detail}</div>
+                </Link>
+              ))}
+            </div>
+          )}
           <div className="px-6 py-4 border-b border-line"><span className="c-label">Case files · {cases.length}</span></div>
           {cases.map((k) => (
             <button

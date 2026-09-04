@@ -5,9 +5,13 @@ import { useSearchParams } from "next/navigation";
 import type { TraceResult, TraceNode, TraceEdge } from "@/lib/trace/engine";
 import type { LookupResult } from "@/lib/chains/types";
 import { TopBar, AddressInput, Seg, Primary, Chip, Section, KV, Flag, StatusBar, Empty } from "@/components/console";
+import type { TxView } from "@/lib/chains/tx";
+import type { CospendCluster } from "@/lib/chains/btc";
 
 type Lookup = LookupResult & { screening: { ofacSanctioned: boolean; listSize: number; listSyncedAt: string | null; reported: { source: string; category: string } | null; entity: { entity: string; type: string; source: string } | null } };
 
+type Scr = { sanctioned: boolean; entity: string | null; reported: string | null };
+type TxFull = Omit<TxView, "legs"> & { legs: (TxView["legs"][number] & { fromScreen: Scr; toScreen: Scr })[] };
 type BookEntry = { address: string; chain: string; txCount: number; received: number; symbol: string; verifiedOn: string; why: string };
 const DEMO = [
   { address: "12HQDsicffSBaYdJ6BhnE22sfjTESmmzKx", chain: "btc", why: "OFAC SDN · 1,335 tx · reaches Binance at hop 1" },
@@ -17,6 +21,46 @@ const DEMO = [
 ] as const;
 
 const short = (a: string) => (a.length > 18 ? `${a.slice(0, 8)}…${a.slice(-6)}` : a);
+
+/* Activity over time: inflow / outflow per bucket, from the transfers already fetched. */
+function Trend({ transfers, symbol }: { transfers: { time: number | null; value: number; direction: string }[]; symbol: string }) {
+  const ts = transfers.filter((t) => t.time).map((t) => t.time!) as number[];
+  if (ts.length < 2) return null;
+  const min = Math.min(...ts);
+  const max = Math.max(...ts);
+  const span = max - min;
+  const day = 86400_000;
+  const bucket = span > 400 * day ? 30 * day : span > 90 * day ? 7 * day : day;
+  const n = Math.max(1, Math.min(40, Math.ceil(span / bucket) + 1));
+  const inB = new Array(n).fill(0);
+  const outB = new Array(n).fill(0);
+  for (const t of transfers) {
+    if (!t.time) continue;
+    const i = Math.min(n - 1, Math.floor((t.time - min) / bucket));
+    if (t.direction === "in") inB[i] += t.value;
+    else if (t.direction === "out") outB[i] += t.value;
+  }
+  const peak = Math.max(...inB, ...outB, 1e-9);
+  const W = 292;
+  const H = 54;
+  const bw = W / n;
+  const label = bucket === day ? "per day" : bucket === 7 * day ? "per week" : "per month";
+  return (
+    <div className="mt-3">
+      <div className="flex items-center justify-between"><span className="c-kv">Activity · {label}</span><span className="mono text-[10px] text-faint"><span className="text-teal">▮</span> in <span className="text-amber">▮</span> out · {symbol}</span></div>
+      <svg width={W} height={H} className="mt-1 block">
+        {inB.map((v, i) => (
+          <g key={i}>
+            <rect x={i * bw + 0.5} y={H - (v / peak) * (H - 2)} width={Math.max(1, bw / 2 - 1)} height={(v / peak) * (H - 2)} fill="#46a5bf" opacity={0.85} />
+            <rect x={i * bw + bw / 2} y={H - (outB[i] / peak) * (H - 2)} width={Math.max(1, bw / 2 - 1)} height={(outB[i] / peak) * (H - 2)} fill="#e8b23a" opacity={0.85} />
+          </g>
+        ))}
+        <line x1={0} y1={H - 0.5} x2={W} y2={H - 0.5} stroke="#1b2431" />
+      </svg>
+      <div className="flex justify-between mono text-[9.5px] text-faint mt-0.5"><span>{new Date(min).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "2-digit" })}</span><span>peak {fmtV(peak)} {symbol}</span><span>{new Date(max).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "2-digit" })}</span></div>
+    </div>
+  );
+}
 const fmtV = (v: number) => v.toLocaleString("en-IN", { maximumFractionDigits: v < 1 ? 5 : 2 });
 const fmtT = (t: number | null) =>
   t ? new Date(t).toLocaleString("en-IN", { day: "2-digit", month: "short", year: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false }) : "—";
@@ -136,11 +180,34 @@ function TraceInner() {
   const [res, setRes] = useState<TraceResult | null>(null);
   const [seedInfo, setSeedInfo] = useState<Lookup | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
+  const [tx, setTx] = useState<TxFull | null>(null);
+  const [cospend, setCospend] = useState<CospendCluster | null>(null);
 
   const run = useCallback(
     async (addr?: string, d = depth, f = fanout, dr = dir) => {
       const a = (addr ?? address).trim();
       if (!a) return;
+      if (/^(0x)?[0-9a-fA-F]{64}$/.test(a)) {
+        setLoading(true);
+        setError(null);
+        setRes(null);
+        setSeedInfo(null);
+        setCospend(null);
+        try {
+          const r = await fetch(`/api/tx?hash=${encodeURIComponent(a)}`);
+          const b = await r.json();
+          if (!r.ok) throw new Error(b.error ?? "transaction lookup failed");
+          setTx(b);
+        } catch (e) {
+          setTx(null);
+          setError(e instanceof Error ? e.message : "transaction lookup failed");
+        } finally {
+          setLoading(false);
+        }
+        return;
+      }
+      setTx(null);
+      setCospend(null);
       setLoading(true);
       setError(null);
       setSelected(null);
@@ -153,6 +220,7 @@ function TraceInner() {
         setRes(t.body as TraceResult);
         setSeedInfo(l.ok ? (l.body as Lookup) : null);
         setSelected(a);
+        if (/^([13]|bc1)/.test(a)) fetch(`/api/cospend?address=${encodeURIComponent(a)}`).then(async (r) => (r.ok ? setCospend(await r.json()) : null)).catch(() => {});
       } catch (e) {
         setRes(null);
         setError(e instanceof Error ? e.message : "trace failed");
@@ -164,6 +232,12 @@ function TraceInner() {
   );
 
   useEffect(() => {
+    const h = params.get("tx");
+    if (h) {
+      setAddress(h);
+      run(h);
+      return;
+    }
     const a = params.get("address");
     if (a) {
       const d = Math.min(4, Math.max(1, Number(params.get("depth") ?? 2) || 2));
@@ -215,12 +289,68 @@ function TraceInner() {
           }}
           className="flex-1 flex items-center gap-3 min-w-0"
         >
-          <AddressInput value={address} onChange={setAddress} />
+          <AddressInput value={address} onChange={setAddress} placeholder="Paste a BTC, ETH or TRON address — or a transaction hash" />
           <Primary disabled={loading}>{loading ? "tracing…" : "trace"}</Primary>
         </form>
       </TopBar>
 
-      {!res && (
+      {tx && !res && (
+
+        <div className="flex-1 min-h-0 overflow-y-auto px-8 py-6 max-w-[1200px]">
+
+          <div className="flex items-center gap-3"><span className="c-label">Transaction</span><Chip tone="teal">{tx.chain.toUpperCase()}</Chip><Chip tone={tx.confirmed ? "green" : "amber"}>{tx.confirmed ? "confirmed" : "unconfirmed"}</Chip><span className="mono text-[11px] text-faint">{tx.time ? fmtT(tx.time) : "no timestamp"}{tx.block ? ` · block ${tx.block.toLocaleString()}` : ""}</span></div>
+
+          <div className="mono text-[13px] break-all mt-2 text-ink/90">{tx.hash}</div>
+
+          {tx.note && <div className="c-note mt-2">{tx.note}</div>}
+
+          <div className="mt-5 border border-line bg-rail">
+
+            <div className="grid grid-cols-[1fr_1fr_140px] gap-4 px-4 py-2 border-b border-line c-kv"><span>from</span><span>to</span><span className="text-right">value</span></div>
+
+            {tx.legs.map((l, i) => (
+
+              <div key={i} className="grid grid-cols-[1fr_1fr_140px] gap-4 px-4 py-3 border-b border-line2 last:border-0 items-center">
+
+                {[[l.from, l.fromScreen], [l.to, l.toScreen]].map(([a, sc], j) => (
+
+                  <div key={j} className="min-w-0">
+
+                    <button onClick={() => { setAddress(a as string); run(a as string); }} className="mono text-[12.5px] hover:text-amber truncate block max-w-full text-left">{a as string}</button>
+
+                    <div className="flex gap-1.5 mt-1 flex-wrap">
+
+                      {(sc as Scr).sanctioned && <Chip tone="red">OFAC SDN</Chip>}
+
+                      {(sc as Scr).entity && <Chip tone="teal">{(sc as Scr).entity}</Chip>}
+
+                      {(sc as Scr).reported && <Chip tone="amber">community report</Chip>}
+
+                      <span className="mono text-[10px] text-faint">trace →</span>
+
+                    </div>
+
+                  </div>
+
+                ))}
+
+                <span className="mono text-[13px] text-right">{fmtV(l.value)} {tx.symbol}</span>
+
+              </div>
+
+            ))}
+
+          </div>
+
+          {tx.fee !== null && <div className="c-note mt-2">fee {fmtV(tx.fee)} {tx.symbol}</div>}
+
+          <div className="c-note mt-4">Click either side to trace from it. Screening chips are live: OFAC SDN list, community reports, sourced entity labels.</div>
+
+        </div>
+
+      )}
+
+      {!res && !tx && (
         <div className="flex-1 min-h-0 overflow-y-auto">
           {error && <div className="mx-8 mt-6 border border-[#652225] bg-[#1a0c0e] text-red px-4 py-3 text-[13px] max-w-xl">{error}</div>}
           {loading && <div className="px-8 pt-6 mono text-[12px] text-faint">querying chain — {depth} hop{depth > 1 ? "s" : ""}, up to {fanout} counterparties each…</div>}
@@ -294,7 +424,27 @@ function TraceInner() {
                 <KV k="First seen" v={fmtT(s?.firstSeen ?? null)} />
                 <KV k="Last seen" v={fmtT(s?.lastSeen ?? null)} />
               </div>
+              {seedInfo && seedInfo.transfers.length > 1 && <Trend transfers={seedInfo.transfers} symbol={s?.symbol ?? ""} />}
             </Section>
+            {cospend && (
+              <Section title="Co-spend cluster" chip={<Chip tone={cospend.members.length ? "amber" : "mut"}>{cospend.members.length ? `${cospend.size} addresses` : "none found"}</Chip>}>
+                {cospend.members.length ? (
+                  <>
+                    <div className="c-note mb-2">{cospend.members.length} address{cospend.members.length === 1 ? "" : "es"} signed inputs together with the seed in {cospend.txs} transaction{cospend.txs === 1 ? "" : "s"} — likely one owner</div>
+                    {cospend.members.slice(0, 6).map((m) => (
+                      <button key={m.address} onClick={() => { setAddress(m.address); run(m.address); }} className="w-full flex items-center justify-between py-1.5 border-b border-line2 last:border-0 text-left hover:text-amber">
+                        <span className="mono text-[12px]">{short(m.address)}</span>
+                        <span className="mono text-[10.5px] text-faint">{m.txs} tx</span>
+                      </button>
+                    ))}
+                    {cospend.members.length > 6 && <div className="c-note mt-1">+ {cospend.members.length - 6} more</div>}
+                  </>
+                ) : (
+                  <div className="c-note">no transaction spends this address together with another — no ownership lead from this heuristic</div>
+                )}
+                <div className="c-note mt-2">{cospend.heuristic} · heuristic, not proof</div>
+              </Section>
+            )}
             <Section title="Screening">
               <Flag on={!!seedInfo?.screening.ofacSanctioned} onText="OFAC SDN — sanctioned address" offText="Not on the OFAC SDN list" tone="red" />
               <Flag on={!!seedInfo?.screening.reported} onText={`Community report — ${seedInfo?.screening.reported?.category ?? "reported"} (a report, not a finding)`} offText="No community report on this address" tone="red" />

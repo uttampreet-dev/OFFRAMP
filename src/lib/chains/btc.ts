@@ -88,3 +88,20 @@ export async function lookupBtc(address: string): Promise<LookupResult> {
     fetchedAt: Math.min(a.fetchedAt, t.fetchedAt),
   };
 }
+
+/** Common-input-ownership heuristic (Meiklejohn et al., 2013): addresses that sign inputs of the same
+    transaction are very likely controlled by one owner. Heuristic — an investigative lead, not proof. */
+export interface CospendCluster { size: number; txs: number; members: { address: string; txs: number }[]; heuristic: string }
+export async function cospendBtc(address: string): Promise<CospendCluster> {
+  const t = await cachedJson<EsploraTx[]>(`${BASE}/address/${address}/txs`);
+  const count = new Map<string, number>();
+  let txs = 0;
+  for (const tx of t.data) {
+    const ins = [...new Set(tx.vin.map((v) => v.prevout?.scriptpubkey_address).filter(Boolean) as string[])];
+    if (!ins.includes(address) || ins.length < 2) continue;
+    txs++;
+    for (const a of ins) if (a !== address) count.set(a, (count.get(a) ?? 0) + 1);
+  }
+  const members = [...count.entries()].map(([a, n]) => ({ address: a, txs: n })).sort((x, y) => y.txs - x.txs);
+  return { size: members.length + 1, txs, members, heuristic: "common-input-ownership (Meiklejohn et al. 2013)" };
+}

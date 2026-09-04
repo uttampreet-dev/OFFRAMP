@@ -8,6 +8,7 @@ import { listWatch, markWatchSeen, recentAudit, listCases, allPackets, countPack
 import { POLICY_WINDOW_S } from "../intercept";
 
 const LOOKUP_TIMEOUT_MS = 10_000;
+const VELOCITY_ALERT = 5;
 
 export interface BoardAddress {
   address: string;
@@ -156,6 +157,7 @@ export async function boardSnapshot(): Promise<BoardSnapshot> {
       const cp = t.direction === "in" ? t.from : t.to;
       if (cp && isSanctioned(cp)) raiseAlert({ key: `sdn:${a.address}:${t.txid}`, level: "red", kind: "sanctions-contact", address: a.address, case_id: a.cases[0] ?? null, title: "transfer with an OFAC-listed counterparty", detail: `${cp.slice(0, 12)}… · ${t.txid.slice(0, 12)}…` });
     }
+    if (a.newTransfers.length >= VELOCITY_ALERT) raiseAlert({ key: `vel:${a.address}:${a.latestTx}`, level: "amber", kind: "velocity", address: a.address, case_id: a.cases[0] ?? null, title: "abnormal transaction velocity on a watched address", detail: `${a.newTransfers.length} new transfers since the last poll (threshold ${VELOCITY_ALERT})` });
     if (a.reported && a.newTransfers.length) raiseAlert({ key: `rep:${a.address}:${a.latestTx}`, level: "amber", kind: "reported-active", address: a.address, case_id: a.cases[0] ?? null, title: "activity on a community-reported address", detail: `${a.reported.category} · ${a.newTransfers.length} new transfer(s)` });
   }
   for (const w of windows) {

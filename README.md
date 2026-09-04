@@ -8,14 +8,37 @@ Everything on screen is either live public chain data or clearly labelled synthe
 
 | Module | What it does | Data |
 |---|---|---|
-| **Live Board** | Watched addresses re-evaluated against live chain state every 60 s: balance, activity, OFAC hit, known entity, community report. Activity feed from chain events and the audit log. Open freeze windows counting down. Alerts raised once per event: outflow from a watched address, contact with an OFAC-listed counterparty, activity on a reported address, a window under 15 minutes. | live |
-| **Cases** | Sequential case files opened on a seed wallet. Status, notes and every action taken from any module land on one audited timeline. | live · demonstration case marked synthetic |
-| **Trace** | Breadth-first flow trace by hop, following the largest counterparties, stopping at known entities. Value-weighted flow graph, sanctions screening of every node, counterparties by value. | live: Blockstream, Etherscan, TronGrid |
+| **Live Board** | Watched addresses re-evaluated against live chain state every 60 s: balance, activity, OFAC hit, known entity, community report. Activity feed from chain events and the audit log. Open freeze windows counting down. Alerts raised once per event: outflow from a watched address, contact with an OFAC-listed counterparty, activity on a reported address, abnormal transaction velocity, a window under 15 minutes. | live |
+| **Cases** | Sequential case files opened on a seed wallet. Status, notes and every action taken from any module land on one audited timeline. One search across everything the console holds: case ids, wallets, transaction hashes, account numbers, complaints, entities, packets, packs and the audit log. | live · demonstration case marked synthetic |
+| **Trace** | Breadth-first flow trace by hop, following the largest counterparties, stopping at known entities. Value-weighted flow graph, sanctions and community-report screening of every node, counterparties by value, activity-over-time chart. Paste a transaction hash instead of an address to open the transaction with both sides screened. On Bitcoin, a co-spend cluster (common-input-ownership heuristic, Meiklejohn et al. 2013) lists addresses that signed inputs together with the seed. | live: Blockstream, Etherscan, TronGrid |
 | **Bridge** | Matches an on-chain cash-out to an INR bank credit by amount × exchange rate × time window. Reports a *candidate linkage* with a strength score and its rivals, never ownership. | live chain events or synthetic statement |
 | **Red Flags** | Ten explainable detectors grounded in FATF virtual-asset red-flag indicators: rapid layering, structuring, P2P off-ramp, velocity spike, mixer contact, sanctions hit, bridge hop, dormant reactivation, peel chain, round-number transfers. Each fires with evidence lines and a heuristic confidence. | live |
 | **Intercept** | Estimates the withdrawal window from the wallet's own inflow→outflow lag (three or more pairs, capped at 48 h), otherwise a stated 2-hour policy default. Composes and seals a freeze-request packet with SHA-256. A supervisor signs the sealed packet off as a separate audited step. | live · replay of the demonstration case |
 | **Evidence** | Serialises every artefact canonically, hashes it, chains the hashes to a root, verifies the chain on demand. Exports a JSON bundle, an STR draft in FIU-IND layout, and a Section 63 (Bharatiya Sakshya Adhiniyam, 2023) certificate. Documents are drafts until signed. | case artefacts |
 | **Syndicates** | Groups complaints whose money reached the same cash-out wallet, joined transitively, into operator groups: loss, tempo, cities, rails, wallets with screening and hand-offs. | synthetic complaints, labelled |
+
+## Against the brief
+
+| Expected feature | Where it is |
+|---|---|
+| Multi-source data collection | three block explorers, OFAC SDN, CryptoScamDB, sourced entity labels, bank statement CSV, synthetic complaints — all through one adapter layer with a disk cache |
+| Intelligent entity correlation | Bridge (wallet ↔ bank credit), Syndicates (complaints ↔ cash-out wallets), co-spend clustering on Bitcoin, known-entity labels with sources, FATF-grounded detectors |
+| Suspicious transaction detection | ten detectors: rapid layering, structuring, P2P off-ramp, velocity spike, mixer contact, sanctions hit, bridge hop, dormant reactivation, peel chain, round amounts |
+| Interactive intelligence dashboard | Live Board (alerts, watched addresses, windows, cases), Trace (flow graph, activity trend), Cases (search, timeline) |
+| Automated alert generation | board rules raised once per event: outflow, sanctions contact, reported-address activity, abnormal velocity, window closing |
+| Search & investigation support | search by wallet, transaction hash, account number, case id, complaint, entity; every lookup cached; every action in the audit log |
+| Reporting & evidence management | hash-chained evidence packs, STR draft (FIU-IND layout), Section 63 certificate (BSA 2023), JSON bundle, chain of custody from the audit log |
+| Security & access control | scrypt passwords, HMAC-signed sessions, route middleware, three roles, supervisor-only sign-off and case closing, audit of every write |
+| Scalability | stateless engines, per-chain adapters behind one interface, disk cache with stale fallback; a new chain or list is one adapter or one file; SQLite → Postgres is a configuration change |
+
+## Why this stack
+
+- **Next.js 16 + React 19 + TypeScript**: one codebase for the console and its API; typed end to end from chain adapter to screen; server routes keep API keys off the browser.
+- **Plain rules, no model**: every flag must be explainable in a file and defensible in court. Rules grounded in FATF indicators are auditable; a score without reasons is not.
+- **Public explorers on free tiers**: no proprietary feed and no licence; every number is reproducible on a public explorer. The adapter layer means a paid or internal feed can be added later without touching the engines.
+- **SQLite with an audit log**: a single file is honest for a laptop deployment and enough for a district; the schema is standard SQL and moves to Postgres unchanged.
+- **Disk cache with offline replay**: public APIs rate-limit and stall; caching makes the console fast and lets a demonstration run with no network.
+- **SHA-256 hash chain over canonical JSON**: standard primitives a court-appointed expert can recompute; no custom cryptography.
 
 ## Data sources
 
