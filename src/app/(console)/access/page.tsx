@@ -58,7 +58,7 @@ export default function AccessPage() {
         </div>
       </TopBar>
 
-      <div className={`flex-1 min-h-0 grid ${me?.role === "supervisor" ? "grid-cols-[1fr_1fr_420px]" : "grid-cols-[1fr_1fr]"} overflow-hidden`}>
+      <div className={`flex-1 min-h-0 grid ${me?.role === "supervisor" ? "grid-cols-[minmax(0,1fr)_minmax(0,1fr)_340px]" : "grid-cols-[minmax(0,1fr)_minmax(0,1fr)]"} overflow-hidden`}>
         {/* your account */}
         <div className="overflow-y-auto border-r border-line">
           <div className="px-7 py-4 border-b border-line"><span className="c-label">Your account</span></div>

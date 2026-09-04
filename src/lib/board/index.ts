@@ -118,13 +118,20 @@ async function evaluate(w: WatchRow, caseIds: Map<string, string[]>): Promise<Bo
   }
 }
 
-export async function boardSnapshot(): Promise<BoardSnapshot> {
+export async function boardSnapshot(fast = false): Promise<BoardSnapshot> {
   const cases = listCases();
   const byAddr = new Map<string, string[]>();
   for (const c of cases) byAddr.set(c.seed.toLowerCase(), [...(byAddr.get(c.seed.toLowerCase()) ?? []), c.id]);
   const watch = listWatch();
   const watched: BoardAddress[] = [];
-  for (let i = 0; i < watch.length; i += 3) watched.push(...(await Promise.all(watch.slice(i, i + 3).map((w) => evaluate(w, byAddr)))));
+  if (fast) {
+    for (const w of watch) {
+      const e = knownEntity(w.address);
+      watched.push({ address: w.address, chain: w.chain, label: w.label, symbol: w.last_symbol ?? (w.chain === "btc" ? "BTC" : w.chain === "eth" ? "ETH" : "USDT"), balance: w.last_balance, txCount: w.last_txcount, lastSeen: w.last_seen, latestTx: w.last_tx, sanctioned: isSanctioned(w.address), entity: e ? { entity: e.entity, type: e.type, source: e.source } : null, reported: isReported(w.address), fromCache: true, stale: true, error: null, newTransfers: [], cases: byAddr.get(w.address.toLowerCase()) ?? [] });
+    }
+  } else {
+    for (let i = 0; i < watch.length; i += 3) watched.push(...(await Promise.all(watch.slice(i, i + 3).map((w) => evaluate(w, byAddr)))));
+  }
 
   const events: BoardEvent[] = [];
   for (const a of watched)

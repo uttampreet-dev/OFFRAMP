@@ -110,34 +110,34 @@ function Inner() {
       {error && <div className="mx-8 mt-6 border border-[#652225] bg-[#1a0c0e] text-red px-4 py-3 text-[13px] max-w-xl">{error}</div>}
 
       {ev && (
-        <div className="flex-1 min-h-0 grid grid-cols-[1fr_380px_400px] overflow-hidden">
+        <div className="flex-1 min-h-0 grid grid-cols-[minmax(0,1fr)_320px_340px] overflow-hidden">
           {/* pack contents */}
           <div className="overflow-y-auto">
-            <div className="px-7 py-5 border-b border-line flex items-center gap-3">
-              <span className="c-label">Pack contents · {ev.artefacts.length} artefacts</span>
-              <Chip tone={ev.demo ? "mut" : "green"}>{ev.demo ? "demonstration case · synthetic where marked" : "live public chain data"}</Chip>
-              <span className="ml-auto mono text-[12px] text-ink/80">{ev.caseId}</span>
+            <div className="px-6 py-4 border-b border-line flex items-center gap-3 overflow-hidden">
+              <span className="c-label whitespace-nowrap">Pack contents · {ev.artefacts.length}</span>
+              <Chip tone={ev.demo ? "mut" : "green"}>{ev.demo ? "demonstration · synthetic where marked" : "live chain data"}</Chip>
+              <span className="ml-auto mono text-[12px] text-ink/80 whitespace-nowrap shrink-0">{ev.caseId}</span>
             </div>
-            <div className="px-7">
+            <div className="px-6">
               {ev.artefacts.map((a) => (
-                <div key={a.name} className="grid grid-cols-[1fr_auto] gap-4 py-3.5 border-b border-line2">
+                <div key={a.name} className="grid grid-cols-[minmax(0,1fr)_150px] gap-4 py-3 border-b border-line2">
                   <div className="min-w-0">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
                       <span className="mono text-[13.5px] text-ink/95">{a.name}</span>
                       <Chip tone={kindTone(a.kind)}>{a.kind}</Chip>
                       {a.synthetic && <Chip tone="mut">synthetic</Chip>}
                     </div>
                     <div className="c-note mt-1">{a.summary}</div>
                   </div>
-                  <div className="text-right">
-                    <div className="mono text-[11.5px] text-mut">{a.sha256.slice(0, 16)}…</div>
+                  <div className="text-right shrink-0">
+                    <div className="mono text-[11px] text-mut">{a.sha256.slice(0, 14)}…</div>
                     <div className="mono text-[10.5px] text-faint mt-0.5">{a.bytes.toLocaleString()} B · sha-256</div>
                   </div>
                 </div>
               ))}
               {ev.artefacts.length === 0 && <p className="c-note py-6">Nothing to pack yet.</p>}
             </div>
-            <div className="px-7 py-5 flex items-center gap-4">
+            <div className="px-6 py-5 flex items-center gap-4">
               <button onClick={sealPack} disabled={sealing || ev.artefacts.length === 0} className="mono text-[11px] tracking-[0.12em] uppercase font-extrabold bg-amber text-[#12100c] px-5 py-3 hover:brightness-110 disabled:opacity-40">
                 {sealing ? "sealing…" : "seal pack · chain hashes"}
               </button>

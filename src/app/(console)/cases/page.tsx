@@ -118,7 +118,7 @@ function Inner() {
         </form>
       </TopBar>
 
-      <div className="flex-1 min-h-0 grid grid-cols-[440px_1fr] overflow-hidden">
+      <div className="flex-1 min-h-0 grid grid-cols-[380px_minmax(0,1fr)] overflow-hidden">
         <div className="border-r border-line overflow-y-auto">
           {hits !== null && (
             <div className="border-b border-line bg-panel">

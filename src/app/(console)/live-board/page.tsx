@@ -89,6 +89,8 @@ function Inner() {
 
   useEffect(() => {
     const w = params.get("watch");
+    // last-known values first so the board is never blank, then the live poll
+    fetch("/api/board?fast=1", { cache: "no-store" }).then((r) => r.json()).then((b) => { if (b && !b.error) setSnap((cur) => cur ?? (b as BoardSnapshot)); }).catch(() => {});
     if (w) watch(w, "from Trace");
     else poll();
     timer.current = setInterval(() => setLeft((x) => (x <= 1 ? POLL_S : x - 1)), 1000);
@@ -157,7 +159,7 @@ function Inner() {
         </div>
       )}
       {snap && (
-        <div className="flex-1 min-h-0 grid grid-cols-[1.35fr_1fr_400px] overflow-hidden">
+        <div className="flex-1 min-h-0 grid grid-cols-[minmax(0,1.7fr)_minmax(0,0.9fr)_300px] overflow-hidden">
           {/* watched */}
           <div className="overflow-y-auto">
             <div className="px-6 py-4 border-b border-line flex items-center gap-3">
@@ -165,30 +167,32 @@ function Inner() {
               <span className="c-note">re-evaluated every {POLL_S} s from the chain cache · balances and counts are public chain data</span>
             </div>
             <div className="px-6">
-              <div className="grid grid-cols-[1fr_78px_120px_70px_92px] gap-3 py-2 border-b border-line c-kv">
-                <span>address · label</span><span>chain</span><span className="text-right">balance</span><span className="text-right">tx</span><span className="text-right">last activity</span>
+              <div className="grid grid-cols-[minmax(0,1fr)_52px_112px_52px_86px] gap-2 py-2 border-b border-line c-kv whitespace-nowrap">
+                <span>address · label</span><span>chain</span><span className="text-right">balance</span><span className="text-right">tx</span><span className="text-right">last seen</span>
               </div>
               {snap.watched.map((a) => (
-                <div key={a.address} className="grid grid-cols-[1fr_78px_120px_70px_92px] gap-3 py-3 border-b border-line2 items-center group">
+                <div key={a.address} className="grid grid-cols-[minmax(0,1fr)_52px_112px_52px_86px] gap-2 py-2.5 border-b border-line2 items-center group">
                   <div className="min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
+                    <div className="flex items-center gap-2 overflow-hidden whitespace-nowrap">
                       <Link href={`/trace?address=${a.address}`} className="mono text-[13px] hover:text-amber">{short(a.address)}</Link>
-                      {a.sanctioned && <Chip tone="red">OFAC SDN</Chip>}
-                      {a.entity && <Chip tone="teal">{a.entity.entity}</Chip>}
-                      {a.reported && <Chip tone="amber">community report · {a.reported.category}</Chip>}
-                      {a.newTransfers.length > 0 && <Chip tone="amber">new activity ×{a.newTransfers.length}</Chip>}
-                      {a.stale && <Chip tone="mut">last known · lookup timed out</Chip>}
                       {a.cases.map((c) => (
                         <Link key={c} href={`/cases?id=${c}`} className="mono text-[10px] text-amber underline underline-offset-2">{c}</Link>
                       ))}
-                      <button onClick={() => unwatch(a.address)} className="mono text-[10px] text-faint opacity-0 group-hover:opacity-100 hover:text-red">remove</button>
+                      <button onClick={() => unwatch(a.address)} className="mono text-[10px] text-faint opacity-0 group-hover:opacity-100 hover:text-red ml-auto">remove</button>
                     </div>
-                    <div className="c-note truncate mt-0.5">{a.error ? <span className="text-red">{a.error}</span> : a.label}</div>
+                    <div className="flex items-center gap-1.5 mt-1 overflow-hidden whitespace-nowrap">
+                      {a.sanctioned && <Chip tone="red">OFAC SDN</Chip>}
+                      {a.entity && <Chip tone="teal">{a.entity.entity}</Chip>}
+                      {a.reported && <Chip tone="amber">report · {a.reported.category}</Chip>}
+                      {a.newTransfers.length > 0 && <Chip tone="amber">new ×{a.newTransfers.length}</Chip>}
+                      {a.stale && !loading && <Chip tone="mut">last known</Chip>}
+                      <span className="c-note truncate min-w-0">{a.error ? <span className="text-red">{a.error}</span> : a.label}</span>
+                    </div>
                   </div>
-                  <span className="mono text-[11px] uppercase text-mut">{a.chain}</span>
-                  <span className={`mono text-[12.5px] text-right ${a.stale ? "text-faint" : ""}`}>{a.balance !== null ? `${fmtV(a.balance)} ${a.symbol}` : a.txCount !== null ? "n/a" : "—"}</span>
-                  <span className="mono text-[12.5px] text-right">{a.txCount ?? "—"}</span>
-                  <span className="mono text-[11px] text-right text-mut">{ago(a.lastSeen)}</span>
+                  <span className="mono text-[10.5px] uppercase text-mut">{a.chain}</span>
+                  <span className={`mono text-[12px] text-right truncate ${a.stale ? "text-faint" : ""}`}>{a.balance !== null ? `${fmtV(a.balance)} ${a.symbol}` : a.txCount !== null ? "n/a" : "—"}</span>
+                  <span className="mono text-[12px] text-right">{a.txCount ?? "—"}</span>
+                  <span className="mono text-[10.5px] text-right text-mut whitespace-nowrap">{ago(a.lastSeen)}</span>
                 </div>
               ))}
               {snap.watched.length === 0 && <p className="c-note py-6">Nothing watched yet. Add an address above or from Trace.</p>}
@@ -223,7 +227,7 @@ function Inner() {
             <div className="px-6">
               {snap.cases.slice(0, 8).map((c) => (
                 <Link key={c.id} href={`/cases?id=${c.id}`} className="block py-3 border-b border-line2 hover:bg-panel -mx-2 px-2">
-                  <div className="flex items-center gap-2"><span className="mono text-[12px] font-bold">{c.id}</span><Chip tone={statusTone(c.status)}>{c.status}</Chip>{c.synthetic ? <Chip tone="mut">synthetic</Chip> : null}</div>
+                  <div className="flex items-center gap-2 flex-wrap"><span className="mono text-[12px] font-bold whitespace-nowrap">{c.id}</span><Chip tone={statusTone(c.status)}>{c.status}</Chip>{c.synthetic ? <Chip tone="mut">synthetic</Chip> : null}</div>
                   <div className="text-[12.5px] text-ink/85 mt-1 leading-snug">{c.title}</div>
                   <div className="mono text-[10.5px] text-faint mt-0.5">{c.chain.toUpperCase()} · {c.officer} · {ago(c.updated_at)}</div>
                 </Link>

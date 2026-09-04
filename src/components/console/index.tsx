@@ -12,7 +12,7 @@ export function TopBar({ title, subtitle, children, secondRow }: { title: string
         </div>
         {children}
       </div>
-      {secondRow && <div className="h-[44px] border-t border-line/70 flex items-center px-6 gap-5">{secondRow}</div>}
+      {secondRow && <div className="min-h-[44px] py-1.5 border-t border-line/70 flex items-center flex-wrap px-6 gap-x-5 gap-y-1.5">{secondRow}</div>}
     </div>
   );
 }
@@ -67,7 +67,7 @@ export function Chip({ tone = "mut", children }: { tone?: "green" | "red" | "amb
     teal: "bg-[#0a1a1f] text-teal border-[#1f4a56]",
     mut: "bg-panel2 text-mut border-line",
   }[tone];
-  return <span className={`mono text-[9.5px] tracking-[0.1em] uppercase font-bold border px-2 py-0.5 ${c}`}>{children}</span>;
+  return <span className={`mono text-[9.5px] tracking-[0.1em] uppercase font-bold border px-2 py-0.5 whitespace-nowrap shrink-0 ${c}`}>{children}</span>;
 }
 
 export function Section({ title, chip, children }: { title: string; chip?: ReactNode; children: ReactNode }) {

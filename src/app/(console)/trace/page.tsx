@@ -144,18 +144,22 @@ function Flow({ res, selected, onSelect }: { res: TraceResult; selected: string 
           const stroke = n.sanctioned ? "#e5484d" : n.entity ? "#46a5bf" : isSeed ? "#e8b23a" : "#9fb0c1";
           const isSel = selected === n.address;
           const dim = selected !== null && !isSel && !adjacent.has(n.address);
-          const right = true;
+          const right = n.hop === 0 && res && res.stats.hopsReached > 0 ? false : (true);
           const lx = p.x + r + 9;
           return (
             <g key={n.address} onClick={() => onSelect(n.address)} style={{ cursor: "pointer", opacity: dim ? 0.5 : 1, transition: "opacity .2s" }}>
               {(n.sanctioned || isSel) && <circle cx={p.x} cy={p.y} r={r + 7} fill="none" stroke={isSel ? "#e8b23a" : "#e5484d"} strokeOpacity="0.5" strokeWidth="1.2" />}
               <circle cx={p.x} cy={p.y} r={r} fill={n.sanctioned ? "#12080a" : n.entity ? "#0a1a1f" : "#0b1119"} stroke={stroke} strokeWidth={isSel ? 2.5 : 1.8} />
-              <text x={lx} y={p.y - 3} textAnchor={right ? "start" : "end"} fontSize="12.5" fill="#e3ebf2" style={{ fontFamily: "var(--font-mono)" }}>
-                {short(n.address)}
-              </text>
-              <text x={lx} y={p.y + 12} textAnchor={right ? "start" : "end"} fontSize="10.5" fill={n.entity ? "#46a5bf" : n.sanctioned ? "#e5484d" : "#7a8ea3"} style={{ fontFamily: "var(--font-mono)" }}>
-                {n.entity ? `${n.entity.entity} · ${n.entity.type}` : n.sanctioned ? "OFAC SDN" : n.expanded ? `${fmtV(n.inValue || n.outValue)} ${n.symbol}` : "not expanded"}
-              </text>
+              {(size.w >= 640 || n.expanded || n.entity || n.sanctioned || isSel) && (
+                <>
+                  <text x={lx} y={p.y - 3} textAnchor={right ? "start" : "end"} fontSize="12.5" fill="#e3ebf2" style={{ fontFamily: "var(--font-mono)" }}>
+                    {short(n.address)}
+                  </text>
+                  <text x={lx} y={p.y + 12} textAnchor={right ? "start" : "end"} fontSize="10.5" fill={n.entity ? "#46a5bf" : n.sanctioned ? "#e5484d" : "#7a8ea3"} style={{ fontFamily: "var(--font-mono)" }}>
+                    {n.entity ? `${n.entity.entity} · ${n.entity.type}` : n.sanctioned ? "OFAC SDN" : n.expanded ? `${fmtV(n.inValue || n.outValue)} ${n.symbol}` : "not expanded"}
+                  </text>
+                </>
+              )}
             </g>
           );
         })}
@@ -411,7 +415,7 @@ function TraceInner() {
       )}
 
       {res && (
-        <div className="flex-1 min-h-0 grid grid-cols-[340px_1fr_360px]">
+        <div className="flex-1 min-h-0 grid grid-cols-[272px_minmax(0,1fr)_288px] 2xl:grid-cols-[318px_minmax(0,1fr)_330px]">
           {/* left: summary */}
           <aside className="border-r border-line bg-rail overflow-y-auto">
             <Section title="Address summary" chip={<Chip tone="green">{seedInfo?.fromCache ? "cached" : "live"}</Chip>}>
@@ -506,7 +510,7 @@ function TraceInner() {
             <div className="absolute top-4 left-5 c-label z-10">
               Flow · {res.direction === "out" ? "downstream" : "upstream"} · hop 0 → {res.stats.hopsReached}
             </div>
-            <div className="absolute top-4 right-5 c-note z-10">click a node · edge width ∝ value</div>
+            <div className="absolute top-4 right-5 c-note z-10 hidden 2xl:block">click a node · edge width ∝ value</div>
             <div className="absolute inset-0 top-10">
               <Flow res={res} selected={selected} onSelect={setSelected} />
             </div>

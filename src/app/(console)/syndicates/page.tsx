@@ -76,7 +76,7 @@ function Graph({ rep, sel, onSelect }: { rep: SyndicateReport; sel: string | nul
           if (!w) return null;
           return (
             <text key={s.id} x={w.x} y={w.y - 34 - Math.min(10, s.wallets[0].complaints * 1.6)} textAnchor="middle" fontSize={11} fontWeight={700} fill={PALETTE[i % PALETTE.length]} fontFamily="ui-monospace, Menlo, monospace" opacity={sel === null || sel === s.id ? 1 : 0.2}>
-              {s.id} · {s.complaints.length} complaints · {lakh(s.amountInr)}
+              {sel === null || sel === s.id ? `${s.id} · ${s.complaints.length} complaints · ${lakh(s.amountInr)}` : s.id}
             </text>
           );
         })}
@@ -116,7 +116,7 @@ export default function SyndicatesPage() {
       </TopBar>
       {error && <div className="mx-8 mt-6 border border-[#652225] bg-[#1a0c0e] text-red px-4 py-3 text-[13px] max-w-xl">{error}</div>}
       {rep && (
-        <div className="flex-1 min-h-0 grid grid-cols-[300px_1fr_420px] overflow-hidden">
+        <div className="flex-1 min-h-0 grid grid-cols-[270px_minmax(0,1fr)_350px] overflow-hidden">
           <div className="border-r border-line overflow-y-auto">
             <div className="px-5 py-4 border-b border-line"><span className="c-label">Syndicates · by loss</span></div>
             {rep.syndicates.map((x, i) => (

@@ -150,7 +150,7 @@ function Inner() {
       {res && (
         <div className="flex-1 min-h-0 overflow-y-auto">
           {/* the seam */}
-          <div className="grid grid-cols-[1fr_200px_1fr] border-b border-line">
+          <div className="grid grid-cols-[minmax(0,1fr)_200px_minmax(0,1fr)] border-b border-line">
             <div className="px-7 py-5 bg-panel">
               <div className="flex items-center gap-3 mb-3">
                 <span className="c-label">On-chain · outflows</span>
@@ -160,9 +160,12 @@ function Inner() {
                 const hit = ev.txid === matchedEvent;
                 const up = !!matchedCredit && res.linkages.some((l) => l.upstreamOfBest && l.event.txid === ev.txid && l.credit.ts === matchedCredit.ts && l.credit.credit === matchedCredit.credit);
                 return (
-                  <div key={ev.txid} className={`mono flex items-center gap-4 text-[13px] border-b border-line2 py-3 ${hit ? "bg-[#17130a] -mx-3 px-3 shadow-[inset_3px_0_0_#e8b23a]" : ""}`}>
-                    <span className="text-faint w-[64px] shrink-0">{hms(ev.ts)}</span>
-                    <span className="truncate flex-1 text-ink/90">{short(ev.from)} → {short(ev.to)}<span className="text-faint"> · {ev.note}</span>{up && <span className="text-teal"> · upstream of match</span>}</span>
+                  <div key={ev.txid} className={`mono flex items-start gap-4 text-[13px] border-b border-line2 py-2.5 ${hit ? "bg-[#17130a] -mx-3 px-3 shadow-[inset_3px_0_0_#e8b23a]" : ""}`}>
+                    <span className="text-faint w-[64px] shrink-0 pt-px">{hms(ev.ts)}</span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-ink/90">{short(ev.from)} → {short(ev.to)}</span>
+                      <span className="block truncate text-[11px] text-faint mt-0.5">{ev.note}{up && <span className="text-teal"> · upstream of match</span>}</span>
+                    </span>
                     <span className={`font-bold shrink-0 ${hit ? "text-amber2" : ""}`}>{fmtV(ev.value)} {ev.symbol}</span>
                   </div>
                 );
@@ -186,11 +189,11 @@ function Inner() {
                 </div>
               )}
             </div>
-            <div className="px-7 py-5 cash-paper">
+            <div className="px-6 py-5 cash-paper min-w-0 overflow-hidden">
               <div className="flex items-center gap-3 mb-3">
-                <span className="c-label text-cashmut">Bank statement · credits</span>
-                <Chip tone="mut">{res.statementSynthetic ? "synthetic — labelled" : "uploaded"}</Chip>
-                <span className="ml-auto mono text-[11px] text-cashmut">A/C {res.account}</span>
+                <span className="c-label text-cashmut whitespace-nowrap">Statement · credits</span>
+                <Chip tone="mut">{res.statementSynthetic ? "synthetic" : "uploaded"}</Chip>
+                <span className="ml-auto mono text-[11px] text-cashmut whitespace-nowrap">A/C {res.account}</span>
               </div>
               {res.credits.map((cr, i) => {
                 const hit = cr === matchedCredit || (matchedCredit && cr.ts === matchedCredit.ts && cr.credit === matchedCredit.credit);
@@ -206,7 +209,7 @@ function Inner() {
           </div>
 
           {/* linkages + resolved entity */}
-          <div className="grid grid-cols-[1fr_440px]">
+          <div className="grid grid-cols-[minmax(0,1fr)_380px]">
             <div className="px-7 py-5 border-r border-line">
               <div className="c-label mb-3">Candidate linkages · {res.linkages.length}</div>
               {res.linkages.length === 0 && <p className="c-note">No outflow matched a credit within {res.tolerancePct}% and {res.windowHours} h. Widen the tolerance or the window, or check the statement schema.</p>}

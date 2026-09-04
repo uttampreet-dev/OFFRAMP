@@ -149,7 +149,7 @@ function Inner() {
       )}
 
       {rep && counts && (
-        <div className="flex-1 min-h-0 grid grid-cols-[1fr_440px]">
+        <div className="flex-1 min-h-0 grid grid-cols-[minmax(0,1fr)_380px]">
           {/* results */}
           <div className="min-w-0 overflow-y-auto">
             <div className="px-8 pt-6 pb-4 border-b border-line flex items-end gap-8">
@@ -184,7 +184,7 @@ function Inner() {
                   <button
                     key={x.id}
                     onClick={() => setSel(x.id)}
-                    className={`w-full text-left grid grid-cols-[14px_260px_1fr_120px] items-center gap-4 px-8 py-3.5 border-b border-line2 transition-colors ${on ? "bg-panel shadow-[inset_3px_0_0_#e8b23a]" : "hover:bg-panel/60"}`}
+                    className={`w-full text-left grid grid-cols-[14px_200px_minmax(0,1fr)_110px] items-center gap-3 px-6 py-3 border-b border-line2 transition-colors ${on ? "bg-panel shadow-[inset_3px_0_0_#e8b23a]" : "hover:bg-panel/60"}`}
                   >
                     <span className={`w-2.5 h-2.5 ${sq}`} />
                     <div>
