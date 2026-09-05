@@ -318,7 +318,7 @@ Nothing that solves the problem is outsourced. The trace engine, detectors, risk
 | [TronGrid](https://www.trongrid.io/) | TRON accounts, TRC-20 (USDT) transfers, transactions by hash | free key raises limits |
 | [OFAC SDN digital-currency addresses](https://github.com/0xB10C/ofac-sanctioned-digital-currency-addresses) (public mirror by 0xB10C) | sanctions screening, `data/ofac`, 940 unique addresses across the BTC, ETH, TRX and USDT lists, synced 2026-08-31 | public domain source data |
 | [CryptoScamDB](https://cryptoscamdb.org/) | community-reported addresses, `data/scam`, 4,270 entries, shown as reports, not findings | open data |
-| Blockchair, WalletExplorer, Etherscan and Tronscan labels; OFAC designations | known exchanges and mixers, `data/known-entities.json`, 42 entries, each with its source URL | public pages, cited per entry |
+| WalletExplorer, Etherscan and Tronscan labels; OFAC designations | known exchanges and mixers, `data/known-entities.json`, 42 entries, each with its source URL, each checked against that page (`data/known-entities-check.csv`) | public pages, cited per entry |
 | Next.js, React, Tailwind CSS, better-sqlite3, TypeScript | framework, UI, styling, embedded database, typing | MIT |
 | Node.js `crypto` (scrypt, HMAC, SHA-256) | password hashing, session signing, evidence hashing | standard library |
 | Pre-trained models | none | |

@@ -17,7 +17,7 @@ const FALLBACK: KnownEntity[] = [
     chain: "btc",
     entity: "Binance",
     type: "exchange",
-    source: "https://blockchair.com/bitcoin/address/1NDyJtNTjmwk5xPNhjgAMu4HDHigtobu1s",
+    source: "https://www.walletexplorer.com/address/1NDyJtNTjmwk5xPNhjgAMu4HDHigtobu1s",
   },
 ];
 
