@@ -1,0 +1,123 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="420" viewBox="0 0 1600 420" role="img" aria-label="OFFRAMP — crypto flow intelligence. Follows the money across the seam where it stops being crypto and starts being cash.">
+  <defs>
+    <pattern id="grid" width="44" height="44" patternUnits="userSpaceOnUse">
+      <path d="M44 0H0V44" fill="none" stroke="#161f2b" stroke-width="1"/>
+    </pattern>
+    <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#e8b23a" stop-opacity="0.22"/>
+      <stop offset="1" stop-color="#e8b23a" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="cash" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1d1710"/>
+      <stop offset="1" stop-color="#17120b"/>
+    </linearGradient>
+    <linearGradient id="fade" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#070a0f" stop-opacity="1"/>
+      <stop offset="1" stop-color="#070a0f" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="soft" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="6"/>
+    </filter>
+    <path id="p-btc"  d="M 905 120 C 990 120, 1010 210, 1085 210"/>
+    <path id="p-eth"  d="M 905 210 C 990 210, 1010 210, 1085 210"/>
+    <path id="p-tron" d="M 905 300 C 990 300, 1010 210, 1085 210"/>
+    <path id="p-hop"  d="M 1085 210 C 1140 210, 1150 210, 1190 210"/>
+    <path id="p-seam" d="M 1190 210 C 1250 210, 1270 236, 1338 236"/>
+  </defs>
+
+  <!-- ground -->
+  <rect width="1600" height="420" fill="#070a0f"/>
+  <rect width="1600" height="420" fill="url(#grid)"/>
+  <ellipse cx="1290" cy="210" rx="260" ry="200" fill="url(#glow)"/>
+  <rect x="0" y="0" width="760" height="420" fill="url(#fade)"/>
+
+  <!-- wordmark -->
+  <g font-family="-apple-system, 'Helvetica Neue', Helvetica, Arial, sans-serif">
+    <text x="80" y="118" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11.5" letter-spacing="3" font-weight="700" fill="#5c6e82">FOR CYBER-CRIME UNITS · INVESTIGATOR CONSOLE · BTC · ETH · TRON</text>
+    <text x="78" y="216" font-size="104" font-weight="800" letter-spacing="10" fill="#e9eff5">OFF<tspan fill="#e8b23a">RAMP</tspan></text>
+    <text x="82" y="252" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="14" letter-spacing="6" font-weight="700" fill="#8598aa">CRYPTO FLOW INTELLIGENCE</text>
+    <text x="80" y="306" font-size="21" fill="#8598aa">Follows the money across the seam where it</text>
+    <text x="80" y="336" font-size="21" fill="#8598aa">stops being <tspan fill="#e9eff5" font-weight="600">crypto</tspan> and starts being <tspan fill="#e8b23a" font-weight="700">cash.</tspan></text>
+  </g>
+
+  <!-- on-chain side -->
+  <g font-family="'SF Mono', Menlo, Consolas, monospace" font-size="11" font-weight="700" letter-spacing="2">
+    <text x="820" y="74" fill="#5c6e82">ON-CHAIN · PUBLIC · TRACEABLE</text>
+    <text x="1338" y="74" fill="#9c8663">OFF-CHAIN · INR · FREEZABLE</text>
+  </g>
+
+  <!-- chain chips -->
+  <g font-family="'SF Mono', Menlo, Consolas, monospace" font-size="12" font-weight="700" letter-spacing="1.5">
+    <rect x="838" y="104" width="66" height="32" rx="2" fill="#0c121a" stroke="#1b2431"/>
+    <text x="871" y="125" text-anchor="middle" fill="#e8b23a">BTC</text>
+    <rect x="838" y="194" width="66" height="32" rx="2" fill="#0c121a" stroke="#1b2431"/>
+    <text x="871" y="215" text-anchor="middle" fill="#46a5bf">ETH</text>
+    <rect x="838" y="284" width="66" height="32" rx="2" fill="#0c121a" stroke="#1b2431"/>
+    <text x="871" y="305" text-anchor="middle" fill="#3dd68c">TRON</text>
+  </g>
+
+  <!-- flow paths -->
+  <g fill="none" stroke="#2a3644" stroke-width="1.5">
+    <use href="#p-btc"/><use href="#p-eth"/><use href="#p-tron"/><use href="#p-hop"/>
+  </g>
+  <use href="#p-seam" fill="none" stroke="#e8b23a" stroke-width="1.5" stroke-opacity="0.7" stroke-dasharray="4 4"/>
+
+  <!-- hop node: sanctioned seed -->
+  <circle cx="1085" cy="210" r="16" fill="#0c121a" stroke="#e5484d" stroke-width="2"/>
+  <circle cx="1085" cy="210" r="24" fill="none" stroke="#e5484d" stroke-width="1" stroke-opacity="0.5">
+    <animate attributeName="r" values="18;30;18" dur="2.8s" repeatCount="indefinite"/>
+    <animate attributeName="stroke-opacity" values="0.6;0;0.6" dur="2.8s" repeatCount="indefinite"/>
+  </circle>
+  <g font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" letter-spacing="1.5" font-weight="700">
+    <text x="1085" y="258" text-anchor="middle" fill="#e5484d">OFAC SDN</text>
+    <text x="1085" y="274" text-anchor="middle" fill="#5c6e82" font-weight="400" letter-spacing="0">1295rkVy…NNDMV</text>
+  </g>
+
+  <!-- p2p node -->
+  <circle cx="1190" cy="210" r="9" fill="#0c121a" stroke="#e8b23a" stroke-width="1.5"/>
+  <g font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" letter-spacing="1.5" font-weight="700">
+    <text x="1190" y="176" text-anchor="middle" fill="#e8b23a">P2P CASH-OUT</text>
+    <text x="1190" y="190" text-anchor="middle" fill="#5c6e82" font-weight="400" letter-spacing="0">9,398 USDT</text>
+  </g>
+
+  <!-- the seam -->
+  <rect x="1286" y="92" width="2" height="250" fill="#e8b23a" filter="url(#soft)">
+    <animate attributeName="opacity" values="0.35;0.9;0.35" dur="3.2s" repeatCount="indefinite"/>
+  </rect>
+  <rect x="1286.5" y="92" width="1" height="250" fill="#f5dfa4"/>
+  <text x="1287" y="366" text-anchor="middle" font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" letter-spacing="3" font-weight="700" fill="#e8b23a">THE SEAM</text>
+
+  <!-- cash panel -->
+  <rect x="1318" y="92" width="250" height="250" rx="2" fill="url(#cash)" stroke="#3a2f20"/>
+  <g font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10" fill="#9c8663">
+    <text x="1338" y="118" letter-spacing="2" font-weight="700">STATEMENT · A/C XXXXXX4471</text>
+    <text x="1338" y="152">11:31:07  UPI/collect …4471</text>
+    <text x="1552" y="152" text-anchor="end" fill="#e0d4bf">₹42,000</text>
+    <text x="1338" y="180">11:38:52  IMPS/P2P 88120</text>
+    <text x="1552" y="180" text-anchor="end" fill="#e0d4bf">₹1,15,000</text>
+    <rect x="1328" y="220" width="232" height="30" fill="#e8b23a" fill-opacity="0.10" stroke="#e8b23a" stroke-opacity="0.55"/>
+    <rect x="1328" y="220" width="2" height="30" fill="#e8b23a"/>
+    <text x="1338" y="240" fill="#f5dfa4" font-weight="700">11:49:20  IMPS/P2P 88147</text>
+    <text x="1552" y="240" text-anchor="end" fill="#f5dfa4" font-weight="700">₹7,98,180</text>
+    <text x="1338" y="280">11:56:44  UPI/collect …9903</text>
+    <text x="1552" y="280" text-anchor="end" fill="#e0d4bf">₹64,500</text>
+    <text x="1338" y="318" letter-spacing="2" font-weight="700" fill="#e8b23a">CANDIDATE LINKAGE</text>
+    <text x="1552" y="318" text-anchor="end" fill="#f5dfa4" font-weight="700" font-size="13">96.9%</text>
+    <text x="1338" y="333" font-size="9.5">Δ 0.22% · Δt 6 min 11 s · amount × FX × time</text>
+  </g>
+
+  <!-- travelling value -->
+  <g fill="#e8b23a">
+    <circle r="3.5"><animateMotion dur="3.6s" repeatCount="indefinite" begin="0s"><mpath href="#p-btc"/></animateMotion></circle>
+    <circle r="3.5" fill="#46a5bf"><animateMotion dur="3.6s" repeatCount="indefinite" begin="1.2s"><mpath href="#p-eth"/></animateMotion></circle>
+    <circle r="3.5" fill="#3dd68c"><animateMotion dur="3.6s" repeatCount="indefinite" begin="2.4s"><mpath href="#p-tron"/></animateMotion></circle>
+    <circle r="3.5"><animateMotion dur="1.6s" repeatCount="indefinite" begin="0.6s"><mpath href="#p-hop"/></animateMotion></circle>
+    <circle r="4" fill="#f5dfa4"><animateMotion dur="2.2s" repeatCount="indefinite" begin="1.1s"><mpath href="#p-seam"/></animateMotion></circle>
+  </g>
+
+  <!-- footer strip -->
+  <g font-family="'SF Mono', Menlo, Consolas, monospace" font-size="10.5" letter-spacing="2" font-weight="700" fill="#5c6e82">
+    <text x="80" y="392">TRACE · SCREEN · BRIDGE · INTERCEPT · EVIDENCE · SYNDICATES</text>
+    <text x="1568" y="392" text-anchor="end">LIVE PUBLIC CHAIN DATA · NO MODEL · EVERY FLAG NAMES ITS RULE</text>
+  </g>
+</svg>

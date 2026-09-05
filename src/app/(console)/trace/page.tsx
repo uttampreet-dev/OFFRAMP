@@ -597,7 +597,7 @@ function TraceInner() {
       )}
 
       <StatusBar
-        left={<>live public chain data{res ? ` · ${res.stats.hopsReached} hop${res.stats.hopsReached === 1 ? "" : "s"} resolved in ${(res.stats.ms / 1000).toFixed(1)} s` : ""}</>}
+        left={<>live public chain data · most recent transfers per address, not full history{res ? ` · ${res.stats.hopsReached} hop${res.stats.hopsReached === 1 ? "" : "s"} resolved in ${(res.stats.ms / 1000).toFixed(1)} s` : ""}</>}
         right="counterparty grouping is heuristic · not proof of ownership"
       />
     </div>
