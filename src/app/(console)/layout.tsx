@@ -1,4 +1,5 @@
 import Rail from "@/components/Rail";
+import AlertWatcher from "@/components/AlertWatcher";
 import { getSession } from "@/lib/auth";
 
 export default async function ConsoleLayout({ children }: { children: React.ReactNode }) {
@@ -7,6 +8,7 @@ export default async function ConsoleLayout({ children }: { children: React.Reac
     <div className="flex min-h-screen">
       <Rail user={session?.u ?? null} role={session?.role ?? null} />
       <main className="flex-1 min-w-0 bg-bg overflow-hidden">{children}</main>
+      <AlertWatcher user={session?.u ?? null} />
     </div>
   );
 }
