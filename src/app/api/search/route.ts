@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getSession } from "@/lib/auth";
 import { existsSync, readFileSync } from "fs";
 import path from "path";
 import { getDb } from "@/lib/db";
@@ -15,6 +16,8 @@ interface Hit { kind: string; id: string; title: string; detail: string; href: s
 /** One search across everything the console holds: cases, packets, packs, watch list, audit, complaints,
     known entities, statement accounts — plus what the query itself is (address / tx hash). */
 export async function GET(req: NextRequest) {
+  const s = await getSession();
+  if (!s) return NextResponse.json({ error: "unauthorised" }, { status: 401 });
   const q = (req.nextUrl.searchParams.get("q") ?? "").trim();
   if (q.length < 3) return NextResponse.json({ hits: [], q });
   const like = `%${q}%`;

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getSession } from "@/lib/auth";
 import { lookupAddress, detectChain } from "@/lib/chains";
 import { isSanctioned, ofacIndex } from "@/lib/ofac";
 import { isReported } from "@/lib/board";
@@ -8,6 +9,8 @@ import { riskScore } from "@/lib/risk";
 export const runtime = "nodejs";
 
 export async function GET(req: NextRequest) {
+  const s = await getSession();
+  if (!s) return NextResponse.json({ error: "unauthorised" }, { status: 401 });
   const address = req.nextUrl.searchParams.get("address")?.trim();
   if (!address) return NextResponse.json({ error: "address is required" }, { status: 400 });
   const chain = detectChain(address);

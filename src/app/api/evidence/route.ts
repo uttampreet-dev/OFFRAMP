@@ -1,10 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getSession } from "@/lib/auth";
 import { assembleArtefacts, caseState } from "@/lib/evidence";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
 export async function GET(req: NextRequest) {
+  const s = await getSession();
+  if (!s) return NextResponse.json({ error: "unauthorised" }, { status: 401 });
   const q = req.nextUrl.searchParams;
   const caseId = q.get("case") ?? "2026-CHD-0417";
   const address = q.get("address") ?? "";

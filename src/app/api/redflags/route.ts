@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getSession } from "@/lib/auth";
 import { redFlags } from "@/lib/detectors";
 import { isSanctioned } from "@/lib/ofac";
 import { isReported } from "@/lib/board";
@@ -10,6 +11,8 @@ export const runtime = "nodejs";
 export const maxDuration = 60;
 
 export async function GET(req: NextRequest) {
+  const s = await getSession();
+  if (!s) return NextResponse.json({ error: "unauthorised" }, { status: 401 });
   const address = req.nextUrl.searchParams.get("address")?.trim();
   if (!address) return NextResponse.json({ error: "address is required" }, { status: 400 });
   const depth = Number(req.nextUrl.searchParams.get("depth") ?? 2);

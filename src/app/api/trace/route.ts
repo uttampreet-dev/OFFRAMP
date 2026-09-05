@@ -1,10 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getSession } from "@/lib/auth";
 import { traceFlow, type Direction } from "@/lib/trace/engine";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
 export async function GET(req: NextRequest) {
+  const s = await getSession();
+  if (!s) return NextResponse.json({ error: "unauthorised" }, { status: 401 });
   const q = req.nextUrl.searchParams;
   const address = q.get("address")?.trim();
   if (!address) return NextResponse.json({ error: "address is required" }, { status: 400 });

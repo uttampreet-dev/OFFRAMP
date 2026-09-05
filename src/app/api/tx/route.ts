@@ -1,10 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getSession } from "@/lib/auth";
 import { lookupTx } from "@/lib/chains/tx";
 import { isSanctioned } from "@/lib/ofac";
 import { knownEntity } from "@/lib/trace/labels";
 import { isReported } from "@/lib/board";
 export const runtime = "nodejs";
 export async function GET(req: NextRequest) {
+  const s = await getSession();
+  if (!s) return NextResponse.json({ error: "unauthorised" }, { status: 401 });
   const hash = req.nextUrl.searchParams.get("hash")?.trim();
   if (!hash) return NextResponse.json({ error: "hash is required" }, { status: 400 });
   try {

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getSession } from "@/lib/auth";
 import { parseStatement } from "@/lib/bridge/parse";
 import { correlate } from "@/lib/bridge/correlate";
 import { DEMO_CHAIN_EVENTS, DEMO_STATEMENT_CSV, sampleStatements } from "@/lib/bridge/sample";
@@ -18,6 +19,8 @@ interface Body {
 }
 
 export async function POST(req: NextRequest) {
+  const s = await getSession();
+  if (!s) return NextResponse.json({ error: "unauthorised" }, { status: 401 });
   const body = (await req.json().catch(() => null)) as Body | null;
   if (!body?.mode) return NextResponse.json({ error: "mode is required" }, { status: 400 });
   try {
