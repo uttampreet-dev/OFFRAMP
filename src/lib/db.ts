@@ -338,6 +338,9 @@ export function raiseAlert(a: Omit<AlertRow, "at" | "acked_by" | "acked_at">): b
 export function openAlerts(limit = 30): AlertRow[] {
   return getDb().prepare("SELECT * FROM alerts WHERE acked_by IS NULL ORDER BY at DESC LIMIT ?").all(limit) as AlertRow[];
 }
+export function alertsForCase(caseId: string, address: string): AlertRow[] {
+  return getDb().prepare("SELECT * FROM alerts WHERE case_id = ? OR address = ? ORDER BY at ASC").all(caseId, address) as AlertRow[];
+}
 export function ackAlert(key: string, by: string): void {
   getDb().prepare("UPDATE alerts SET acked_by = ?, acked_at = ? WHERE key = ?").run(by, Date.now(), key);
 }

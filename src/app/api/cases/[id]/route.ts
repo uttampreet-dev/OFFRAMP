@@ -9,7 +9,7 @@ const STATUSES: CaseStatus[] = ["intake", "tracing", "cash-out", "escalated", "c
 
 export async function GET(_req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
   const { id } = await ctx.params;
-  const d = caseDetail(id);
+  const d = await caseDetail(id);
   return d ? NextResponse.json(d) : NextResponse.json({ error: "case not found" }, { status: 404 });
 }
 export async function PATCH(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {

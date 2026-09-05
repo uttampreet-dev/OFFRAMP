@@ -3,12 +3,23 @@ import { Suspense, useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import type { CaseRow, CaseStatus } from "@/lib/db";
-import type { CaseDetail } from "@/lib/cases";
+import type { CaseDetail, TimelineKind } from "@/lib/cases";
 import { TopBar, AddressInput, Seg, Primary, Chip, StatusBar } from "@/components/console";
 
 type CaseListRow = CaseRow & { packets: number; packs: number };
 const STATUSES: [string, string][] = [["intake", "intake"], ["tracing", "tracing"], ["cash-out", "cash-out"], ["escalated", "escalated"], ["closed", "closed"]];
+const stamp = (ts: number) => { const d = new Date(ts + 5.5 * 3600_000); return `${String(d.getUTCDate()).padStart(2, "0")} ${d.toLocaleString("en-GB", { month: "short", timeZone: "UTC" })} ${String(d.getUTCHours()).padStart(2, "0")}:${String(d.getUTCMinutes()).padStart(2, "0")}`; };
 const ist = (ts: number) => new Date(ts + 5.5 * 3600_000).toISOString().replace("T", " ").slice(0, 16) + " IST";
+const KINDS: { k: TimelineKind; label: string; dot: string }[] = [
+  { k: "chain", label: "chain", dot: "bg-teal" },
+  { k: "statement", label: "bank", dot: "bg-amber" },
+  { k: "alert", label: "alerts", dot: "bg-red" },
+  { k: "packet", label: "packets", dot: "bg-red" },
+  { k: "pack", label: "packs", dot: "bg-red" },
+  { k: "audit", label: "actions", dot: "bg-[#4e5f70]" },
+];
+const dotFor = (k: TimelineKind) => (k === "opened" ? "bg-amber" : KINDS.find((x) => x.k === k)?.dot ?? "bg-[#4e5f70]");
+const fmtMove = (v: number, sym: string) => (sym === "INR" ? `₹${v.toLocaleString("en-IN")}` : `${v.toLocaleString("en-IN", { maximumFractionDigits: v < 1 ? 5 : 2 })} ${sym}`);
 const statusTone = (s: string): "amber" | "red" | "teal" | "mut" | "green" => (s === "cash-out" ? "red" : s === "escalated" ? "amber" : s === "tracing" ? "teal" : s === "closed" ? "green" : "mut");
 
 function Inner() {
@@ -22,6 +33,7 @@ function Inner() {
   const [msg, setMsg] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [q, setQ] = useState("");
+  const [hide, setHide] = useState<Set<TimelineKind>>(new Set());
   const [hits, setHits] = useState<{ kind: string; id: string; title: string; detail: string; href: string; synthetic?: boolean }[] | null>(null);
   async function search() {
     if (q.trim().length < 3) return setHits([]);
@@ -163,6 +175,7 @@ function Inner() {
                 <div className="mt-4 flex items-center gap-4 flex-wrap">
                   <Seg label="status" value={c.status} options={STATUSES} onChange={(s) => patch({ status: s as CaseStatus })} />
                   <span className="c-note">opened {ist(c.created_at)} by {c.officer}</span>
+                  <a href={`/api/cases/${c.id}/report`} target="_blank" rel="noreferrer" className="ml-auto mono text-[10.5px] tracking-[0.12em] uppercase font-extrabold text-amber border border-amber/50 px-3 py-1.5 hover:bg-amber hover:text-[#12100c]">investigation report ↗</a>
                 </div>
               </div>
               <div className="grid grid-cols-[1fr_1fr]">
@@ -191,12 +204,35 @@ function Inner() {
                   </button>
                 </div>
                 <div className="px-7 py-5">
-                  <div className="c-label mb-3">Timeline · {detail!.timeline.length} entries</div>
-                  {detail!.timeline.map((t, i) => (
-                    <div key={i} className="grid grid-cols-[10px_1fr] gap-3 py-2.5 border-b border-line2">
-                      <span className={`mt-1.5 w-2 h-2 rounded-full ${t.title.includes("sealed") ? "bg-red" : t.kind === "opened" || t.title.startsWith("case") ? "bg-amber" : "bg-[#4e5f70]"}`} />
+                  <div className="flex items-center justify-between gap-3 flex-wrap mb-3">
+                    <span className="c-label">Timeline · {detail!.timeline.length} entries</span>
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      {KINDS.filter((x) => detail!.counts[x.k] > 0).map((x) => {
+                        const off = hide.has(x.k);
+                        return (
+                          <button
+                            key={x.k}
+                            onClick={() => setHide((h) => { const n = new Set(h); if (n.has(x.k)) n.delete(x.k); else n.add(x.k); return n; })}
+                            className={`mono text-[9.5px] tracking-[0.12em] uppercase font-bold inline-flex items-center gap-1.5 border px-2 h-[22px] ${off ? "border-line text-faint" : "border-line2 text-mut hover:text-ink"}`}
+                          >
+                            <span className={`w-1.5 h-1.5 rounded-full ${off ? "bg-[#2a3542]" : x.dot}`} />
+                            {x.label} · {detail!.counts[x.k]}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                  {detail!.chainNote && <div className="c-note mb-2">{detail!.chainNote}</div>}
+                  {c.synthetic ? <div className="c-note mb-2">chain events and the statement on this case are synthetic, part of the demonstration narrative</div> : null}
+                  {detail!.timeline.filter((t) => !hide.has(t.kind)).map((t, i) => (
+                    <div key={i} className={`grid grid-cols-[10px_1fr] gap-3 py-2.5 border-b border-line2 ${t.key ? "bg-panel/40 -mx-2 px-2" : ""}`}>
+                      <span className={`mt-1.5 w-2 h-2 rounded-full ${dotFor(t.kind)} ${t.key ? "ring-2 ring-offset-1 ring-offset-bg ring-amber/50" : ""}`} />
                       <div className="min-w-0">
-                        <div className="flex items-baseline gap-3"><span className="mono text-[12px] text-ink/90">{t.title}</span><span className="mono text-[10.5px] text-faint ml-auto shrink-0">{ist(t.at)} · {t.by}</span></div>
+                        <div className="flex items-baseline gap-2.5">
+                          <span className={`mono text-[12px] whitespace-nowrap ${t.key ? "text-ink font-bold" : "text-ink/90"}`}>{t.title}</span>
+                          {t.value !== undefined && t.symbol && t.kind === "chain" && <span className="mono text-[11px] text-teal shrink-0">{fmtMove(t.value, t.symbol)}</span>}
+                          <span className="mono text-[10px] text-faint ml-auto shrink-0" title={ist(t.at)}>{stamp(t.at)} · {t.by}</span>
+                        </div>
                         <div className="mono text-[10.5px] text-mut break-all">{t.detail}</div>
                       </div>
                     </div>
@@ -205,7 +241,7 @@ function Inner() {
                     <>
                       <div className="c-label mt-6 mb-2">Sealed artefacts</div>
                       {detail!.packets.map((p) => (
-                        <div key={p.id} className="mono text-[11.5px] py-1.5 border-b border-line2">{p.id} <span className="text-faint">· packet · {p.sha256.slice(0, 16)}… · {p.by}</span></div>
+                        <div key={p.id} className="mono text-[11.5px] py-1.5 border-b border-line2">{p.id} <span className="text-faint">· packet · {p.sha256.slice(0, 16)}… · {p.by}{p.approvedBy ? ` · signed off by ${p.approvedBy}` : " · awaiting sign-off"}</span></div>
                       ))}
                       {detail!.packs.map((p) => (
                         <div key={p.id} className="mono text-[11.5px] py-1.5 border-b border-line2">{p.id} <span className="text-faint">· pack · root {p.rootHash.slice(0, 16)}… · {p.by}</span></div>
