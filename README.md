@@ -2,7 +2,7 @@
   <img src="docs/banner.svg" alt="OFFRAMP — crypto flow intelligence. Follows the money across the seam where it stops being crypto and starts being cash." width="100%">
 </p>
 
-<h3 align="center">A mule bank account can be frozen in minutes. The crypto leg in between is where the trail is hardest to connect to the bank side.<br>OFFRAMP is an investigator's console that connects it.</h3>
+<h3 align="center">Crypto-to-cash investigation console for cyber-crime units.<br>Trace the flow, join it to the bank credit, act inside the withdrawal window, seal the evidence.</h3>
 
 <p align="center">
   <img src="https://img.shields.io/badge/Next.js-16-000000?style=flat-square&logo=next.js&logoColor=white" alt="Next.js 16">
@@ -28,11 +28,19 @@
   <a href="#how-it-works">How it works</a> ·
   <a href="#architecture">Architecture</a> ·
   <a href="#data-and-what-is-synthetic">Data</a> ·
-  <a href="#limitations">Limitations</a> ·
+  <a href="#honest-limitations">Limitations</a> ·
+  <a href="#future-scope">Future scope</a> ·
   <a href="#getting-started">Getting started</a>
 </p>
 
-**OFFRAMP** traces stolen funds across Bitcoin, Ethereum and TRON, screens every address on the path, matches the cash-out to the rupee credit that followed it, prepares the freeze request while the withdrawal window is still open, and seals the evidence so anyone can recompute it. It is a working prototype of a defensible investigative workflow, built on live public chain data with clearly labelled synthetic demonstration data.
+A mule bank account can be frozen in minutes. The crypto leg in between is where the trail is hardest to connect to the bank side. **OFFRAMP** traces stolen funds across Bitcoin, Ethereum and TRON, screens every address on the path, matches the cash-out to the rupee credit that followed it, prepares the freeze request while the withdrawal window is still open, and seals the evidence so anyone can recompute it. Built on live public chain data, with clearly labelled synthetic demonstration data.
+
+<p align="center"><b>Complaint → <a href="#demo-walkthrough">Trace</a> → <a href="#demo-walkthrough">Red Flags</a> → <a href="#demo-walkthrough">Bridge</a> → <a href="#demo-walkthrough">Intercept</a> → <a href="#demo-walkthrough">Evidence</a></b><br><sub>one case file · every step audited · every hash recomputable</sub></p>
+
+<p align="center">
+  <img src="docs/screens/trace.webp" alt="Trace — hop-layered flow graph from an OFAC-listed Bitcoin seed, risk score, co-spend cluster" width="100%">
+</p>
+<p align="center"><sub><b>Trace</b> on a live OFAC-listed Bitcoin wallet, two hops downstream. The largest edge lands on a Binance deposit address whose label links to its public source. The risk score names its one factor. The co-spend cluster lists addresses that signed inputs together with the seed.</sub></p>
 
 | | |
 |---|---|
@@ -47,7 +55,7 @@
 
 ## Why OFFRAMP
 
-Stolen money in an Indian cyber-fraud case follows one route. The victim pays into a mule account. The mule buys USDT on TRON. The USDT hops across two or three wallets, and a P2P merchant sells it back for rupees into another mule account. The money is crypto for about an hour. Then it is cash again.
+Stolen money follows one route: victim to mule account, mule account to USDT, two or three wallet hops, a P2P sale back into rupees, withdrawal. The money is crypto for about an hour.
 
 The interception pipeline that exists today is built for the cash half. The 1930 helpline feeds CFCFRMS, banks freeze on request, and the I4C Suspect Registry holds 24.67 lakh mule accounts; the pipeline has saved ₹7,130 crore. It covers bank accounts, SIMs and IMEIs, not wallet addresses (Ministry of Home Affairs, Lok Sabha Unstarred Question No. 432, answered 02.12.2025). The wallet leg can be read on a public explorer, but nothing in the pipeline joins it to the bank credit on the other side.
 
@@ -107,25 +115,14 @@ The demonstration case `2026-CHD-0417` is an investment-app fraud that cashed ou
 
 Optional detours: **Screen** ranks a pasted list of up to 200 addresses; **Syndicates** groups the synthetic complaints dataset by shared cash-out wallet. Set `OFFRAMP_OFFLINE=1` to run the whole walkthrough from the disk cache with no network.
 
-<table>
-  <tr>
-    <td width="50%"><img src="docs/screens/bridge.webp" alt="The Bridge — on-chain outflows beside INR statement credits, candidate linkage 96.9%"></td>
-    <td width="50%"><img src="docs/screens/intercept.webp" alt="Intercept — withdrawal window countdown, trigger chain, freeze-request packet"></td>
-  </tr>
-  <tr>
-    <td><sub><b>Bridge.</b> Outflows on the left, statement credits on the right. The best candidate is highlighted with its deviation and lag; rivals are shown, not hidden.</sub></td>
-    <td><sub><b>Intercept.</b> The window, its stated basis, the trigger chain and the packet the officer will send. Nothing leaves the machine.</sub></td>
-  </tr>
-</table>
+<p align="center">
+  <img src="docs/screens/bridge.webp" alt="The Bridge — on-chain outflows beside INR statement credits, candidate linkage 96.9%" width="100%">
+</p>
+<p align="center"><sub><b>Bridge.</b> Outflows on the left, statement credits on the right, the seam between them. The best candidate is highlighted with its deviation and lag; rivals are shown, not hidden.</sub></p>
 
 ---
 
 ## The console
-
-<p align="center">
-  <img src="docs/screens/trace.webp" alt="Trace — hop-layered flow graph from an OFAC-listed Bitcoin seed, risk score, co-spend cluster" width="100%">
-</p>
-<p align="center"><sub><b>Trace</b> on a live OFAC-listed Bitcoin wallet, two hops downstream. The largest edge lands on a Binance deposit address whose label links to its public source. The risk score names its one factor. The co-spend cluster lists addresses that signed inputs together with the seed.</sub></p>
 
 | Module | What it does | Data |
 |---|---|---|
@@ -147,7 +144,7 @@ Optional detours: **Screen** ranks a pasted list of up to 200 addresses; **Syndi
 Every number on a screen comes from a rule that can be read in this repository. Full definitions are in [docs/METHOD.md](docs/METHOD.md).
 
 - **Detectors.** Ten rule-based indicators, each mapped to a FATF virtual-asset red-flag category (rapid layering, structuring, P2P off-ramp, velocity spike, mixer contact, sanctions hit, bridge hop, dormant reactivation, peel chain, round amounts). The FATF guidance names the behaviour; the thresholds and logic are this project's own and are stated per detector.
-- **Risk score.** Additive weights, capped at 100, every point tied to a named rule and its evidence. The weights are transparent prioritisation heuristics set for this prototype, not probabilities and not statistically calibrated. The score ranks wallets for attention.
+- **Risk score.** Additive weights, capped at 100, every point tied to a named rule and its evidence. The weights are transparent prioritisation heuristics, not probabilities and not statistically calibrated. The score ranks wallets for attention.
 - **Bridge strength.** For each outflow and each later credit inside the window, amount agreement and time agreement are combined as a geometric mean. The result is a plausible candidate linkage. It does not prove that a bank credit came from a particular crypto transaction, and near-equal candidates are marked ambiguous.
 - **Withdrawal window.** The median inflow→outflow lag on the wallet when three or more pairs exist (floored at 10 min, capped at 48 h); otherwise a 2-hour policy default, labelled as a planning figure.
 - **Evidence chain.** Canonical JSON, SHA-256 per artefact, hashes chained to a root.
@@ -253,7 +250,7 @@ flowchart LR
 - **Disk cache** keyed by URL with a five-minute TTL, stale fallback when the network fails, and full offline replay.
 - **Engines** are pure functions over typed transfers, so the same code runs on live data and on the demonstration set.
 - **SQLite** in WAL mode through better-sqlite3 for users, sessions, cases, watch list, alerts, packets, packs and the audit log. The schema is plain SQL behind one module; a Postgres port would replace the driver, not the engines.
-- **Access control.** No public sign-up; a supervisor provisions accounts. scrypt password hashes with per-user salts, HMAC-SHA-256 signed httpOnly session cookies, five failed logins lock an account for fifteen minutes, three roles with supervisor-only sign-off, case closing and account management enforced on the server. The edge middleware checks the cookie's signature and expiry; every API route then re-checks the server-side session record, so logout, *sign out everywhere* and disabling an account end API access immediately. Sessions expire after twelve hours. This is a prototype access model, not a hardened deployment.
+- **Access control.** No public sign-up; a supervisor provisions accounts. scrypt password hashes with per-user salts, HMAC-SHA-256 signed httpOnly session cookies, five failed logins lock an account for fifteen minutes, three roles with supervisor-only sign-off, case closing and account management enforced on the server. The edge middleware checks the cookie's signature and expiry; every API route then re-checks the server-side session record, so logout, *sign out everywhere* and disabling an account end API access immediately. Sessions expire after twelve hours.
 
 ### Project structure
 
@@ -334,17 +331,21 @@ No stolen credentials, private keys, wallet seeds or illicit funds are used or s
 
 ---
 
-## Limitations
+## Honest limitations
 
-- **Prototype.** An evaluation build demonstrating a workflow, not a production system. Single machine, SQLite, a development default for the session secret unless `AUTH_SECRET` is set, and no penetration testing.
-- **Recent-window analysis.** Each lookup reads the most recent transactions an explorer returns in one call: about 25 confirmed on Bitcoin, 50 on Ethereum, 50 TRC-20 transfers on TRON. Traces, detectors and the risk score work on that window, not a wallet's full history. The Trace status bar says so; the address summary's totals come from the explorer and cover the full history.
-- **Three chains.** Bitcoin, Ethereum and TRON. Other chains need an adapter each.
-- **Heuristics, not verdicts.** Detector confidences and risk weights are heuristics; the Bridge strength is a candidate linkage; co-spend clustering applies the common-input heuristic on Bitcoin only. None establishes ownership.
-- **Attribution coverage.** 42 sourced exchange and mixer labels; everything else is *unattributed* by design. Sanctions screening covers OFAC only; UN and Indian designations are not loaded.
-- **Token balances on Ethereum** are not computed from transfer lists (internal transfers are invisible), so the board shows them as unknown rather than wrong.
-- **Documents are drafts.** The STR and Section 63 outputs are templates populated from the case. They have no legal effect until the persons the law requires review and sign them, and nothing here is a claim about admissibility.
-- **Alerts are on-screen; nobody is paged.** Toasts and, if the officer opts in, browser notifications. Nothing is transmitted to any external system.
-- **Synthetic demonstration data.** The demo case, its statement and the complaints dataset are synthetic and labelled; the mechanics are identical on real inputs.
+- **Recent-window analysis.** Each lookup uses the most recent transactions an explorer returns in one call (about 25 on Bitcoin, 50 on Ethereum, 50 TRC-20 on TRON). Traces, detectors and the risk score work on that window and the Trace status bar says so; the address summary totals cover the full history.
+- **Heuristics, not verdicts.** Detector confidences and risk weights are heuristics, a Bridge match is a candidate linkage, co-spend clustering is Bitcoin-only. None establishes ownership. The STR and Section 63 outputs are drafts populated from the case; they take effect only when the persons the law requires sign them.
+- **Coverage.** Three chains; OFAC sanctions only; 42 sourced entity labels, with everything else shown as *unattributed*; Ethereum token balances shown as unknown rather than estimated.
+- **Nothing leaves the console.** Alerts are on-screen (and browser notifications if enabled); packets and reports are prepared, not transmitted. The demonstration case and complaints dataset are synthetic and labelled.
+
+## Future scope
+
+- **Full wallet history.** Page through explorer results and show per-node coverage, so very active wallets are analysed end to end.
+- **More lists and chains.** UN and Indian designations beside OFAC; further chains added as adapters behind the same interface.
+- **Delivery rails.** Send sealed freeze packets to exchange compliance desks and link CFCFRMS references, behind the existing supervisor sign-off.
+- **Signed documents.** Digital signatures on the STR and Section 63 outputs so a signed pack can be filed directly.
+- **Scale-out.** Postgres and per-unit accounts for larger cyber cells and multiple concurrent officers.
+- **Live rates and labels.** A daily FX table from a public source and additional attribution sources, each still cited per entry.
 
 ---
 
@@ -358,7 +359,7 @@ node scripts/sync-ofac.mjs         # refresh the sanctions list
 npm run dev                        # http://localhost:3000
 ```
 
-Demo accounts are seeded for local evaluation only. Rotate them and set `AUTH_SECRET` before any deployment beyond a demonstration.
+Demo accounts are seeded for evaluation. Rotate them and set `AUTH_SECRET` in the deployment environment.
 
 | Login | Password | Role |
 |---|---|---|

@@ -7,13 +7,11 @@ Companion to the README's architecture diagram. Design rationale, access model, 
 - **Rules, not a model.** A flag has to be explainable in a file and defensible under questioning. A rule that names its FATF category, its threshold and its evidence is auditable; a score without reasons is not. No pre-trained model is used anywhere.
 - **Public explorers on free tiers.** No proprietary feed and no licence; every number is reproducible on a public explorer. Blockstream needs no key, TronGrid works without one at lower limits, Etherscan needs a free key. A paid or internal feed would be one more adapter behind the same interface.
 - **Disk cache with offline replay.** Public APIs rate-limit and stall. `src/lib/cache.ts` keys responses by URL, serves them for five minutes, falls back to the stale copy when the network fails, and with `OFFRAMP_OFFLINE=1` serves only from disk so a demonstration runs with no network.
-- **SQLite with an audit log.** One file through better-sqlite3 in WAL mode is honest for a single-machine prototype. Tables: users, sessions, cases, watch, alerts, packets, packs, audit. The schema is plain SQL behind `src/lib/db.ts`; a Postgres port would replace the driver and adapt queries, leaving the engines untouched. It has not been done.
+- **SQLite with an audit log.** One file through better-sqlite3 in WAL mode keeps the store simple and portable. Tables: users, sessions, cases, watch, alerts, packets, packs, audit. The schema is plain SQL behind `src/lib/db.ts`; a Postgres port would replace the driver and adapt queries, leaving the engines untouched. It has not been done.
 - **Server routes only.** API keys never reach the browser; the console talks to its own API under `src/app/api`.
 - **Pure engines.** Trace, detectors, risk, correlation, window and evidence are functions over typed transfers, so the same code runs on live chain data and on the labelled demonstration set.
 
 ## Access model
-
-A prototype model, stated precisely.
 
 | Control | Implementation |
 |---|---|
@@ -24,7 +22,7 @@ A prototype model, stated precisely.
 | Server check | every API route except login and the public landing feed calls `getSession()`, which verifies the cookie again and requires the session record to be alive, so logout, *sign out everywhere*, and disabling an account stop API access immediately |
 | Lockout | five failed logins lock the account for fifteen minutes; the lockout is audited |
 | Roles | investigator, compliance, supervisor; only a supervisor can sign off a packet, close a case or manage accounts, enforced in the route |
-| Secret | `AUTH_SECRET` signs sessions; when unset the build uses a fixed development value, which must be replaced before any deployment |
+| Secret | `AUTH_SECRET` signs sessions; when unset the build uses a fixed development value, which is replaced in the deployment environment |
 | Audit | login, failure, lockout, password change, status change, note, watch, seal, sign-off, pack and account changes are recorded with the acting username |
 
 ## Case lifecycle

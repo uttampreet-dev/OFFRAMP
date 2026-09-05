@@ -23,7 +23,7 @@ The panel beside every finding states what a flag does not mean: it does not est
 
 ## Risk score
 
-`src/lib/risk.ts`. Additive, capped at 100, every point tied to a named rule and its evidence. The weights are prioritisation heuristics set for this prototype so that a sanctions listing outranks a community report and direct exposure outranks a single detector. They are not probabilities and have not been statistically calibrated. The score orders wallets for attention; it is not a verdict.
+`src/lib/risk.ts`. Additive, capped at 100, every point tied to a named rule and its evidence. The weights are prioritisation heuristics chosen so that a sanctions listing outranks a community report and direct exposure outranks a single detector. They are not probabilities and have not been statistically calibrated. The score orders wallets for attention; it is not a verdict.
 
 | Factor | Points | Rule |
 |---|---|---|
