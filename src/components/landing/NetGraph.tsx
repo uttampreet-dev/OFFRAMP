@@ -40,7 +40,8 @@ interface Pulse {
   dir: 1 | -1;
 }
 
-export default function NetGraph({ input, onHover }: { input: GraphInput | null; onHover: (h: HoverInfo | null) => void }) {
+/* layout · "seam": the landing composition (cloud sits left of the seam, route continues into the ledger) · "centered": a symmetrical circular cloud filling its box */
+export default function NetGraph({ input, onHover, layout = "seam" }: { input: GraphInput | null; onHover: (h: HoverInfo | null) => void; layout?: "seam" | "centered" }) {
   const ref = useRef<HTMLCanvasElement>(null);
   const hoverRef = useRef<HoverInfo | null>(null);
 
@@ -88,18 +89,20 @@ export default function NetGraph({ input, onHover }: { input: GraphInput | null;
       center = null;
       if (!input) return;
       /* the cloud lives in the band between the headline (left) and the seam (right); taller than wide */
-      const wide = W >= 1100;
+      const centered = layout === "centered";
+      const wide = !centered && W >= 1100;
       const seamX = wide ? W - 254 : W;
-      const copyEnd = W > 900 ? W * 0.505 : 0;
-      const cx = wide ? (copyEnd + seamX) / 2 + 6 : W > 900 ? W * 0.66 : W * 0.5;
-      const cy = H * 0.46;
-      const rx = wide ? (seamX - copyEnd) / 2 + 24 : Math.min(Math.min(W, H) * 0.31 * 1.25, W - cx - 200, cx - 30);
-      const ry = wide ? Math.min(H * 0.3, rx * 1.15) : Math.min(W, H) * 0.31 * 0.85;
+      const copyEnd = !centered && W > 900 ? W * 0.505 : 0;
+      const R = Math.min(W * 0.33, H * 0.3);
+      const cx = centered ? W / 2 : wide ? (copyEnd + seamX) / 2 + 6 : W > 900 ? W * 0.66 : W * 0.5;
+      const cy = centered ? H * 0.47 : H * 0.46;
+      const rx = centered ? R : wide ? (seamX - copyEnd) / 2 + 24 : Math.min(Math.min(W, H) * 0.31 * 1.25, W - cx - 200, cx - 30);
+      const ry = centered ? R : wide ? Math.min(H * 0.3, rx * 1.15) : Math.min(W, H) * 0.31 * 0.85;
       /* the headline band: nodes that would land on the copy are lifted above or dropped below it */
       const bandTop = H * 0.28;
       const bandBot = H * 0.7;
       const copyRight = W * 0.5;
-      center = { labeled: false, bx: cx, by: cy, x: cx, y: cy, r: wide ? 17 : 15, addr: input.center, value: 0, symbol: "", dir: "center", phase: 0 };
+      center = { labeled: false, bx: cx, by: cy, x: cx, y: cy, r: wide || centered ? 17 : 15, addr: input.center, value: 0, symbol: "", dir: "center", phase: 0 };
       const seen = new Map<string, { value: number; symbol: string; dir: "in" | "out" | "self" }>();
       for (const t of input.transfers) {
         const other = t.direction === "in" ? t.from : t.to;
@@ -107,12 +110,12 @@ export default function NetGraph({ input, onHover }: { input: GraphInput | null;
         const prev = seen.get(other);
         if (prev) prev.value += t.value;
         else seen.set(other, { value: t.value, symbol: t.symbol, dir: t.direction });
-        if (seen.size >= (wide ? 10 : 16)) break;
+        if (seen.size >= (wide ? 10 : centered ? 12 : 16)) break;
       }
       const list = [...seen.entries()];
       list.forEach(([addr, m], i) => {
-        const a = (i / list.length) * Math.PI * 2 - Math.PI / 2 + (wide ? 0.2 : 0.35);
-        const k = wide ? 0.86 + ((i * 37) % 23) / 160 : 0.72 + ((i * 37) % 23) / 40;
+        const a = (i / list.length) * Math.PI * 2 - Math.PI / 2 + (wide ? 0.2 : centered ? 0.26 : 0.35);
+        const k = wide || centered ? 0.86 + ((i * 37) % 23) / 160 : 0.72 + ((i * 37) % 23) / 40;
         let bx = cx + Math.cos(a) * rx * k;
         let by = cy + Math.sin(a) * ry * k;
         if (wide && bx < copyRight - 60 && by > bandTop && by < bandBot) {
@@ -125,7 +128,7 @@ export default function NetGraph({ input, onHover }: { input: GraphInput | null;
           by,
           x: 0,
           y: 0,
-          r: (wide ? 5.5 : 4.5) + Math.min(8, Math.log10(1 + m.value) * 2.4),
+          r: (wide || centered ? 5.5 : 4.5) + Math.min(8, Math.log10(1 + m.value) * 2.4),
           addr,
           value: m.value,
           symbol: m.symbol,
@@ -136,8 +139,9 @@ export default function NetGraph({ input, onHover }: { input: GraphInput | null;
       /* label the largest counterparties that sit clear of the headline block, and never on top of each other */
       const placed: Node[] = [];
       nodes
-        .filter((n) => n.bx > W * 0.55 || KNOWN[n.addr])
+        .filter((n) => centered || n.bx > W * 0.55 || KNOWN[n.addr])
         .filter((n) => !wide || n.bx + 190 < seamX || Math.abs(n.by - cy) > ry * 0.5 || KNOWN[n.addr])
+        .filter((n) => !centered || Math.abs(n.bx - cx) > rx * 0.45 || KNOWN[n.addr])
         .sort((a, b) => (KNOWN[b.addr] ? 1 : 0) - (KNOWN[a.addr] ? 1 : 0) || b.value - a.value)
         .forEach((n) => {
           if (placed.length >= (wide ? 3 : 4)) return;
@@ -301,8 +305,8 @@ export default function NetGraph({ input, onHover }: { input: GraphInput | null;
           ctx.fill();
           ctx.stroke();
           if (n.labeled && n !== hov) {
-            const seamGuard = W >= 1100 ? W - 254 - 190 : W - 190;
-            const right = n.x < seamGuard;
+            const seamGuard = layout === "seam" && W >= 1100 ? W - 254 - 190 : W - 190;
+            const right = layout === "centered" ? n.x >= center!.x : n.x < seamGuard;
             const lx = right ? n.x + n.r + 8 : n.x - n.r - 8;
             ctx.textAlign = right ? "left" : "right";
             ctx.font = "10px SF Mono, Menlo, monospace";
@@ -318,7 +322,7 @@ export default function NetGraph({ input, onHover }: { input: GraphInput | null;
               ctx.font = "bold 8px SF Mono, Menlo, monospace";
               ctx.fillText("SUSPICIOUS ROUTE · HOP 1", lx, n.y + 33);
             }
-            if (!known && W >= 1100 && n === routeNode()) {
+            if (!known && layout === "seam" && W >= 1100 && n === routeNode()) {
               ctx.fillStyle = "rgba(232,178,58,0.9)";
               ctx.font = "bold 8px SF Mono, Menlo, monospace";
               ctx.fillText("LARGEST COUNTERPARTY · ROUTE FOLLOWED", lx, n.y + 21);
@@ -327,7 +331,7 @@ export default function NetGraph({ input, onHover }: { input: GraphInput | null;
         }
 
         /* the seam and the off-chain continuation — drawn dashed: what follows the exchange is the demonstration case, not this wallet's history */
-        if (W >= 1100) {
+        if (layout === "seam" && W >= 1100) {
           const seamX = W - 254;
           const rn = routeNode();
           const ty = H * 0.5 - 8;
@@ -452,7 +456,7 @@ export default function NetGraph({ input, onHover }: { input: GraphInput | null;
       canvas.removeEventListener("mouseleave", onLeave);
       document.removeEventListener("visibilitychange", onVis);
     };
-  }, [input, onHover]);
+  }, [input, onHover, layout]);
 
   return <canvas ref={ref} className="absolute inset-0" role="img" aria-label={input ? `Live money-flow map of wallet ${input.center}${input.sanctioned ? ", an OFAC-sanctioned address" : ""}, showing its largest counterparties from public chain data` : "Money-flow map loading from public chain data"} />;
 }

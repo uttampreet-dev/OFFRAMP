@@ -52,7 +52,7 @@ export default function LoginScreen({ ofacCount, syncedAt, users, initial = null
       <section className="relative min-h-[46vh] lg:min-h-screen overflow-hidden">
         <div className="absolute inset-0 chain-grid opacity-60" />
         <div className="absolute inset-0">
-          <NetGraph input={graph} onHover={setHover} />
+          <NetGraph input={graph} onHover={setHover} layout="centered" />
         </div>
         <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(90deg,rgba(7,10,15,0.55)_0%,rgba(7,10,15,0.15)_45%,rgba(7,10,15,0.35)_100%)]" />
         <div className="absolute inset-x-0 bottom-0 h-40 pointer-events-none bg-[linear-gradient(180deg,transparent,rgba(7,10,15,0.85))]" />
