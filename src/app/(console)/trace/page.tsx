@@ -4,11 +4,13 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import type { TraceResult, TraceNode, TraceEdge } from "@/lib/trace/engine";
 import type { LookupResult } from "@/lib/chains/types";
-import { TopBar, AddressInput, Seg, Primary, Chip, Section, KV, Flag, StatusBar, Empty } from "@/components/console";
+import { TopBar, AddressInput, Seg, Primary, Chip, Section, KV, Flag, StatusBar, Empty, RiskBadge, RiskFactors } from "@/components/console";
+import type { RiskScore } from "@/lib/risk";
 import type { TxView } from "@/lib/chains/tx";
 import type { CospendCluster } from "@/lib/chains/btc";
+import Sankey from "./Sankey";
 
-type Lookup = LookupResult & { screening: { ofacSanctioned: boolean; listSize: number; listSyncedAt: string | null; reported: { source: string; category: string } | null; entity: { entity: string; type: string; source: string } | null } };
+type Lookup = LookupResult & { risk?: RiskScore; screening: { ofacSanctioned: boolean; listSize: number; listSyncedAt: string | null; reported: { source: string; category: string } | null; entity: { entity: string; type: string; source: string } | null } };
 
 type Scr = { sanctioned: boolean; entity: string | null; reported: string | null };
 type TxFull = Omit<TxView, "legs"> & { legs: (TxView["legs"][number] & { fromScreen: Scr; toScreen: Scr })[] };
@@ -186,6 +188,7 @@ function TraceInner() {
   const [selected, setSelected] = useState<string | null>(null);
   const [tx, setTx] = useState<TxFull | null>(null);
   const [cospend, setCospend] = useState<CospendCluster | null>(null);
+  const [view, setView] = useState<"graph" | "sankey">(params.get("view") === "flow" ? "sankey" : "graph");
 
   const run = useCallback(
     async (addr?: string, d = depth, f = fanout, dr = dir) => {
@@ -394,7 +397,7 @@ function TraceInner() {
                   </div>
                   <div className="p-5 grid grid-cols-[1fr_1fr] gap-x-6 gap-y-5">
                     {[
-                      ["Flow graph", "hop-layered, edge width ∝ value, sanctioned nodes ringed red"],
+                      ["Flow graph · fund flow", "hop-layered graph, or a value-proportional view showing how much of the seed\u2019s value each hop retains"],
                       ["Screening", "OFAC SDN on the seed and every wallet reached"],
                       ["Known entities", "the trail stops at a publicly attributed exchange or mixer"],
                       ["Counterparties", "largest destinations with share of traced value"],
@@ -430,6 +433,11 @@ function TraceInner() {
               </div>
               {seedInfo && seedInfo.transfers.length > 1 && <Trend transfers={seedInfo.transfers} symbol={s?.symbol ?? ""} />}
             </Section>
+            {seedInfo?.risk && (
+              <Section title="Risk score" chip={<RiskBadge score={seedInfo.risk.score} band={seedInfo.risk.band} />}>
+                <RiskFactors factors={seedInfo.risk.factors} note={seedInfo.risk.note} />
+              </Section>
+            )}
             {cospend && (
               <Section title="Co-spend cluster" chip={<Chip tone={cospend.members.length ? "amber" : "mut"}>{cospend.members.length ? `${cospend.size} addresses` : "none found"}</Chip>}>
                 {cospend.members.length ? (
@@ -510,9 +518,18 @@ function TraceInner() {
             <div className="absolute top-4 left-5 c-label z-10">
               Flow · {res.direction === "out" ? "downstream" : "upstream"} · hop 0 → {res.stats.hopsReached}
             </div>
-            <div className="absolute top-4 right-5 c-note z-10 hidden 2xl:block">click a node · edge width ∝ value</div>
+            <div className="absolute top-3 right-5 z-10 flex items-center gap-3">
+              <span className="c-note hidden 2xl:block">{view === "graph" ? "click a node · edge width ∝ value" : "bar height and band thickness ∝ value"}</span>
+              <div className="flex border border-line">
+                {(["graph", "sankey"] as const).map((v) => (
+                  <button key={v} onClick={() => setView(v)} className={`mono text-[9.5px] tracking-[0.14em] uppercase font-bold px-3 h-[26px] ${view === v ? "bg-amber text-[#12100c]" : "text-mut hover:text-ink"}`}>
+                    {v === "graph" ? "graph" : "fund flow"}
+                  </button>
+                ))}
+              </div>
+            </div>
             <div className="absolute inset-0 top-10">
-              <Flow res={res} selected={selected} onSelect={setSelected} />
+              {view === "graph" ? <Flow res={res} selected={selected} onSelect={setSelected} /> : <Sankey res={res} selected={selected} onSelect={setSelected} />}
             </div>
           </div>
 
