@@ -24,70 +24,75 @@ export function ModulePreview({ k }: { k: ModuleKey }) {
     case "live-board":
       return (
         <>
-          <H>Active cases</H>
-          <Row l="2026-CHD-0417" m="TRON · CASH-OUT" r="₹8.00L" tone="hit" />
-          <Row l="2026-CHD-0391" m="TRON · TRACING" r="₹3.10L" />
-          <Row l="2026-LDH-0122" m="BTC · INTAKE" r="₹5.75L" />
+          <H>Watched addresses · re-evaluated every 60 s</H>
+          <Row l="12aNKp2…TKupL" m="BTC · OFAC SDN · 102 tx" r="0 BTC" tone="red" />
+          <Row l="TA3rH2A…mZdFg" m="TRON · OFAC SDN · 1 tx" r="9,994.74 USDT" tone="red" />
+          <Row l="12HQDsi…mmzKx" m="BTC · OFAC SDN · 1,335 tx" r="0 BTC" tone="red" />
           <div className="mt-5 flex items-center justify-between">
-            <span className="c-kv">Open windows</span>
-            <span className="mono text-[16px] font-bold text-red">01:47:22</span>
+            <span className="c-kv">Open window · replay of the demonstration case</span>
+            <span className="mono text-[16px] font-bold text-amber">01:47:22</span>
           </div>
           <div className="mt-3 flex flex-wrap gap-2">
-            <Pill t="rapid layering 14" tone="red" /><Pill t="P2P off-ramp 22" tone="amber" /><Pill t="sanctions hit 1" tone="red" /><Pill t="mixer 3" tone="mut" />
+            <Pill t="alert · outflow" tone="amber" /><Pill t="alert · sanctions contact" tone="red" /><Pill t="alert · velocity" tone="amber" /><Pill t="alert · window < 15 min" tone="red" />
           </div>
         </>
       );
     case "cases":
       return (
         <>
-          <H>Watchlist</H>
-          <Row l="TVd6j…2Lm7" m="TRON · P2P off-ramp · NEW ACTIVITY" r="11:43" tone="amber" />
-          <Row l="TQr7x…9Kp3" m="TRON · layered cluster" r="04 Aug" />
-          <Row l="bc1q8…4mz2" m="BTC → TRON bridge" r="09 Aug" />
-          <div className="c-note mt-4">re-evaluated every 10 minutes against live chain state</div>
+          <H>Case files</H>
+          <Row l="2026-CHD-0417" m="TRON · CASH-OUT · demonstration · synthetic" r="₹8.00L" tone="hit" />
+          <div className="mt-4">
+            <H>Timeline · audited under the officer's login</H>
+            <Row l="11:43 IST" m="case.opened · seed TVd6j…g0Lm7" r="investigator" />
+            <Row l="—" m="packet.sealed · pack.sealed · pack.exported" r="on demand" />
+          </div>
+          <div className="c-note mt-4">search: case id · wallet · transaction hash · account · complaint · entity</div>
         </>
       );
     case "trace":
       return (
         <>
-          <Row l="0 · 11:02:16" m="TKx9c…7Ha2 · victim payment" r="9,412 USDT" />
-          <Row l="1 · 11:09:44" m="TQm4v…1Bd8 · split ×3" r="9,410 USDT" tone="amber" />
-          <Row l="2 · 11:16:02" m="TZp8s…4Kf1 · rapid layering" r="9,404 USDT" tone="red" />
-          <Row l="3 · 11:28:31" m="TBn2w…9Rc5 · pass-through" r="9,398 USDT" />
-          <Row l="4 · 11:43:09" m="TVd6j…2Lm7 · CASH-OUT" r="9,398 USDT" tone="amber" />
+          <H>12HQDsi…mmzKx · OFAC SDN · 2 hops · live</H>
+          <Row l="hop 1" m="1NDyJtN…tobu1s · Binance · public attribution" r="925.38 BTC" tone="hit" />
+          <Row l="hop 1" m="38ogm5u…gWbtN8" r="0.01511 BTC" />
+          <Row l="hop 1" m="3DT1c4X…46sk89" r="0.01237 BTC" />
+          <Row l="hop 1" m="3Fc8xEd…8TU4TX" r="0.01218 BTC" />
+          <div className="c-note mt-4">co-spend cluster · 731 addresses · common-input heuristic · not proof</div>
         </>
       );
     case "bridge":
       return (
-        <div className="grid grid-cols-2 gap-6 relative">
+        <div className="grid grid-cols-[1fr_auto_1fr] gap-x-5 items-center">
           <div>
-            <H>On-chain</H>
-            <Row l="11:43:09" m="TVd6j…2Lm7 → sold" r="9,398 USDT" />
-            <Row l="11:28:31" m="TBn2w…9Rc5" r="9,398 USDT" />
+            <H>On-chain · demonstration case</H>
+            <Row l="11:43:09" m="TBn2wY…e0Rc5 → TVd6j…g0Lm7 · cash-out" r="9,398 USDT" tone="amber" />
+            <Row l="11:28:31" m="TZp8sQ…d0Kf1 · pass-through" r="9,398 USDT" />
+          </div>
+          <div className="border border-[#8a6f26] bg-[#0e0c08] px-4 py-2 text-center self-center">
+            <div className="mono text-[8px] tracking-[0.18em] font-extrabold text-amber">CANDIDATE LINKAGE</div>
+            <div className="mono text-[20px] font-bold text-amber2 leading-tight">96.9%</div>
+            <div className="mono text-[7.5px] text-[#8c7a50]">Δ 0.22% · Δt 6 min 11 s</div>
           </div>
           <div className="cash-paper -my-2 py-2 px-3 rounded-sm">
-            <H>Bank statement · synthetic</H>
+            <H>Bank statement 4471 · synthetic</H>
             <Row l="11:38:52" m="IMPS/P2P/ref 88120" r="₹1,15,000" />
             <Row l="11:49:20" m="IMPS/P2P/ref 88147" r="₹7,98,180" tone="hit" />
-          </div>
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 border border-[#8a6f26] bg-[#0e0c08] px-4 py-2 text-center">
-            <div className="mono text-[8px] tracking-[0.18em] font-extrabold text-amber">SEAM MATCH</div>
-            <div className="mono text-[20px] font-bold text-amber2 leading-tight">97.4%</div>
           </div>
         </div>
       );
     case "red-flags":
       return (
         <>
-          <H>Detectors · 4 of 10 fired</H>
+          <H>TA82wQ7…fziqN · sanctioned TRON seed · 3 of 10 fired</H>
           <div className="flex flex-wrap gap-2">
-            <Pill t="rapid layering" tone="red" /><Pill t="structuring" tone="red" /><Pill t="P2P off-ramp" tone="amber" /><Pill t="velocity spike" tone="amber" />
-            <Pill t="mixer — none" tone="mut" /><Pill t="sanctions — clear" tone="mut" /><Pill t="bridge hop — none" tone="mut" /><Pill t="dormant — no" tone="mut" />
-            <Pill t="peel chain — none" tone="mut" /><Pill t="round-number — none" tone="mut" />
+            <Pill t="rapid layering" tone="red" /><Pill t="sanctions list hit" tone="red" /><Pill t="round-number transfers" tone="mut" />
+            <Pill t="structuring — clear" tone="mut" /><Pill t="mixer — clear" tone="mut" /><Pill t="P2P off-ramp — clear" tone="mut" /><Pill t="velocity — clear" tone="mut" />
+            <Pill t="bridge hop — clear" tone="mut" /><Pill t="peel chain — clear" tone="mut" /><Pill t="dormant — clear" tone="mut" />
           </div>
           <div className="mt-5 border-t border-line2 pt-4">
             <H>Why rapid layering fired</H>
-            <div className="mono text-[12px] text-ink/85 leading-relaxed">3 outputs reconsolidated within 13 min · FATF VA red-flag 2020 §layering</div>
+            <div className="mono text-[12px] text-ink/85 leading-relaxed">THabxpQ…kFAEf received 15,003 USDT and forwarded 15,045 USDT 11 min later · 5 intermediaries within 2 h · FATF 2020, immediate onward transfer</div>
           </div>
         </>
       );
@@ -98,25 +103,26 @@ export function ModulePreview({ k }: { k: ModuleKey }) {
             <span className="mono text-[30px] font-extrabold text-mut">47</span>
             <span className="text-amber">→</span>
             <span className="mono text-[30px] font-extrabold text-amber">3</span>
-            <span className="text-[11px] text-faint">complaints collapse into networks by shared cash-out wallet</span>
+            <span className="text-[11px] text-faint">synthetic complaints join into operator groups by shared cash-out wallet</span>
           </div>
-          <Row l="SYN-A" m="P2P off-ramp cluster · 8 victims" r="₹41.2L" tone="red" />
-          <Row l="SYN-B" m="layered, 2 hops deep · 7 victims" r="₹28.6L" tone="amber" />
-          <Row l="SYN-C" m="cross-chain BTC→TRON · 6 victims" r="₹19.4L" />
+          <Row l="SYN-01" m="7 complaints · 4 cities · 4.1 / week" r="₹33.2L" tone="amber" />
+          <Row l="SYN-02" m="7 complaints · 4 cities · 3.5 / week" r="₹28.6L" />
+          <Row l="SYN-03" m="6 complaints · 4 cities · 3.2 / week" r="₹19.4L" />
         </>
       );
     case "intercept":
       return (
         <>
           <div className="flex items-baseline justify-between">
-            <span className="c-kv">Est. window before withdrawal</span>
-            <span className="mono text-[30px] font-extrabold text-red leading-none">01:47:22</span>
+            <span className="c-kv">Window before withdrawal · replay</span>
+            <span className="mono text-[30px] font-extrabold text-amber leading-none">01:47:22</span>
           </div>
           <div className="mt-4">
-            <Row l="EXCHANGE" m="Known VASP · deposit cluster #DC-2210" r="" />
-            <Row l="DEPOSIT" m="TVd6j…2Lm7" r="" />
-            <Row l="AMOUNT" m="9,398 USDT · ≈ ₹7,99,960" r="" />
-            <Row l="EVIDENCE" m="sha256 3f9a…c710 · BSA s.63 attached" r="" />
+            <Row l="CASE" m="2026-CHD-0417 · demonstration" r="" />
+            <Row l="WALLET" m="TVd6j…g0Lm7 · unattributed · no public owner" r="" />
+            <Row l="AMOUNT" m="9,398 USDT · ≈ ₹7,99,958" r="" />
+            <Row l="WINDOW" m="02:00:00 · policy default · fewer than 3 pairs" r="" />
+            <Row l="SEAL" m="SHA-256 · supervisor sign-off · audited" r="" />
           </div>
           <div className="c-note mt-4">OFFRAMP does not freeze funds — it composes the request an authorised officer sends.</div>
         </>
@@ -124,13 +130,12 @@ export function ModulePreview({ k }: { k: ModuleKey }) {
     case "evidence":
       return (
         <>
-          <H>Pack contents</H>
-          <Row l="trace_graph.json" m="" r="3f9a…c710" />
-          <Row l="hop_log.csv" m="" r="88b1…4de2" />
-          <Row l="detector_findings" m="" r="c04f…91aa" />
-          <Row l="freeze_packet" m="" r="4e51…07c9" />
-          <Row l="str_draft (FIU-IND)" m="" r="7c23…b108" />
-          <div className="c-note mt-4">hash chain verified · 0 modifications since seal</div>
+          <H>Pack · case 2026-CHD-0417 · 4 artefacts</H>
+          <Row l="bridge_correlation.json" m="synthetic" r="sha-256" />
+          <Row l="bank_statement_4471.csv" m="synthetic" r="sha-256" />
+          <Row l="chain_events.json" m="synthetic" r="sha-256" />
+          <Row l="freeze_packet.json" m="sealed" r="sha-256" tone="hit" />
+          <div className="c-note mt-4">hᵢ = sha256(hᵢ₋₁ ∥ aᵢ) · root recomputed on demand · exports: STR draft · s.63 certificate · JSON</div>
         </>
       );
   }

@@ -56,6 +56,7 @@ export default function NetGraph({ input, onHover }: { input: GraphInput | null;
     let raf = 0;
     let running = true;
     const DPR = Math.min(2, window.devicePixelRatio || 1);
+    const still = typeof window.matchMedia === "function" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     const resize = () => {
       const r = canvas.parentElement!.getBoundingClientRect();
@@ -70,7 +71,7 @@ export default function NetGraph({ input, onHover }: { input: GraphInput | null;
     };
 
     /* decorative background dust — carries no data */
-    const dust = Array.from({ length: 70 }, (_, i) => ({
+    const dust = Array.from({ length: 36 }, (_, i) => ({
       fx: (i * 0.618033) % 1,
       fy: ((i * 0.381966) % 1) * 0.96 + 0.02,
       r: 0.6 + ((i * 7) % 10) / 9,
@@ -86,9 +87,19 @@ export default function NetGraph({ input, onHover }: { input: GraphInput | null;
       pulses = [];
       center = null;
       if (!input) return;
-      const cx = W > 900 ? W * 0.66 : W * 0.5;
+      /* the cloud lives in the band between the headline (left) and the seam (right); taller than wide */
+      const wide = W >= 1100;
+      const seamX = wide ? W - 254 : W;
+      const copyEnd = W > 900 ? W * 0.505 : 0;
+      const cx = wide ? (copyEnd + seamX) / 2 + 6 : W > 900 ? W * 0.66 : W * 0.5;
       const cy = H * 0.46;
-      center = { labeled: false, bx: cx, by: cy, x: cx, y: cy, r: 15, addr: input.center, value: 0, symbol: "", dir: "center", phase: 0 };
+      const rx = wide ? (seamX - copyEnd) / 2 + 24 : Math.min(Math.min(W, H) * 0.31 * 1.25, W - cx - 200, cx - 30);
+      const ry = wide ? Math.min(H * 0.3, rx * 1.15) : Math.min(W, H) * 0.31 * 0.85;
+      /* the headline band: nodes that would land on the copy are lifted above or dropped below it */
+      const bandTop = H * 0.28;
+      const bandBot = H * 0.7;
+      const copyRight = W * 0.5;
+      center = { labeled: false, bx: cx, by: cy, x: cx, y: cy, r: wide ? 17 : 15, addr: input.center, value: 0, symbol: "", dir: "center", phase: 0 };
       const seen = new Map<string, { value: number; symbol: string; dir: "in" | "out" | "self" }>();
       for (const t of input.transfers) {
         const other = t.direction === "in" ? t.from : t.to;
@@ -96,20 +107,25 @@ export default function NetGraph({ input, onHover }: { input: GraphInput | null;
         const prev = seen.get(other);
         if (prev) prev.value += t.value;
         else seen.set(other, { value: t.value, symbol: t.symbol, dir: t.direction });
-        if (seen.size >= 16) break;
+        if (seen.size >= (wide ? 10 : 16)) break;
       }
       const list = [...seen.entries()];
-      const R = Math.min(W, H) * 0.31;
       list.forEach(([addr, m], i) => {
-        const a = (i / list.length) * Math.PI * 2 - Math.PI / 2 + 0.35;
-        const rr = R * (0.72 + ((i * 37) % 23) / 40);
+        const a = (i / list.length) * Math.PI * 2 - Math.PI / 2 + (wide ? 0.2 : 0.35);
+        const k = wide ? 0.86 + ((i * 37) % 23) / 160 : 0.72 + ((i * 37) % 23) / 40;
+        let bx = cx + Math.cos(a) * rx * k;
+        let by = cy + Math.sin(a) * ry * k;
+        if (wide && bx < copyRight - 60 && by > bandTop && by < bandBot) {
+          by = by < cy ? bandTop - 24 : bandBot + 24;
+          bx = Math.max(bx, copyRight - 40);
+        }
         nodes.push({
           labeled: false,
-          bx: cx + Math.cos(a) * rr * 1.25,
-          by: cy + Math.sin(a) * rr * 0.85,
+          bx,
+          by,
           x: 0,
           y: 0,
-          r: 4.5 + Math.min(7, Math.log10(1 + m.value) * 2.2),
+          r: (wide ? 5.5 : 4.5) + Math.min(8, Math.log10(1 + m.value) * 2.4),
           addr,
           value: m.value,
           symbol: m.symbol,
@@ -117,16 +133,26 @@ export default function NetGraph({ input, onHover }: { input: GraphInput | null;
           phase: i * 1.7,
         });
       });
-      /* label the largest counterparties that sit clear of the headline block */
+      /* label the largest counterparties that sit clear of the headline block, and never on top of each other */
+      const placed: Node[] = [];
       nodes
         .filter((n) => n.bx > W * 0.55 || KNOWN[n.addr])
+        .filter((n) => !wide || n.bx + 190 < seamX || Math.abs(n.by - cy) > ry * 0.5 || KNOWN[n.addr])
         .sort((a, b) => (KNOWN[b.addr] ? 1 : 0) - (KNOWN[a.addr] ? 1 : 0) || b.value - a.value)
-        .slice(0, 4)
-        .forEach((n) => (n.labeled = true));
+        .forEach((n) => {
+          if (placed.length >= (wide ? 3 : 4)) return;
+          const clash = placed.some((p) => Math.abs(p.by - n.by) < 60 && Math.abs(p.bx - n.bx) < 260);
+          if (clash) return;
+          n.labeled = true;
+          placed.push(n);
+        });
     }
 
     let lastPulse = 0;
+    let cashPulses: number[] = [];
     const mouse = { x: -1e4, y: -1e4 };
+    /* the node the suspicious route ends on: the attributed exchange if one is reached, else the largest counterparty */
+    const routeNode = () => nodes.find((n) => KNOWN[n.addr]) ?? [...nodes].sort((a, b) => b.value - a.value)[0] ?? null;
 
     const onMove = (e: MouseEvent) => {
       const r = canvas.getBoundingClientRect();
@@ -145,7 +171,7 @@ export default function NetGraph({ input, onHover }: { input: GraphInput | null;
       /* dust */
       for (const d of dust) {
         const a = 0.12 + 0.1 * Math.sin(t * 0.0012 + d.tw * 6.28);
-        ctx.fillStyle = `rgba(133,152,170,${a * 0.35})`;
+        ctx.fillStyle = `rgba(133,152,170,${a * 0.22})`;
         ctx.beginPath();
         ctx.arc(d.fx * W, d.fy * H, d.r, 0, 6.28);
         ctx.fill();
@@ -153,11 +179,12 @@ export default function NetGraph({ input, onHover }: { input: GraphInput | null;
 
       if (center && nodes.length) {
         /* drift */
-        center.x = center.bx + Math.sin(t * 0.00045) * 6;
-        center.y = center.by + Math.cos(t * 0.00038) * 5;
+        const dr = still ? 0 : 1;
+        center.x = center.bx + Math.sin(t * 0.00045) * 6 * dr;
+        center.y = center.by + Math.cos(t * 0.00038) * 5 * dr;
         for (const n of nodes) {
-          n.x = n.bx + Math.sin(t * 0.0005 + n.phase) * 9;
-          n.y = n.by + Math.cos(t * 0.00042 + n.phase) * 7;
+          n.x = n.bx + Math.sin(t * 0.0005 + n.phase) * 9 * dr;
+          n.y = n.by + Math.cos(t * 0.00042 + n.phase) * 7 * dr;
         }
 
         /* hover pick */
@@ -185,9 +212,9 @@ export default function NetGraph({ input, onHover }: { input: GraphInput | null;
 
         /* amber pool + radar sweep around the traced wallet */
         {
-          const R = Math.min(W, H) * 0.44;
+          const R = Math.min(W, H) * 0.36;
           const pool = ctx.createRadialGradient(center.x, center.y, 0, center.x, center.y, R * 0.55);
-          pool.addColorStop(0, "rgba(232,178,58,0.10)");
+          pool.addColorStop(0, "rgba(232,178,58,0.07)");
           pool.addColorStop(1, "rgba(232,178,58,0)");
           ctx.fillStyle = pool;
           ctx.beginPath();
@@ -198,8 +225,8 @@ export default function NetGraph({ input, onHover }: { input: GraphInput | null;
             ctx.translate(center.x, center.y);
             ctx.rotate((t * 0.00038) % 6.283);
             const sweep = ctx.createConicGradient(0, 0, 0);
-            sweep.addColorStop(0, "rgba(232,178,58,0.11)");
-            sweep.addColorStop(0.1, "rgba(232,178,58,0.02)");
+            sweep.addColorStop(0, "rgba(232,178,58,0.05)");
+            sweep.addColorStop(0.1, "rgba(232,178,58,0.01)");
             sweep.addColorStop(0.16, "rgba(232,178,58,0)");
             sweep.addColorStop(1, "rgba(232,178,58,0)");
             ctx.fillStyle = sweep;
@@ -213,12 +240,19 @@ export default function NetGraph({ input, onHover }: { input: GraphInput | null;
 
         /* edges */
         nodes.forEach((n) => {
+          const route = !!KNOWN[n.addr];
           const grad = ctx.createLinearGradient(center!.x, center!.y, n.x, n.y);
-          grad.addColorStop(0, "rgba(196,160,74,0.6)");
-          grad.addColorStop(0.45, "rgba(110,124,140,0.5)");
-          grad.addColorStop(1, "rgba(80,98,116,0.28)");
+          if (route) {
+            grad.addColorStop(0, "rgba(229,72,77,0.75)");
+            grad.addColorStop(0.5, "rgba(232,178,58,0.8)");
+            grad.addColorStop(1, "rgba(70,165,191,0.85)");
+          } else {
+            grad.addColorStop(0, "rgba(196,160,74,0.42)");
+            grad.addColorStop(0.45, "rgba(110,124,140,0.34)");
+            grad.addColorStop(1, "rgba(80,98,116,0.2)");
+          }
           ctx.strokeStyle = n === hov ? "rgba(232,178,58,0.85)" : grad;
-          ctx.lineWidth = n === hov ? 1.5 : 1.1;
+          ctx.lineWidth = n === hov ? 1.5 : route ? 2.2 : 1.1;
           ctx.beginPath();
           ctx.moveTo(center!.x, center!.y);
           const mx = (center!.x + n.x) / 2 + (n.by - center!.by) * 0.12;
@@ -228,9 +262,10 @@ export default function NetGraph({ input, onHover }: { input: GraphInput | null;
         });
 
         /* pulses along edges */
-        if (t - lastPulse > 380 && nodes.length) {
+        if (!still && t - lastPulse > 620 && nodes.length) {
           lastPulse = t;
-          const edge = Math.floor(Math.random() * nodes.length);
+          const routeIdx = nodes.findIndex((n) => KNOWN[n.addr]);
+          const edge = routeIdx >= 0 && Math.random() < 0.5 ? routeIdx : Math.floor(Math.random() * nodes.length);
           pulses.push({ edge, t: 0, dir: nodes[edge].dir === "in" ? -1 : 1 });
           if (pulses.length > 14) pulses.shift();
         }
@@ -266,7 +301,8 @@ export default function NetGraph({ input, onHover }: { input: GraphInput | null;
           ctx.fill();
           ctx.stroke();
           if (n.labeled && n !== hov) {
-            const right = n.x < W - 190;
+            const seamGuard = W >= 1100 ? W - 254 - 190 : W - 190;
+            const right = n.x < seamGuard;
             const lx = right ? n.x + n.r + 8 : n.x - n.r - 8;
             ctx.textAlign = right ? "left" : "right";
             ctx.font = "10px SF Mono, Menlo, monospace";
@@ -278,6 +314,82 @@ export default function NetGraph({ input, onHover }: { input: GraphInput | null;
             if (known) {
               ctx.fillStyle = "rgba(70,165,191,0.95)";
               ctx.fillText(KNOWN[n.addr], lx, n.y + 21);
+              ctx.fillStyle = "rgba(232,178,58,0.9)";
+              ctx.font = "bold 8px SF Mono, Menlo, monospace";
+              ctx.fillText("SUSPICIOUS ROUTE · HOP 1", lx, n.y + 33);
+            }
+            if (!known && W >= 1100 && n === routeNode()) {
+              ctx.fillStyle = "rgba(232,178,58,0.9)";
+              ctx.font = "bold 8px SF Mono, Menlo, monospace";
+              ctx.fillText("LARGEST COUNTERPARTY · ROUTE FOLLOWED", lx, n.y + 21);
+            }
+          }
+        }
+
+        /* the seam and the off-chain continuation — drawn dashed: what follows the exchange is the demonstration case, not this wallet's history */
+        if (W >= 1100) {
+          const seamX = W - 254;
+          const rn = routeNode();
+          const ty = H * 0.5 - 8;
+          // seam line
+          const sg = ctx.createLinearGradient(0, H * 0.18, 0, H * 0.82);
+          sg.addColorStop(0, "rgba(232,178,58,0)");
+          sg.addColorStop(0.5, `rgba(232,178,58,${0.55 + 0.2 * Math.sin(t * 0.0016)})`);
+          sg.addColorStop(1, "rgba(232,178,58,0)");
+          ctx.strokeStyle = sg;
+          ctx.lineWidth = 1.5;
+          ctx.shadowColor = "rgba(232,178,58,0.35)";
+          ctx.shadowBlur = 8;
+          ctx.beginPath();
+          ctx.moveTo(seamX, H * 0.18);
+          ctx.lineTo(seamX, H * 0.82);
+          ctx.stroke();
+          ctx.shadowBlur = 0;
+
+          if (rn) {
+            // dashed continuation: exchange → seam → ledger row
+            ctx.setLineDash([5, 5]);
+            ctx.lineDashOffset = -((t * 0.03) % 20);
+            const cg = ctx.createLinearGradient(rn.x, rn.y, W - 226, ty);
+            cg.addColorStop(0, "rgba(70,165,191,0.7)");
+            cg.addColorStop(0.55, "rgba(232,178,58,0.75)");
+            cg.addColorStop(1, "rgba(224,212,191,0.8)");
+            ctx.strokeStyle = cg;
+            ctx.lineWidth = 1.4;
+            ctx.beginPath();
+            ctx.moveTo(rn.x, rn.y);
+            ctx.quadraticCurveTo(rn.x + (seamX - rn.x) * 0.35, rn.y + Math.max(70, (ty - rn.y) * 0.6), seamX, ty);
+            ctx.lineTo(W - 226, ty);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            // cash pulses along the continuation
+            if (!still && Math.random() < 0.012) cashPulses.push(0);
+            cashPulses = cashPulses.filter((k) => k < 1);
+            for (let i = 0; i < cashPulses.length; i++) {
+              cashPulses[i] += 0.006;
+              const k = cashPulses[i];
+              let px: number;
+              let py: number;
+              if (k < 0.75) {
+                const u = k / 0.75;
+                const mx = rn.x + (seamX - rn.x) * 0.35;
+                const my = rn.y + Math.max(70, (ty - rn.y) * 0.6);
+                const om = 1 - u;
+                px = om * om * rn.x + 2 * om * u * mx + u * u * seamX;
+                py = om * om * rn.y + 2 * om * u * my + u * u * ty;
+              } else {
+                const u = (k - 0.75) / 0.25;
+                px = seamX + (W - 226 - seamX) * u;
+                py = ty;
+              }
+              const crossed = k >= 0.75;
+              ctx.fillStyle = crossed ? "rgba(224,212,191,0.95)" : "rgba(232,178,58,0.95)";
+              ctx.shadowColor = crossed ? "rgba(224,212,191,1)" : "rgba(232,178,58,1)";
+              ctx.shadowBlur = 12;
+              ctx.beginPath();
+              ctx.arc(px, py, 2.8, 0, 6.28);
+              ctx.fill();
+              ctx.shadowBlur = 0;
             }
           }
         }
@@ -342,5 +454,5 @@ export default function NetGraph({ input, onHover }: { input: GraphInput | null;
     };
   }, [input, onHover]);
 
-  return <canvas ref={ref} className="absolute inset-0" />;
+  return <canvas ref={ref} className="absolute inset-0" role="img" aria-label={input ? `Live money-flow map of wallet ${input.center}${input.sanctioned ? ", an OFAC-sanctioned address" : ""}, showing its largest counterparties from public chain data` : "Money-flow map loading from public chain data"} />;
 }

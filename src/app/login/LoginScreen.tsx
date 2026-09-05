@@ -2,11 +2,12 @@
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import NetGraph, { type GraphInput, type HoverInfo } from "@/components/landing/NetGraph";
+import type { DemoGraph } from "@/lib/demo-graph";
 
 const SEED = "12HQDsicffSBaYdJ6BhnE22sfjTESmmzKx";
 const short = (a: string) => `${a.slice(0, 7)}…${a.slice(-5)}`;
 
-export default function LoginScreen({ ofacCount, syncedAt, users }: { ofacCount: number; syncedAt: string | null; users: number }) {
+export default function LoginScreen({ ofacCount, syncedAt, users, initial = null }: { ofacCount: number; syncedAt: string | null; users: number; initial?: DemoGraph | null }) {
   const router = useRouter();
   const params = useSearchParams();
   const next = params.get("next");
@@ -14,15 +15,16 @@ export default function LoginScreen({ ofacCount, syncedAt, users }: { ofacCount:
   const [password, setPassword] = useState("");
   const [error, setError] = useState<{ text: string; code: number } | null>(null);
   const [busy, setBusy] = useState(false);
-  const [graph, setGraph] = useState<GraphInput | null>(null);
+  const [graph, setGraph] = useState<GraphInput | null>(initial ? { center: initial.center, sanctioned: initial.sanctioned, transfers: initial.transfers } : null);
   const [hover, setHover] = useState<HoverInfo | null>(null);
   const [clock, setClock] = useState("");
 
   useEffect(() => {
-    fetch(`/api/demo-trace?address=${SEED}`)
-      .then((r) => r.json())
-      .then((b) => setGraph({ center: SEED, sanctioned: true, transfers: b.transfers ?? [] }))
-      .catch(() => setGraph(null));
+    if (!initial)
+      fetch(`/api/demo-trace?address=${SEED}`)
+        .then((r) => r.json())
+        .then((b) => setGraph({ center: SEED, sanctioned: true, transfers: b.transfers ?? [] }))
+        .catch(() => setGraph(null));
     const tick = () => setClock(new Date().toLocaleTimeString("en-IN", { hour12: false }) + " IST");
     tick();
     const id = setInterval(tick, 1000);

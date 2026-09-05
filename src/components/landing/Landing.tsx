@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { AddressSummary, Transfer } from "@/lib/chains/types";
 import NetGraph, { type HoverInfo } from "./NetGraph";
 import { ModulePreview, type ModuleKey } from "@/components/console/previews";
+import type { DemoGraph } from "@/lib/demo-graph";
 
 /* ───────────── reveal on scroll ───────────── */
 function useReveal() {
@@ -72,10 +73,14 @@ const DEMO_CHIPS = [
 const short = (a: string) => `${a.slice(0, 7)}…${a.slice(-5)}`;
 const fmtV = (v: number) => v.toLocaleString("en-IN", { maximumFractionDigits: v < 1 ? 5 : 2 });
 
-function Hero({ ofacCount, loggedIn }: { ofacCount: number; loggedIn: boolean }) {
+function Hero({ ofacCount, loggedIn, initial }: { ofacCount: number; loggedIn: boolean; initial: DemoGraph | null }) {
   const [active, setActive] = useState(DEMO_CHIPS[0].address);
-  const [data, setData] = useState<DemoResult | null>(null);
-  const [state, setState] = useState<"loading" | "ok" | "err">("loading");
+  const [data, setData] = useState<DemoResult | null>(
+    initial
+      ? { summary: { chain: "btc", address: initial.center, txCount: initial.txCount, receivedTotal: initial.receivedTotal, sentTotal: 0, balance: 0, symbol: initial.symbol, firstSeen: null, lastSeen: null }, transfers: initial.transfers, fromCache: true, screening: { ofacSanctioned: initial.sanctioned, listSize: ofacCount } }
+      : null,
+  );
+  const [state, setState] = useState<"loading" | "ok" | "err">(initial ? "ok" : "loading");
   const [hover, setHover] = useState<HoverInfo | null>(null);
 
   const load = useCallback(async (address: string) => {
@@ -91,8 +96,8 @@ function Hero({ ofacCount, loggedIn }: { ofacCount: number; loggedIn: boolean })
     }
   }, []);
   useEffect(() => {
-    load(DEMO_CHIPS[0].address);
-  }, [load]);
+    if (!initial) load(DEMO_CHIPS[0].address);
+  }, [load, initial]);
   const onHover = useCallback((h: HoverInfo | null) => setHover(h), []);
 
   const s = data?.summary;
@@ -104,6 +109,34 @@ function Hero({ ofacCount, loggedIn }: { ofacCount: number; loggedIn: boolean })
       <NetGraph input={graph} onHover={onHover} />
       <div className="absolute inset-0 pointer-events-none bg-[linear-gradient(90deg,rgba(6,9,14,0.62)_0%,rgba(6,9,14,0.5)_36%,rgba(6,9,14,0.12)_60%,transparent_100%)]" />
       <div className="absolute inset-x-0 bottom-0 h-28 pointer-events-none bg-[linear-gradient(180deg,transparent,rgba(6,9,14,0.55))]" />
+
+      {/* the cash side of the seam — the demonstration statement, labelled */}
+      <div className="hidden min-[1100px]:block absolute right-5 top-1/2 -translate-y-1/2 w-[204px] cash-paper border border-[#3a2f18] shadow-[0_0_0_1px_rgba(232,178,58,0.08)] pointer-events-none" aria-hidden="true">
+        <div className="px-4 pt-3 pb-2 border-b border-[#2b2318]">
+          <div className="mono text-[7.5px] tracking-[0.18em] uppercase font-extrabold text-cashmut">Off-chain · bank statement</div>
+          <div className="mono text-[7px] tracking-[0.12em] uppercase text-[#b09a76] mt-0.5">demonstration · synthetic</div>
+        </div>
+        <div className="px-4 py-1">
+          {(
+            [
+              ["11:38:52", "IMPS/P2P/ref 88120", "1,15,000", false],
+              ["11:49:20", "IMPS/P2P/ref 88147", "7,98,180", true],
+              ["11:56:44", "UPI/collect/…9903", "64,500", false],
+            ] as const
+          ).map(([t, n, v, hit]) => (
+            <div key={t} className={`mono flex justify-between gap-2 text-[10px] py-[7px] border-b border-[#2b2318] last:border-0 ${hit ? "bg-[#2a1f0a] -mx-2 px-2 text-[#fbe9bc] shadow-[inset_2px_0_0_#e8b23a]" : "text-cashink"}`}>
+              <span className={hit ? "" : "text-[#8a7659]"}>{t}</span>
+              <span className="truncate">{n}</span>
+              <span className="font-bold">₹{v}</span>
+            </div>
+          ))}
+        </div>
+        <div className="px-4 py-2.5 border-t border-[#2b2318] flex items-baseline justify-between">
+          <span className="mono text-[7.5px] tracking-[0.16em] uppercase font-extrabold text-amber">candidate linkage</span>
+          <span className="mono text-[15px] font-bold text-amber2 leading-none">96.9%</span>
+        </div>
+        <div className="px-4 pb-3 mono text-[7px] text-[#8c7a50]">Δ 0.22% · Δt 6 min 11 s</div>
+      </div>
 
       {/* HUD — top */}
       <header className="absolute inset-x-0 top-0 flex items-center justify-between px-8 h-[68px] pointer-events-none">
@@ -269,7 +302,7 @@ function CaseBand({ capture = false }: { capture?: boolean }) {
     <section id="case" ref={sec} className="border-b border-line">
       <div className="max-w-[1180px] mx-auto px-8 py-16 grid lg:grid-cols-[0.9fr_1.1fr] gap-12 items-center">
         <div>
-          <p className="mono hlabel text-[9.5px]">The case that does not get solved</p>
+          <p className="mono hlabel text-[9.5px]">The case that does not get solved <span className="text-amber/80 ml-2">· demonstration · synthetic narrative</span></p>
           <h2 className="text-[clamp(26px,3vw,38px)] font-extrabold mt-4 leading-[1.1]">
             ₹8 lakh. Four wallets.
             <br />
@@ -319,15 +352,17 @@ function CaseBand({ capture = false }: { capture?: boolean }) {
 
 /* ───────────── console preview: the rail + a live mini-view per module ───────────── */
 const MODULES = [
-  { g: "TRIAGE", key: "live-board", name: "Live Board", n: 4, sub: "Cyber Cell · Sector 17 · shift 0800–2000", chip: ["c-red", "1 window open"] },
-  { g: "TRIAGE", key: "cases", name: "Cases", n: 12, sub: "12 open · 4 require action", chip: ["c-mut", "sort: exposure"] },
-  { g: "INVESTIGATE", key: "trace", name: "Trace", n: 0, sub: "TR7NHq…gjLj6t · TRC-20 USDT · 4 hops · 41 min", chip: ["c-live", "live · tron"] },
-  { g: "INVESTIGATE", key: "bridge", name: "Bridge", n: 0, sub: "on-chain → INR · amount × FX × time", chip: ["c-amb", "seam matched"] },
-  { g: "INVESTIGATE", key: "red-flags", name: "Red Flags", n: 7, sub: "FATF indicator suite · 4 of 10 fired", chip: ["c-red", "4 fired"] },
-  { g: "INVESTIGATE", key: "syndicates", name: "Syndicates", n: 3, sub: "47 complaints · Chandigarh + Ludhiana + Mohali", chip: ["c-amb", "3 networks"] },
-  { g: "ACT", key: "intercept", name: "Intercept", n: 1, sub: "case 2026-CHD-0417 · trigger fired 11:43:09", chip: ["c-red", "window open"] },
-  { g: "ACT", key: "evidence", name: "Evidence", n: 0, sub: "evidence pack · 6 artefacts · hash chain intact", chip: ["c-live", "sealed"] },
+  { g: "TRIAGE", key: "live-board", name: "Live Board", n: 8, sub: "8 watched · 940 SDN · alerts once per event", chip: ["c-live", "live"], data: "live" },
+  { g: "TRIAGE", key: "cases", name: "Cases", n: 1, sub: "one file per wallet · audited timeline · search", chip: ["c-mut", "demonstration case"], data: "demo" },
+  { g: "INVESTIGATE", key: "trace", name: "Trace", n: 0, sub: "12HQDsi…mmzKx · OFAC SDN · Binance at hop 1", chip: ["c-live", "live · btc"], data: "live" },
+  { g: "INVESTIGATE", key: "bridge", name: "Bridge", n: 0, sub: "on-chain → INR · amount × FX × time", chip: ["c-amb", "96.9% candidate"], data: "demo" },
+  { g: "INVESTIGATE", key: "red-flags", name: "Red Flags", n: 3, sub: "FATF indicator suite · 3 of 10 fired", chip: ["c-red", "3 fired"], data: "live" },
+  { g: "INVESTIGATE", key: "syndicates", name: "Syndicates", n: 3, sub: "47 complaints · Chandigarh · Ludhiana · Mohali · Panchkula", chip: ["c-amb", "3 groups"], data: "demo" },
+  { g: "ACT", key: "intercept", name: "Intercept", n: 1, sub: "case 2026-CHD-0417 · trigger 11:43:09 IST", chip: ["c-red", "window open"], data: "demo" },
+  { g: "ACT", key: "evidence", name: "Evidence", n: 0, sub: "4 artefacts · hash chain · STR · s.63", chip: ["c-live", "sealed"], data: "live" },
 ] as const;
+/* the order an investigator actually works in — what the preview cycles through */
+const FLOW: ModuleKey[] = ["trace", "red-flags", "bridge", "intercept", "evidence", "live-board", "cases", "syndicates"];
 
 const chipCls: Record<string, string> = {
   "c-live": "text-green border-[#1c5943] bg-[#08170f]",
@@ -337,19 +372,15 @@ const chipCls: Record<string, string> = {
 };
 
 function ConsolePreview() {
-  const [active, setActive] = useState<ModuleKey>("bridge");
+  const [active, setActive] = useState<ModuleKey>("trace");
   const [touched, setTouched] = useState(false);
   useEffect(() => {
     if (touched) return;
-    const id = setInterval(() => {
-      setActive((k) => {
-        const i = MODULES.findIndex((m) => m.key === k);
-        return MODULES[(i + 1) % MODULES.length].key;
-      });
-    }, 3200);
+    const id = setInterval(() => setActive((k) => FLOW[(FLOW.indexOf(k) + 1) % FLOW.length]), 3400);
     return () => clearInterval(id);
   }, [touched]);
   const mod = MODULES.find((m) => m.key === active)!;
+  const step = FLOW.indexOf(active) + 1;
   const groups = ["TRIAGE", "INVESTIGATE", "ACT"] as const;
 
   return (
@@ -387,13 +418,15 @@ function ConsolePreview() {
             <div className="text-[12px] font-bold leading-tight">{mod.name}</div>
             <div className="mono text-[9px] text-[#657a8e]">{mod.sub}</div>
           </div>
-          <span className={`mono ml-auto text-[8.5px] tracking-[0.08em] uppercase font-bold border px-2 py-0.5 ${chipCls[mod.chip[0]]}`}>{mod.chip[1]}</span>
+          <span className="mono ml-auto text-[8.5px] tracking-[0.12em] uppercase text-faint hidden sm:inline">step {step} of {FLOW.length}</span>
+          <span className={`mono text-[8.5px] tracking-[0.08em] uppercase font-bold border px-2 py-0.5 ${mod.data === "live" ? chipCls["c-live"] : chipCls["c-mut"]}`}>{mod.data === "live" ? "live chain data" : "synthetic · labelled"}</span>
+          <span className={`mono text-[8.5px] tracking-[0.08em] uppercase font-bold border px-2 py-0.5 ${chipCls[mod.chip[0]]}`}>{mod.chip[1]}</span>
         </div>
         <div key={active} className="row-in p-5 flex-1">
           <ModulePreview k={active} />
         </div>
         <div className="border-t border-line px-5 h-[38px] flex items-center justify-between">
-          <span className="mono text-[8.5px] text-faint">{touched ? "hover a module on the left" : "cycling · hover to take control"}</span>
+          <span className="mono text-[8.5px] text-faint">{touched ? "hover a module on the left" : "walking the investigation in order · hover to take control"}</span>
           <Link href={`/login?next=${encodeURIComponent(`/${mod.key}`)}`} className="mono text-[9px] tracking-[0.12em] uppercase font-extrabold text-amber hover:brightness-110">
             Open {mod.name} in console →
           </Link>
@@ -404,12 +437,12 @@ function ConsolePreview() {
 }
 
 /* ═════════════════════════ page ═════════════════════════ */
-export default function Landing({ ofacCount, syncedAt, tickerAddrs, capture = false, loggedIn = false }: { ofacCount: number; syncedAt: string | null; tickerAddrs: string[]; capture?: boolean; loggedIn?: boolean }) {
+export default function Landing({ ofacCount, syncedAt, tickerAddrs, capture = false, loggedIn = false, initial = null }: { ofacCount: number; syncedAt: string | null; tickerAddrs: string[]; capture?: boolean; loggedIn?: boolean; initial?: DemoGraph | null }) {
   useReveal();
   const tick = [...tickerAddrs, ...tickerAddrs];
   return (
     <div className={`ground grain min-h-screen text-ink overflow-x-clip ${capture ? "capture" : ""}`}>
-      <Hero ofacCount={ofacCount} loggedIn={loggedIn} />
+      <Hero ofacCount={ofacCount} loggedIn={loggedIn} initial={initial} />
 
       {/* SDN ticker */}
       <div className="border-b border-line overflow-hidden py-2.5">
@@ -436,10 +469,15 @@ export default function Landing({ ofacCount, syncedAt, tickerAddrs, capture = fa
           </h2>
         </div>
         <div className="rv relative border-y border-line" data-rv style={{ transitionDelay: "0.1s" }}>
+          <div className="hidden md:grid grid-cols-[1fr_auto_1fr] items-center border-b border-line">
+            <div className="mono text-[9px] tracking-[0.2em] uppercase font-extrabold text-ink/80 py-2.5 pl-[max(2rem,calc((100vw-1180px)/2+2rem))]">Crypto <span className="text-faint font-bold">· public chain, traceable</span></div>
+            <div className="mono text-[8.5px] tracking-[0.22em] uppercase font-extrabold text-amber px-5 py-2.5 border-x border-line">the seam</div>
+            <div className="mono text-[9px] tracking-[0.2em] uppercase font-extrabold text-cashink py-2.5 pr-[max(2rem,calc((100vw-1180px)/2+2rem))] text-right">Cash <span className="text-[#9c8663] font-bold">· INR bank credit, freezable</span></div>
+          </div>
           <div className="grid md:grid-cols-2">
-            <div className="px-8 md:pl-[max(2rem,calc((100vw-1180px)/2+2rem))] md:pr-20 py-10">
+            <div className="px-8 md:pl-[max(2rem,calc((100vw-1180px)/2+2rem))] md:pr-32 py-10">
               <div className="mono text-[8.5px] tracking-[0.18em] uppercase font-extrabold text-mut mb-5">
-                On-chain · TRC-20 USDT <span className="text-green ml-2">live</span>
+                On-chain · TRC-20 USDT <span className="text-amber ml-2">demonstration case · synthetic — labelled</span>
               </div>
               {[
                 ["11:43:09", "TVd6j…2Lm7 → sold off-chain", "9,398 USDT"],
@@ -454,7 +492,7 @@ export default function Landing({ ofacCount, syncedAt, tickerAddrs, capture = fa
                 </div>
               ))}
             </div>
-            <div className="cash-paper px-8 md:pl-20 md:pr-[max(2rem,calc((100vw-1180px)/2+2rem))] py-10">
+            <div className="cash-paper px-8 md:pl-32 md:pr-[max(2rem,calc((100vw-1180px)/2+2rem))] py-10">
               <div className="mono text-[8.5px] tracking-[0.18em] uppercase font-extrabold text-cashmut mb-5">
                 Off-chain · bank statement <span className="text-[#b09a76] ml-2">synthetic — labelled</span>
               </div>
@@ -479,17 +517,17 @@ export default function Landing({ ofacCount, syncedAt, tickerAddrs, capture = fa
               ))}
             </div>
           </div>
-          <div className="hidden md:block absolute left-1/2 top-0 bottom-0 w-[2px] -translate-x-1/2 bg-gradient-to-b from-transparent via-amber to-transparent seam-line" />
+          <div className="hidden md:block absolute left-1/2 top-[38px] bottom-0 w-[2px] -translate-x-1/2 bg-gradient-to-b from-transparent via-amber to-transparent seam-line" />
           <div className="hidden md:block absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 border border-[#8a6f26] bg-[#0e0c08] px-5 py-3 text-center z-10">
-            <div className="mono text-[8px] tracking-[0.18em] font-extrabold text-amber">SEAM MATCH</div>
-            <div className="mono text-[24px] font-bold text-amber2 leading-tight">97.4%</div>
-            <div className="mono text-[7.5px] text-[#8c7a50] mt-0.5">amount × FX × time · Δt 6 min 11 s</div>
+            <div className="mono text-[8px] tracking-[0.18em] font-extrabold text-amber">CANDIDATE LINKAGE</div>
+            <div className="mono text-[24px] font-bold text-amber2 leading-tight">96.9%</div>
+            <div className="mono text-[7.5px] text-[#8c7a50] mt-0.5">amount × FX × time · Δ 0.22% · Δt 6 min 11 s</div>
           </div>
         </div>
         <div className="max-w-[1180px] mx-auto px-8 py-10 grid sm:grid-cols-3 gap-10">
           {[
             ["01", "Trace the chain", "Follow the funds hop by hop across BTC, ETH and TRON, on live public data."],
-            ["02", "Correlate the credit", "Match the cash-out to an INR credit on amount × FX × time — a candidate linkage, stated as such."],
+            ["02", "Correlate the credit", "Match the cash-out to an INR credit on amount × FX × time — a candidate linkage, stated as such. The statement is synthetic here; in a case it is the one the bank supplies."],
             ["03", "Seal the packet", "A hash-chained freeze request and evidence pack, ready for the authorised officer."],
           ].map(([n, t, d], i) => (
             <div key={n} className="rv border-t border-line pt-4" data-rv style={{ transitionDelay: `${0.08 * i}s` }}>
@@ -521,9 +559,9 @@ export default function Landing({ ofacCount, syncedAt, tickerAddrs, capture = fa
       <section id="trust" className="max-w-[1180px] mx-auto px-8 py-20">
         <div className="grid sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-line border-y border-line">
           {[
-            { pre: "₹", n: 22845, post: " cr", l: "lost to cyber fraud in 2024 · MHA, LS Q.432", c: "text-red" },
-            { pre: "₹", n: 7130, post: " cr", l: "saved by the bank-side freeze pipeline", c: "text-green" },
-            { pre: "", n: ofacCount, post: "", l: "sanctioned addresses screened on every trace", c: "text-amber" },
+            { pre: "₹", n: 22845, post: " cr", l: "lost to cyber fraud in India in 2024 · MHA, Lok Sabha Q.432", c: "text-red" },
+            { pre: "₹", n: 7130, post: " cr", l: "frozen by the bank-side 1930 / CFCFRMS pipeline — which has no crypto leg", c: "text-green" },
+            { pre: "", n: ofacCount, post: "", l: `OFAC SDN addresses screened on every node of every trace${syncedAt ? ` · synced ${syncedAt.slice(0, 10)}` : ""}`, c: "text-amber" },
           ].map((x, i) => (
             <div key={x.l} className="rv py-7 sm:px-8 first:pl-0" data-rv style={{ transitionDelay: `${i * 0.08}s` }}>
               <div className={`mono text-[30px] font-bold whitespace-nowrap ${x.c}`}>

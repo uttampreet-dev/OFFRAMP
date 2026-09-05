@@ -9,7 +9,7 @@
   --color-line2: #161f2a;
   --color-ink: #e9eff5;
   --color-mut: #8598aa;
-  --color-faint: #4e5f70;
+  --color-faint: #5c6e82;
   --color-amber: #e8b23a;
   --color-amber2: #f5dfa4;
   --color-red: #e5484d;
@@ -141,6 +141,11 @@ body {
 
 @keyframes row-in { from { opacity: 0; transform: translateY(9px); } to { opacity: 1; transform: none; } }
 .row-in { animation: row-in 0.45s ease-out both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .kin > span, .ticker, .row-in, .seam-line, .mock-el, .mock-stamp, .mock-flag, .mock-seal { animation: none !important; }
+  .rv { opacity: 1 !important; transform: none !important; transition: none !important; }
+}
 
 /* dev capture mode (?capture=1): fixed hero height, everything revealed */
 .capture .hero-wall { height: 940px; }
