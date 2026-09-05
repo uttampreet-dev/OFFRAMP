@@ -1,6 +1,6 @@
 # Architecture
 
-Companion to the README's architecture diagram. Design rationale, access model, case lifecycle, feature coverage and the project tree.
+Companion to the README's architecture diagram. Design rationale, access model, case lifecycle and feature coverage. The project tree is in the README.
 
 ## Design choices
 
@@ -30,7 +30,7 @@ A prototype model, stated precisely.
 ## Case lifecycle
 
 ```mermaid
-%%{init: {"theme": "base", "themeVariables": {"fontFamily": "ui-monospace, Menlo, Consolas, monospace", "fontSize": "12px", "primaryColor": "#0c121a", "primaryTextColor": "#e9eff5", "primaryBorderColor": "#e8b23a", "lineColor": "#8598aa"}}}%%
+%%{init: {"theme": "base", "themeVariables": {"fontFamily": "ui-monospace, Menlo, Consolas, monospace", "fontSize": "13px", "primaryColor": "#ffffff", "primaryTextColor": "#1f2933", "primaryBorderColor": "#c8d0da", "lineColor": "#7b8794", "secondaryColor": "#ffffff", "tertiaryColor": "#ffffff", "clusterBkg": "#f6f8fa", "clusterBorder": "#d0d7de", "titleColor": "#1f2933", "edgeLabelBackground": "#ffffff", "noteBkgColor": "#fff8e6", "noteBorderColor": "#e8b23a", "noteTextColor": "#1f2933"}}}%%
 stateDiagram-v2
   direction LR
   [*] --> intake: open on a seed wallet
@@ -65,45 +65,4 @@ OFFRAMP/
 │   ├── app/
 │   │   ├── page.tsx                      landing · live money-flow wall
 │   │   ├── login/                        sign-in
-│   │   ├── (console)/                    ten authenticated screens
-│   │   │   ├── live-board/  screen/  cases/
-│   │   │   ├── trace/  (Sankey.tsx)  bridge/  red-flags/  syndicates/
-│   │   │   └── intercept/  evidence/  access/
-│   │   └── api/                          29 server routes
-│   │       ├── lookup · trace · tx · cospend · redflags · screen · search
-│   │       ├── bridge · statements · intercept/{seal,approve}
-│   │       ├── evidence/{seal,[id]/export} · cases/[id]/report · syndicates
-│   │       └── board · watch · alerts · auth/* · admin/users · addresses
-│   ├── lib/
-│   │   ├── chains/        btc.ts · eth.ts · tron.ts · tx.ts · one interface
-│   │   ├── trace/         engine.ts (BFS by hop) · labels.ts (sourced entities)
-│   │   ├── detectors/     ten rule-based indicators
-│   │   ├── bridge/        parse.ts · fx.ts · correlate.ts · sample.ts
-│   │   ├── intercept/     window estimate · canonical JSON · sealed packets
-│   │   ├── evidence/      hash chain · manifest · verify
-│   │   ├── syndicates/    transitive grouping by cash-out wallet
-│   │   ├── board/         60 s re-evaluation · five alert rules
-│   │   ├── cases/         unified timeline
-│   │   ├── risk.ts        transparent score
-│   │   ├── screen.ts      bulk screening
-│   │   ├── report.ts      printable investigation report
-│   │   ├── cache.ts       disk cache · stale fallback · offline replay
-│   │   ├── auth.ts        scrypt · HMAC sessions · lockout
-│   │   ├── db.ts          SQLite schema · seed · audit
-│   │   └── ofac.ts · scam.ts · entities.ts · demo-graph.ts
-│   ├── components/
-│   │   ├── console/       shell, inputs, chips, previews
-│   │   ├── landing/       Landing.tsx · NetGraph.tsx
-│   │   └── AlertWatcher.tsx · Rail.tsx · Stub.tsx
-│   ├── templates/         str.html · bsa63.html
-│   └── middleware.ts      signature and expiry check on every non-public path
-├── data/
-│   ├── ofac/              XBT · ETH · TRX · USDT · meta (940 unique addresses)
-│   ├── scam/              cryptoscamdb.json (4,270 reports)
-│   ├── known-entities.json  42 exchanges and mixers, each with a source URL
-│   ├── demo/addresses.json  verified demonstration address book
-│   └── synthetic/         complaints.json · statements/*.csv, labelled
-├── scripts/               sync-ofac · sync-scam-lists · gen-synthetic · gen-complaints · build-demo-addresses
-├── docs/                  README assets, METHOD.md, ARCHITECTURE.md
-└── .cache/                chain responses (untracked)
-```
+│   │   ├── (console)/                    ten authenticated scr

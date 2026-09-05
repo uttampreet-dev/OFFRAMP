@@ -52,7 +52,7 @@ Stolen money in an Indian cyber-fraud case follows one route. The victim pays in
 The interception pipeline that exists today is built for the cash half. The 1930 helpline feeds CFCFRMS, banks freeze on request, and the I4C Suspect Registry holds 24.67 lakh mule accounts; the pipeline has saved ₹7,130 crore. It covers bank accounts, SIMs and IMEIs, not wallet addresses (Ministry of Home Affairs, Lok Sabha Unstarred Question No. 432, answered 02.12.2025). The wallet leg can be read on a public explorer, but nothing in the pipeline joins it to the bank credit on the other side.
 
 ```mermaid
-%%{init: {"theme": "base", "themeVariables": {"fontFamily": "ui-monospace, Menlo, Consolas, monospace", "fontSize": "13px", "primaryColor": "#0c121a", "primaryTextColor": "#e9eff5", "primaryBorderColor": "#1b2431", "lineColor": "#8598aa", "secondaryColor": "#17120b", "tertiaryColor": "#0e141d", "clusterBkg": "#070a0f", "clusterBorder": "#1b2431", "edgeLabelBackground": "#070a0f"}}}%%
+%%{init: {"theme": "base", "themeVariables": {"fontFamily": "ui-monospace, Menlo, Consolas, monospace", "fontSize": "13px", "primaryColor": "#ffffff", "primaryTextColor": "#1f2933", "primaryBorderColor": "#c8d0da", "lineColor": "#7b8794", "secondaryColor": "#ffffff", "tertiaryColor": "#ffffff", "clusterBkg": "#f6f8fa", "clusterBorder": "#d0d7de", "titleColor": "#1f2933", "edgeLabelBackground": "#ffffff", "noteBkgColor": "#fff8e6", "noteBorderColor": "#e8b23a", "noteTextColor": "#1f2933"}}}%%
 flowchart LR
   V([Victim pays]) --> M1[Mule account 1]
   M1 -->|buys USDT| W1[(Wallet A)]
@@ -71,8 +71,8 @@ flowchart LR
     W3
   end
 
-  style covered fill:#17120b,stroke:#3a2f20,color:#9c8663
-  style gap fill:#0c121a,stroke:#e5484d,color:#e5484d
+  style covered stroke:#b08a3a,stroke-width:1.5px
+  style gap stroke:#e5484d,stroke-width:1.5px
   style W3 stroke:#e8b23a,stroke-width:2px
 ```
 
@@ -153,7 +153,7 @@ Every number on a screen comes from a rule that can be read in this repository. 
 - **Evidence chain.** Canonical JSON, SHA-256 per artefact, hashes chained to a root.
 
 ```mermaid
-%%{init: {"theme": "base", "themeVariables": {"fontFamily": "ui-monospace, Menlo, Consolas, monospace", "fontSize": "12px", "primaryColor": "#0c121a", "primaryTextColor": "#e9eff5", "primaryBorderColor": "#1b2431", "lineColor": "#8598aa", "secondaryColor": "#17120b", "tertiaryColor": "#0e141d", "clusterBkg": "#070a0f", "clusterBorder": "#1b2431", "edgeLabelBackground": "#070a0f"}}}%%
+%%{init: {"theme": "base", "themeVariables": {"fontFamily": "ui-monospace, Menlo, Consolas, monospace", "fontSize": "13px", "primaryColor": "#ffffff", "primaryTextColor": "#1f2933", "primaryBorderColor": "#c8d0da", "lineColor": "#7b8794", "secondaryColor": "#ffffff", "tertiaryColor": "#ffffff", "clusterBkg": "#f6f8fa", "clusterBorder": "#d0d7de", "titleColor": "#1f2933", "edgeLabelBackground": "#ffffff", "noteBkgColor": "#fff8e6", "noteBorderColor": "#e8b23a", "noteTextColor": "#1f2933"}}}%%
 flowchart LR
   subgraph art["Artefacts · canonical JSON"]
     direction TB
@@ -197,7 +197,7 @@ One altered byte changes the root. The Evidence screen recomputes the chain on d
 **Stack.** Next.js 16 (App Router) · React 19 · TypeScript 5 · Tailwind CSS 4 · better-sqlite3 · Node.js `crypto` for scrypt, HMAC and SHA-256. One codebase serves the console and its API. No Python service, no queue, no external model.
 
 ```mermaid
-%%{init: {"theme": "base", "themeVariables": {"fontFamily": "ui-monospace, Menlo, Consolas, monospace", "fontSize": "12px", "primaryColor": "#0c121a", "primaryTextColor": "#e9eff5", "primaryBorderColor": "#1b2431", "lineColor": "#8598aa", "secondaryColor": "#0e141d", "tertiaryColor": "#17120b", "clusterBkg": "#070a0f", "clusterBorder": "#1b2431", "edgeLabelBackground": "#070a0f"}}}%%
+%%{init: {"theme": "base", "themeVariables": {"fontFamily": "ui-monospace, Menlo, Consolas, monospace", "fontSize": "13px", "primaryColor": "#ffffff", "primaryTextColor": "#1f2933", "primaryBorderColor": "#c8d0da", "lineColor": "#7b8794", "secondaryColor": "#ffffff", "tertiaryColor": "#ffffff", "clusterBkg": "#f6f8fa", "clusterBorder": "#d0d7de", "titleColor": "#1f2933", "edgeLabelBackground": "#ffffff", "noteBkgColor": "#fff8e6", "noteBorderColor": "#e8b23a", "noteTextColor": "#1f2933"}}}%%
 flowchart LR
   subgraph sources["Public sources · read only"]
     direction TB
@@ -255,7 +255,58 @@ flowchart LR
 - **SQLite** in WAL mode through better-sqlite3 for users, sessions, cases, watch list, alerts, packets, packs and the audit log. The schema is plain SQL behind one module; a Postgres port would replace the driver, not the engines.
 - **Access control.** No public sign-up; a supervisor provisions accounts. scrypt password hashes with per-user salts, HMAC-SHA-256 signed httpOnly session cookies, five failed logins lock an account for fifteen minutes, three roles with supervisor-only sign-off, case closing and account management enforced on the server. The edge middleware checks the cookie's signature and expiry; every API route then re-checks the server-side session record, so logout, *sign out everywhere* and disabling an account end API access immediately. Sessions expire after twelve hours. This is a prototype access model, not a hardened deployment.
 
-Design rationale, case lifecycle, feature coverage and the full project tree are in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+### Project structure
+
+```
+OFFRAMP/
+├── src/
+│   ├── app/
+│   │   ├── page.tsx                      landing · live money-flow wall
+│   │   ├── login/                        sign-in
+│   │   ├── (console)/                    ten authenticated screens
+│   │   │   ├── live-board/  screen/  cases/
+│   │   │   ├── trace/  (Sankey.tsx)  bridge/  red-flags/  syndicates/
+│   │   │   └── intercept/  evidence/  access/
+│   │   └── api/                          29 server routes
+│   │       ├── lookup · trace · tx · cospend · redflags · screen · search
+│   │       ├── bridge · statements · intercept/{seal,approve}
+│   │       ├── evidence/{seal,[id]/export} · cases/[id]/report · syndicates
+│   │       └── board · watch · alerts · auth/* · admin/users · addresses
+│   ├── lib/
+│   │   ├── chains/        btc.ts · eth.ts · tron.ts · tx.ts · one interface
+│   │   ├── trace/         engine.ts (BFS by hop) · labels.ts (sourced entities)
+│   │   ├── detectors/     ten rule-based indicators
+│   │   ├── bridge/        parse.ts · fx.ts · correlate.ts · sample.ts
+│   │   ├── intercept/     window estimate · canonical JSON · sealed packets
+│   │   ├── evidence/      hash chain · manifest · verify
+│   │   ├── syndicates/    transitive grouping by cash-out wallet
+│   │   ├── board/         60 s re-evaluation · five alert rules
+│   │   ├── cases/         unified timeline
+│   │   ├── risk.ts        transparent score
+│   │   ├── screen.ts      bulk screening
+│   │   ├── report.ts      printable investigation report
+│   │   ├── cache.ts       disk cache · stale fallback · offline replay
+│   │   ├── auth.ts        scrypt · HMAC sessions · lockout
+│   │   ├── db.ts          SQLite schema · seed · audit
+│   │   └── ofac.ts · scam.ts · entities.ts · demo-graph.ts
+│   ├── components/
+│   │   ├── console/       shell, inputs, chips, previews
+│   │   ├── landing/       Landing.tsx · NetGraph.tsx
+│   │   └── AlertWatcher.tsx · Rail.tsx · Stub.tsx
+│   ├── templates/         str.html · bsa63.html
+│   └── middleware.ts      signature and expiry check on every non-public path
+├── data/
+│   ├── ofac/              XBT · ETH · TRX · USDT · meta (940 unique addresses)
+│   ├── scam/              cryptoscamdb.json (4,270 reports)
+│   ├── known-entities.json  42 exchanges and mixers, each with a source URL
+│   ├── demo/addresses.json  verified demonstration address book
+│   └── synthetic/         complaints.json · statements/*.csv, labelled
+├── scripts/               sync-ofac · sync-scam-lists · gen-synthetic · gen-complaints · build-demo-addresses
+├── docs/                  README assets, METHOD.md, ARCHITECTURE.md
+└── .cache/                chain responses (untracked)
+```
+
+Design rationale, the access model in detail, case lifecycle and feature coverage are in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 
 ---
 
@@ -326,7 +377,7 @@ Demo accounts are seeded for local evaluation only. Rotate them and set `AUTH_SE
 
 Node 20 or newer. The console is laid out for 1440 px and wider.
 
-Further reading: [docs/METHOD.md](docs/METHOD.md) (detectors, risk score, Bridge, window, alerts) · [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) (design rationale, lifecycle, project tree).
+Further reading: [docs/METHOD.md](docs/METHOD.md) (detectors, risk score, Bridge, window, alerts) · [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) (design rationale, access model, lifecycle).
 
 ---
 
