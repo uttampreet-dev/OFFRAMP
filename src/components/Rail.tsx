@@ -7,6 +7,7 @@ const GROUPS: { label: string; items: { name: string; href: string }[] }[] = [
     label: "Triage",
     items: [
       { name: "Live Board", href: "/live-board" },
+      { name: "Screen", href: "/screen" },
       { name: "Cases", href: "/cases" },
     ],
   },
