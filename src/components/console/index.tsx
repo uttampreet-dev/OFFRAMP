@@ -115,6 +115,35 @@ export function StatusBar({ left, right }: { left: ReactNode; right?: ReactNode 
   );
 }
 
+export function RiskBadge({ score, band, size = "sm" }: { score: number; band: "low" | "elevated" | "high" | "critical"; size?: "sm" | "lg" }) {
+  const c = { low: "text-green border-[#1c5943] bg-[#08170f]", elevated: "text-amber border-[#66501e] bg-[#17130a]", high: "text-[#f0a35a] border-[#6b4a1e] bg-[#1c120a]", critical: "text-red border-[#652225] bg-[#1a0c0e]" }[band];
+  return (
+    <span className={`mono inline-flex items-baseline gap-1.5 border whitespace-nowrap ${size === "lg" ? "px-3 py-1.5" : "px-2 py-0.5"} ${c}`}>
+      <span className={`font-extrabold ${size === "lg" ? "text-[22px] leading-none" : "text-[12px]"}`}>{score}</span>
+      <span className={`tracking-[0.12em] uppercase font-bold ${size === "lg" ? "text-[9.5px]" : "text-[8.5px]"}`}>{band}</span>
+    </span>
+  );
+}
+
+export function RiskFactors({ factors, note }: { factors: { key: string; label: string; points: number; evidence: string; rule: string }[]; note: string }) {
+  return (
+    <div>
+      {factors.length === 0 && <div className="c-note">no risk factors from screening or exposure</div>}
+      {factors.map((f) => (
+        <div key={f.key} className="grid grid-cols-[44px_1fr] gap-3 py-2 border-b border-line2 last:border-0">
+          <span className="mono text-[13px] font-bold text-amber">+{f.points}</span>
+          <div className="min-w-0">
+            <div className="text-[12.5px] text-ink/90">{f.label}</div>
+            <div className="mono text-[10.5px] text-mut leading-snug">{f.evidence}</div>
+            <div className="mono text-[9.5px] text-faint mt-0.5">rule · {f.rule}</div>
+          </div>
+        </div>
+      ))}
+      <div className="c-note mt-2">{note}</div>
+    </div>
+  );
+}
+
 export function Empty({ children }: { children: ReactNode }) {
   return <div className="p-8 c-body max-w-xl">{children}</div>;
 }

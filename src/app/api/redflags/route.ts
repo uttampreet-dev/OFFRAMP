@@ -3,6 +3,8 @@ import { redFlags } from "@/lib/detectors";
 import { isSanctioned } from "@/lib/ofac";
 import { isReported } from "@/lib/board";
 import { knownEntity } from "@/lib/trace/labels";
+import { riskScore } from "@/lib/risk";
+import { lookupAddress } from "@/lib/chains";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -14,7 +16,9 @@ export async function GET(req: NextRequest) {
   try {
     const rep = await redFlags(address, { depth });
     const ent = knownEntity(address);
-    return NextResponse.json({ ...rep, screening: { sanctioned: isSanctioned(address), reported: isReported(address), entity: ent ? { entity: ent.entity, type: ent.type, source: ent.source } : null } });
+    const lk = await lookupAddress(address).catch(() => null);
+    const risk = riskScore(address, lk?.transfers ?? [], rep.findings);
+    return NextResponse.json({ ...rep, risk, screening: { sanctioned: isSanctioned(address), reported: isReported(address), entity: ent ? { entity: ent.entity, type: ent.type, source: ent.source } : null } });
   } catch (err) {
     return NextResponse.json({ error: err instanceof Error ? err.message : "detector run failed" }, { status: 502 });
   }

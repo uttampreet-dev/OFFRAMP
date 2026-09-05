@@ -3,7 +3,7 @@ import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import type { BoardSnapshot, BoardWindow } from "@/lib/board";
-import { TopBar, AddressInput, Primary, Chip, StatusBar } from "@/components/console";
+import { TopBar, AddressInput, Primary, Chip, StatusBar, RiskBadge } from "@/components/console";
 
 const POLL_S = 60;
 const short = (a: string) => (a.length > 18 ? `${a.slice(0, 7)}…${a.slice(-5)}` : a);
@@ -37,7 +37,7 @@ function Window({ w }: { w: BoardWindow }) {
         <span className={`mono text-[18px] font-extrabold tabular-nums ${rem <= 0 ? "text-faint" : rem < 900 ? "text-red" : "text-amber"}`}>{rem <= 0 ? "closed" : hhmmss(rem)}</span>
       </div>
       <div className="mono text-[10.5px] text-faint mt-0.5">{short(w.address)} · {w.amount.toLocaleString("en-IN")} {w.symbol} · {w.packetId}</div>
-      {w.replayNow && <div className="mt-1"><Chip tone="mut">replay · clock anchored at trigger + 12:38</Chip></div>}
+      {w.replayNow && <div className="mt-1"><Chip tone="mut">replay clock · trigger + 12:38</Chip></div>}
     </div>
   );
 }
@@ -181,6 +181,7 @@ function Inner() {
                       <button onClick={() => unwatch(a.address)} className="mono text-[10px] text-faint opacity-0 group-hover:opacity-100 hover:text-red ml-auto">remove</button>
                     </div>
                     <div className="flex items-center gap-1.5 mt-1 overflow-hidden whitespace-nowrap">
+                      {a.risk && <RiskBadge score={a.risk.score} band={a.risk.band} />}
                       {a.sanctioned && <Chip tone="red">OFAC SDN</Chip>}
                       {a.entity && <Chip tone="teal">{a.entity.entity}</Chip>}
                       {a.reported && <Chip tone="amber">report · {a.reported.category}</Chip>}

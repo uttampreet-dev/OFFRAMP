@@ -3,6 +3,7 @@ import { lookupAddress, detectChain } from "@/lib/chains";
 import { isSanctioned, ofacIndex } from "@/lib/ofac";
 import { isReported } from "@/lib/board";
 import { knownEntity } from "@/lib/trace/labels";
+import { riskScore } from "@/lib/risk";
 
 export const runtime = "nodejs";
 
@@ -16,6 +17,7 @@ export async function GET(req: NextRequest) {
     const idx = ofacIndex();
     return NextResponse.json({
       ...result,
+      risk: riskScore(address, result.transfers),
       screening: {
         ofacSanctioned: isSanctioned(address),
         listSize: idx.set.size,

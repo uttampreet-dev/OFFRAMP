@@ -3,7 +3,8 @@ import { Suspense, useCallback, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import type { RedFlagReport, Finding } from "@/lib/detectors";
-import { TopBar, AddressInput, Seg, Primary, Chip, StatusBar } from "@/components/console";
+import { TopBar, AddressInput, Seg, Primary, Chip, StatusBar, RiskBadge } from "@/components/console";
+import type { RiskScore } from "@/lib/risk";
 
 const DEMO = [
   { address: "TA82wQ77kb9DieW4C8q7C4KwMfnCzfziqN", chain: "tron", why: "OFAC SDN · USDT · layering through sanctioned neighbours" },
@@ -154,6 +155,12 @@ function Inner() {
           <div className="min-w-0 overflow-y-auto">
             <div className="px-8 pt-6 pb-4 border-b border-line flex items-end gap-8">
               <div>
+                {(rep as RedFlagReport & { risk?: RiskScore }).risk && (
+                  <div className="mb-4 flex items-center gap-3">
+                    <RiskBadge score={(rep as RedFlagReport & { risk?: RiskScore }).risk!.score} band={(rep as RedFlagReport & { risk?: RiskScore }).risk!.band} size="lg" />
+                    <span className="c-note">risk score · screening + exposure + fired detectors · {(rep as RedFlagReport & { risk?: RiskScore }).risk!.factors.length} factors</span>
+                  </div>
+                )}
                 <div className="c-label">Detectors fired</div>
                 <div className="flex flex-wrap gap-2 mt-2">
                   {(rep as RedFlagReport & { screening?: { sanctioned: boolean; reported: { category: string } | null; entity: { entity: string; type: string } | null } }).screening?.sanctioned && <Chip tone="red">OFAC SDN</Chip>}

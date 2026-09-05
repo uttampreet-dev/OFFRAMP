@@ -6,6 +6,7 @@ import { isSanctioned, ofacIndex } from "../ofac";
 import { knownEntity } from "../trace/labels";
 import { listWatch, markWatchSeen, recentAudit, listCases, allPackets, countPackets, raiseAlert, openAlerts, type CaseRow, type WatchRow, type AlertRow } from "../db";
 import { POLICY_WINDOW_S } from "../intercept";
+import { riskScore, type RiskScore } from "../risk";
 
 const LOOKUP_TIMEOUT_MS = 10_000;
 const VELOCITY_ALERT = 5;
@@ -25,6 +26,7 @@ export interface BoardAddress {
   fromCache: boolean;
   stale: boolean;
   error: string | null;
+  risk: RiskScore | null;
   newTransfers: Transfer[];
   cases: string[];
 }
@@ -94,6 +96,7 @@ async function evaluate(w: WatchRow, caseIds: Map<string, string[]>): Promise<Bo
     fromCache: false,
     stale: w.last_balance !== null,
     error: null,
+    risk: null,
     newTransfers: [],
     cases: caseIds.get(w.address.toLowerCase()) ?? [],
   };
@@ -112,7 +115,7 @@ async function evaluate(w: WatchRow, caseIds: Map<string, string[]>): Promise<Bo
     /* a token or contract balance derived from transfer lists alone can go negative (internal transfers are not visible); report unknown rather than a wrong number */
     const balance = r.summary.balance < 0 ? null : r.summary.balance;
     markWatchSeen(w.address, latest, r.summary.lastSeen ?? null, balance, r.summary.txCount, r.summary.symbol);
-    return { ...base, symbol: r.summary.symbol, balance, txCount: r.summary.txCount, lastSeen: r.summary.lastSeen, latestTx: latest, fromCache: r.fromCache, stale: false, newTransfers: fresh };
+    return { ...base, symbol: r.summary.symbol, balance, txCount: r.summary.txCount, lastSeen: r.summary.lastSeen, latestTx: latest, fromCache: r.fromCache, stale: false, newTransfers: fresh, risk: riskScore(w.address, r.transfers) };
   } catch (e) {
     return { ...base, error: e instanceof Error ? e.message : "lookup failed" };
   }
@@ -127,7 +130,7 @@ export async function boardSnapshot(fast = false): Promise<BoardSnapshot> {
   if (fast) {
     for (const w of watch) {
       const e = knownEntity(w.address);
-      watched.push({ address: w.address, chain: w.chain, label: w.label, symbol: w.last_symbol ?? (w.chain === "btc" ? "BTC" : w.chain === "eth" ? "ETH" : "USDT"), balance: w.last_balance, txCount: w.last_txcount, lastSeen: w.last_seen, latestTx: w.last_tx, sanctioned: isSanctioned(w.address), entity: e ? { entity: e.entity, type: e.type, source: e.source } : null, reported: isReported(w.address), fromCache: true, stale: true, error: null, newTransfers: [], cases: byAddr.get(w.address.toLowerCase()) ?? [] });
+      watched.push({ address: w.address, chain: w.chain, label: w.label, symbol: w.last_symbol ?? (w.chain === "btc" ? "BTC" : w.chain === "eth" ? "ETH" : "USDT"), balance: w.last_balance, txCount: w.last_txcount, lastSeen: w.last_seen, latestTx: w.last_tx, sanctioned: isSanctioned(w.address), entity: e ? { entity: e.entity, type: e.type, source: e.source } : null, reported: isReported(w.address), fromCache: true, stale: true, error: null, newTransfers: [], risk: riskScore(w.address, []), cases: byAddr.get(w.address.toLowerCase()) ?? [] });
     }
   } else {
     for (let i = 0; i < watch.length; i += 3) watched.push(...(await Promise.all(watch.slice(i, i + 3).map((w) => evaluate(w, byAddr)))));
