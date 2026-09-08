@@ -282,9 +282,9 @@ function TraceInner() {
         subtitle="BTC · ETH · TRON — auto-detected"
         secondRow={
           <>
-            <Seg label="direction" value={dir} options={[["out", "where it went"], ["in", "where it came from"]]} onChange={(v) => setDir(v as "out" | "in")} />
-            <Seg label="depth" value={String(depth)} options={[["1", "1"], ["2", "2"], ["3", "3"], ["4", "4"]]} onChange={(v) => setDepth(Number(v))} />
-            <Seg label="fan-out" value={String(fanout)} options={[["3", "3"], ["5", "5"], ["8", "8"]]} onChange={(v) => setFanout(Number(v))} />
+            <Seg label="direction" value={dir} options={[["out", "where it went"], ["in", "where it came from"]]} onChange={(v) => { setDir(v as "out" | "in"); if (res) run(undefined, depth, fanout, v as "out" | "in"); }} />
+            <Seg label="depth" value={String(depth)} options={[["1", "1"], ["2", "2"], ["3", "3"], ["4", "4"]]} onChange={(v) => { setDepth(Number(v)); if (res) run(undefined, Number(v), fanout, dir); }} />
+            <Seg label="fan-out" value={String(fanout)} options={[["3", "3"], ["5", "5"], ["8", "8"]]} onChange={(v) => { setFanout(Number(v)); if (res) run(undefined, depth, Number(v), dir); }} />
             <span className="ml-auto c-note">each hop follows the largest counterparties · stops at known entities</span>
           </>
         }
