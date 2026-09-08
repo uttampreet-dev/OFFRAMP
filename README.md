@@ -49,7 +49,7 @@ A mule bank account can be frozen in minutes. The crypto leg in between is where
 | **Detect** | ten rule-based indicators mapped to FATF red-flag categories, one transparent risk score; no model |
 | **Correlate** | on-chain cash-out ↔ INR bank credit by amount, rate and time; complaints ↔ cash-out wallets into syndicates |
 | **Act** | withdrawal window measured on the wallet, SHA-256 sealed freeze packet, supervisor sign-off, live board and alerts |
-| **Preserve** | hash-chained evidence packs, STR draft, Section 63 certificate draft, investigation report, audit log |
+| **Preserve** | hash-chained evidence packs, STR draft, Section 63 certificate draft, investigation report, audit log, a public verification page reached by the code printed on each document |
 
 ---
 
@@ -92,7 +92,7 @@ An explorer shows one address at a time and stops there. OFFRAMP keeps the whole
 - **Detection that explains itself.** Ten rule-based indicators and a risk score whose every point names its rule and its evidence. No model, no opaque number.
 - **The bank-side join.** The Bridge matches an on-chain cash-out to a rupee credit in a bank statement by amount, exchange rate and timing, and reports it as a candidate linkage with its rivals.
 - **An action workflow, not a report.** A withdrawal window measured on the wallet's own behaviour, a freeze-request packet sealed with SHA-256, and a supervisor sign-off recorded as a separate step.
-- **Evidence that survives scrutiny.** Every artefact is hashed and chained; the root hash, the draft STR, the Section 63 certificate draft and the investigation report all carry hashes that a third party can recompute.
+- **Evidence that survives scrutiny.** Every artefact is hashed and chained; the root hash, the draft STR, the Section 63 certificate draft and the investigation report all carry hashes that a third party can recompute. The STR and the certificate print a code that opens the public verification page with the pack's hashes carried inside it, so a phone recomputes the chain without an account and without trusting the server.
 - **The network view.** Complaints that cashed out through the same wallet are grouped into syndicates, so one case becomes an operator profile.
 
 OFFRAMP does not freeze funds, does not transmit anything to a bank or exchange, and never names a wallet's owner without a public source.
@@ -110,7 +110,7 @@ The demonstration case `2026-CHD-0417` is an investment-app fraud that cashed ou
 | 3 | **Bridge** | Choose *demonstration case* and correlate with statement `demo-case-4471` | 9,398 USDT out at 11:43:09 beside ₹7,98,180 in at 11:49:20: Δ 0.22 % at ₹85.12/USDT, Δt 6 min 11 s, strength 96.9 %. Two weaker candidates listed beside it. |
 | 4 | **Intercept** | Assess the window and seal the packet | How the window was derived (measured on the wallet, or the labelled 2-hour default), the trigger chain, the freeze-request packet and its SHA-256 on sealing. |
 | 5 | **Live Board** | Sign in as `supervisor` and sign the packet off | The sign-off recorded as its own audited action; the open window counting down; watched addresses re-evaluated every 60 s. |
-| 6 | **Evidence** | Assemble and seal the pack | Four artefacts hashed and chained to a root, the chain verified on demand, exports of the JSON bundle, STR draft and Section 63 certificate draft. |
+| 6 | **Evidence** | Assemble and seal the pack, open the certificate, scan the code at its foot | Artefacts hashed and chained to a root; exports of the JSON bundle, STR draft and Section 63 certificate draft. The code opens `/verify`, which recomputes the chain in the browser and answers *intact*; paste the bundle with one character changed and it answers *broken at artefact N*. |
 | 7 | **Cases** | Open the case | Every step above on one timeline under the login that took it, and the printable investigation report with its body hash. |
 
 Optional detours: **Screen** ranks a pasted list of up to 200 addresses; **Syndicates** groups the synthetic complaints dataset by shared cash-out wallet. Set `OFFRAMP_OFFLINE=1` to run the whole walkthrough from the disk cache with no network.
@@ -133,7 +133,7 @@ Optional detours: **Screen** ranks a pasted list of up to 200 addresses; **Syndi
 | **Bridge** | On-chain cash-out matched to an INR bank credit by amount × rate × time. Candidate linkage with strength and rivals. Four sample statements plus CSV upload. | live events or synthetic statement |
 | **Red Flags** | Ten rule-based indicators mapped to FATF red-flag categories. Each fires with evidence and transaction ids and a bounded confidence, or clears with the reason. | live |
 | **Intercept** | Withdrawal window from the wallet's own inflow→outflow lag, otherwise a labelled policy default. Freeze-request packet sealed with SHA-256. Supervisor sign-off as a separate audited step. | live · demo replay |
-| **Evidence** | Artefacts serialised canonically, hashed, chained to a root, verified on demand. Exports: JSON bundle, STR draft in FIU-IND layout, Section 63 certificate draft. | case artefacts |
+| **Evidence** | Artefacts serialised canonically, hashed, chained to a root, verified on demand. Exports: JSON bundle, STR draft in FIU-IND layout, Section 63 certificate draft, each printing a verification code. Public `/verify` page: by pack id, by the code's carried hashes, or by pasted bundle. | case artefacts |
 | **Syndicates** | Complaints sharing a cash-out wallet, joined transitively into operator groups with loss, tempo, cities and rails. Hand-offs to Trace, Watch and Cases. | synthetic complaints, labelled |
 | **Access** | Own account and sessions. Supervisor: provision, roles, disable, reset, access log. | live |
 
@@ -185,7 +185,7 @@ flowchart LR
   style D stroke:#e8b23a
 ```
 
-One altered byte changes the root. The Evidence screen recomputes the chain on demand and the certificate draft records whether the recomputation matched the sealed manifest. Anyone with a SHA-256 implementation can repeat it from the exported bundle. The STR and Section 63 documents are drafts populated from the case; they carry no effect until the persons the law requires sign them.
+One altered byte changes the root. The Evidence screen recomputes the chain on demand and the certificate draft records whether the recomputation matched the sealed manifest. Anyone with a SHA-256 implementation can repeat it from the exported bundle, and anyone with a phone can do it from the code printed on the certificate: the code carries the artefact names and hashes, `/verify` recomputes hᵢ = sha256(hᵢ₋₁ ∥ aᵢ) in the browser and compares the result with the root printed beside the code. No account, no artefact content, no dependence on the server that sealed the pack. The STR and Section 63 documents are drafts populated from the case; they carry no effect until the persons the law requires sign them.
 
 ---
 
@@ -267,7 +267,7 @@ OFFRAMP/
 │   │   └── api/                          29 server routes
 │   │       ├── lookup · trace · tx · cospend · redflags · screen · search
 │   │       ├── bridge · statements · intercept/{seal,approve}
-│   │       ├── evidence/{seal,[id]/export} · cases/[id]/report · syndicates
+│   │       ├── evidence/{seal,[id]/export} · cases/[id]/report · syndicates · verify (public)
 │   │       └── board · watch · alerts · auth/* · admin/users · addresses
 │   ├── lib/
 │   │   ├── chains/        btc.ts · eth.ts · tron.ts · tx.ts · one interface
@@ -377,6 +377,8 @@ Demo accounts are seeded for evaluation. Rotate them and set `AUTH_SECRET` in th
 | `npm run build && npm start` | production build |
 
 Node 20 or newer. The console is laid out for 1440 px and wider.
+
+**Hosting.** The application is a normal server process: run it on a machine with a disk and the database and cache persist in `data/` and `.cache/`. On hosts whose functions have no shared disk, four variables adapt it: `OFFRAMP_DATA_DIR` and `OFFRAMP_CACHE_DIR` point storage at a writable directory, `OFFRAMP_STATELESS_SESSIONS=1` trusts the signed session cookie alone, and `OFFRAMP_PUBLIC_URL` is the address printed in verification codes. Documents and verification carry the pack manifest with them, so they render on any instance. A hosted copy is at [offramp-ten.vercel.app](https://offramp-ten.vercel.app); state there is per instance, so a unit's deployment belongs on its own machine.
 
 Further reading: [docs/METHOD.md](docs/METHOD.md) (detectors, risk score, Bridge, window, alerts) · [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) (design rationale, access model, lifecycle).
 
