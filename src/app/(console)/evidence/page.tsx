@@ -63,6 +63,8 @@ function Inner() {
       const body = await r.json();
       if (!r.ok) throw new Error(body.error ?? "seal failed");
       await load();
+      // where the listing runs on a different instance than the seal, keep the pack the seal just returned
+      if (body.id && body.m) setEv((cur) => (cur && !cur.packs.some((p) => p.id === body.id) ? { ...cur, packs: [{ id: body.id, rootHash: body.rootHash, by: body.by, at: Date.now(), artefacts: body.artefacts, m: body.m }, ...cur.packs] } : cur));
     } catch (e) {
       setError(e instanceof Error ? e.message : "seal failed");
     } finally {

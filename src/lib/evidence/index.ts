@@ -51,7 +51,7 @@ export async function assembleArtefacts(caseId: string, address: string, demo: b
   return out;
 }
 
-export function sealPack(caseId: string, by: string, artefacts: Artefact[]): PackManifest {
+export function sealPack(caseId: string, by: string, artefacts: Artefact[]): PackManifest & { id: string } {
   const chain: string[] = [];
   let prev = "";
   for (const a of artefacts) {
@@ -70,7 +70,7 @@ export function sealPack(caseId: string, by: string, artefacts: Artefact[]): Pac
   const id = newId("PACK");
   savePack({ id, case_id: caseId, manifest: JSON.stringify(manifest), root_hash: manifest.rootHash, created_by: by, created_at: Date.now() });
   audit(by, "pack.sealed", `case=${caseId} pack=${id} root=${manifest.rootHash.slice(0, 12)} artefacts=${artefacts.length}`);
-  return manifest;
+  return { ...manifest, id };
 }
 
 export function verifyManifest(m: PackManifest): { ok: boolean; brokenAt: number | null } {

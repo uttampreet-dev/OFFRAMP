@@ -13,7 +13,9 @@ export async function POST(req: NextRequest) {
   try {
     const artefacts = await assembleArtefacts(caseId, b.address ?? "", !!b.demo || !b.address);
     const m = sealPack(caseId, s.u, artefacts);
-    return NextResponse.json({ ok: true, rootHash: m.rootHash, artefacts: m.artefacts.length, sealedAt: m.sealedAt, by: m.sealedBy });
+    // the manifest travels back with the answer so the screen can render documents even where functions do not share a disk
+    const { id, ...manifest } = m;
+    return NextResponse.json({ ok: true, id, rootHash: m.rootHash, artefacts: m.artefacts.length, sealedAt: m.sealedAt, by: m.sealedBy, m: Buffer.from(JSON.stringify(manifest)).toString("base64url") });
   } catch (err) {
     return NextResponse.json({ error: err instanceof Error ? err.message : "seal failed" }, { status: 502 });
   }
