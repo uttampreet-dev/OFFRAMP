@@ -3,6 +3,7 @@ import { getSession } from "@/lib/auth";
 import { cospendBtc } from "@/lib/chains/btc";
 import { detectChain } from "@/lib/chains";
 export const runtime = "nodejs";
+export const maxDuration = 60;
 export async function GET(req: NextRequest) {
   const s = await getSession();
   if (!s) return NextResponse.json({ error: "unauthorised" }, { status: 401 });

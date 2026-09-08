@@ -2,7 +2,7 @@ import { createHash } from "crypto";
 import { mkdirSync, readFileSync, writeFileSync, existsSync } from "fs";
 import path from "path";
 
-const CACHE_DIR = path.join(process.cwd(), ".cache");
+const CACHE_DIR = process.env.OFFRAMP_CACHE_DIR ?? path.join(process.cwd(), ".cache");
 const OFFLINE = process.env.OFFRAMP_OFFLINE === "1";
 const DEFAULT_TTL_MS = 5 * 60 * 1000;
 

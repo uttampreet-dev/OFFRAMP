@@ -7,6 +7,7 @@ import { knownEntity } from "@/lib/trace/labels";
 import { riskScore } from "@/lib/risk";
 
 export const runtime = "nodejs";
+export const maxDuration = 60;
 
 export async function GET(req: NextRequest) {
   const s = await getSession();

@@ -7,7 +7,8 @@ let db: Database.Database | null = null;
 
 export function getDb(): Database.Database {
   if (db) return db;
-  const dir = path.join(process.cwd(), "data");
+  // OFFRAMP_DATA_DIR points the database at a writable directory on hosts whose project tree is read-only
+  const dir = process.env.OFFRAMP_DATA_DIR ?? path.join(process.cwd(), "data");
   mkdirSync(dir, { recursive: true });
   db = new Database(path.join(dir, "offramp.db"));
   db.pragma("journal_mode = WAL");

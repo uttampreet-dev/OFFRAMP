@@ -9,6 +9,7 @@ import { getSession } from "@/lib/auth";
 import { audit } from "@/lib/db";
 
 export const runtime = "nodejs";
+export const maxDuration = 60;
 
 const MAX = 200;
 const CONCURRENCY = 4;

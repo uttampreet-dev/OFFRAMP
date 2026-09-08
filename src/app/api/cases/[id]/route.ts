@@ -4,6 +4,7 @@ import { caseDetail } from "@/lib/cases";
 import { getSession } from "@/lib/auth";
 
 export const runtime = "nodejs";
+export const maxDuration = 60;
 export const dynamic = "force-dynamic";
 const STATUSES: CaseStatus[] = ["intake", "tracing", "cash-out", "escalated", "closed"];
 

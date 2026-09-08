@@ -5,6 +5,7 @@ import { isSanctioned } from "@/lib/ofac";
 import { knownEntity } from "@/lib/trace/labels";
 import { isReported } from "@/lib/board";
 export const runtime = "nodejs";
+export const maxDuration = 60;
 export async function GET(req: NextRequest) {
   const s = await getSession();
   if (!s) return NextResponse.json({ error: "unauthorised" }, { status: 401 });

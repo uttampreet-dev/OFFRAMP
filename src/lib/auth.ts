@@ -41,7 +41,8 @@ export async function getSession(): Promise<Session | null> {
   const jar = await cookies();
   const s = verifySessionToken(jar.get(SESSION_COOKIE)?.value);
   if (!s) return null;
-  if (s.sid) {
+  // on hosts that run many short-lived instances the session table is not shared, so the signed cookie alone is trusted there
+  if (s.sid && process.env.OFFRAMP_STATELESS_SESSIONS !== "1") {
     const { sessionAlive } = await import("./db");
     if (!sessionAlive(s.sid)) return null;
   }
