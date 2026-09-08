@@ -179,6 +179,7 @@ function Inner() {
                   <a href={`/api/evidence/${p.id}/export?format=json`} target="_blank" rel="noreferrer" className="mono text-[11px] tracking-[0.1em] uppercase font-bold text-ink border border-line px-3 py-2 hover:border-[#2c3a4c]">JSON bundle · manifest + verification ↗</a>
                   <a href={`/api/evidence/${p.id}/export?format=str`} target="_blank" rel="noreferrer" className="mono text-[11px] tracking-[0.1em] uppercase font-bold text-amber border border-amber/50 px-3 py-2 hover:bg-amber hover:text-[#12100c]">STR draft · FIU-IND format ↗</a>
                   <a href={`/api/evidence/${p.id}/export?format=bsa63`} target="_blank" rel="noreferrer" className="mono text-[11px] tracking-[0.1em] uppercase font-bold text-amber border border-amber/50 px-3 py-2 hover:bg-amber hover:text-[#12100c]">s.63 certificate · BSA 2023 ↗</a>
+                  <a href={`/verify?pack=${p.id}&root=${p.rootHash}`} target="_blank" rel="noreferrer" className="mono text-[11px] tracking-[0.1em] uppercase font-bold text-teal border border-[#1f4a56] px-3 py-2 hover:border-teal">public verification page · no login ↗</a>
                   <button onClick={() => verifyPack(p.id)} className="mono text-[11px] tracking-[0.1em] uppercase font-bold text-mut border border-line px-3 py-2 hover:text-ink text-left">
                     {verify[p.id] ? (verify[p.id].ok ? "✓ verified — chain intact" : `✗ broken at artefact ${verify[p.id].brokenAt}`) : "verify integrity · recompute hashes"}
                   </button>

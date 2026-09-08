@@ -1,0 +1,281 @@
+{
+ "center": "12HQDsicffSBaYdJ6BhnE22sfjTESmmzKx",
+ "sanctioned": true,
+ "transfers": [
+  {
+   "txid": "9e43758cd2d3aa3a2e8dc4b628f88c78ac6ccb74a1bf4b9c02b86df8e562166a",
+   "time": 1593102366000,
+   "from": "12HQDsicffSBaYdJ6BhnE22sfjTESmmzKx",
+   "to": "1NDyJtNTjmwk5xPNhjgAMu4HDHigtobu1s",
+   "value": 74.09965816,
+   "symbol": "BTC",
+   "direction": "out"
+  },
+  {
+   "txid": "9e43758cd2d3aa3a2e8dc4b628f88c78ac6ccb74a1bf4b9c02b86df8e562166a",
+   "time": 1593102366000,
+   "from": "12HQDsicffSBaYdJ6BhnE22sfjTESmmzKx",
+   "to": "3FDA9qJwRnPGfhyJUUMbqxk4J76yhPKJJP",
+   "value": 0.00572431,
+   "symbol": "BTC",
+   "direction": "out"
+  },
+  {
+   "txid": "d8f8df2bd3fd3cd2d95465def264f51b622aad7bc9d7352d2399c818c712b919",
+   "time": 1593099997000,
+   "from": "1Jm91yaDpksyMcr9r9zi59Gi1xgobrvwWE",
+   "to": "12HQDsicffSBaYdJ6BhnE22sfjTESmmzKx",
+   "value": 25.27221,
+   "symbol": "BTC",
+   "direction": "in"
+  },
+  {
+   "txid": "77488f59619535d2226eec88cb8755acceb817df24d9b2b1aa3f3bd56fd0763f",
+   "time": 1592482369000,
+   "from": "12HQDsicffSBaYdJ6BhnE22sfjTESmmzKx",
+   "to": "1NDyJtNTjmwk5xPNhjgAMu4HDHigtobu1s",
+   "value": 68.85697491,
+   "symbol": "BTC",
+   "direction": "out"
+  },
+  {
+   "txid": "77488f59619535d2226eec88cb8755acceb817df24d9b2b1aa3f3bd56fd0763f",
+   "time": 1592482369000,
+   "from": "12HQDsicffSBaYdJ6BhnE22sfjTESmmzKx",
+   "to": "328rFUSYtq7Nonp8HPab9YuQpTx76jW48j",
+   "value": 0.0065471,
+   "symbol": "BTC",
+   "direction": "out"
+  },
+  {
+   "txid": "0b887b172ad51409f5dfbb199db591dff2c4efb19d0a5d157b36a134aa52c57b",
+   "time": 1592481045000,
+   "from": "12nFTTEhDAPzEGUt2LUuXq7WrNXxneryoi",
+   "to": "12HQDsicffSBaYdJ6BhnE22sfjTESmmzKx",
+   "value": 34,
+   "symbol": "BTC",
+   "direction": "in"
+  },
+  {
+   "txid": "57dc7903fe92ac682354dd94546951f7cf4ba6548b01ce5fbc43ab7f2c273549",
+   "time": 1590682166000,
+   "from": "12HQDsicffSBaYdJ6BhnE22sfjTESmmzKx",
+   "to": "1NDyJtNTjmwk5xPNhjgAMu4HDHigtobu1s",
+   "value": 59.36591134,
+   "symbol": "BTC",
+   "direction": "out"
+  },
+  {
+   "txid": "57dc7903fe92ac682354dd94546951f7cf4ba6548b01ce5fbc43ab7f2c273549",
+   "time": 1590682166000,
+   "from": "12HQDsicffSBaYdJ6BhnE22sfjTESmmzKx",
+   "to": "33jjKEXiGxA48Z6H7cELwGqayADC325aMV",
+   "value": 0.01059766,
+   "symbol": "BTC",
+   "direction": "out"
+  },
+  {
+   "txid": "a4621f139a124f3c14c7bd99f4c6813157b4ddb6544aa40fdca9e71cf962385e",
+   "time": 1590681066000,
+   "from": "1BUncqytGVMhdoC2WgQ55Y7N3vT6v21gWS",
+   "to": "12HQDsicffSBaYdJ6BhnE22sfjTESmmzKx",
+   "value": 25,
+   "symbol": "BTC",
+   "direction": "in"
+  },
+  {
+   "txid": "d4a31e9863298220bdf9c1d6312d8cd039cd483dfb6562799149421a2484952d",
+   "time": 1590667907000,
+   "from": "12HQDsicffSBaYdJ6BhnE22sfjTESmmzKx",
+   "to": "38ogm5ujxLTEqRrnobtehpQMFU5DgWbtN8",
+   "value": 0.01510639,
+   "symbol": "BTC",
+   "direction": "out"
+  },
+  {
+   "txid": "d4a31e9863298220bdf9c1d6312d8cd039cd483dfb6562799149421a2484952d",
+   "time": 1590667907000,
+   "from": "12HQDsicffSBaYdJ6BhnE22sfjTESmmzKx",
+   "to": "1NDyJtNTjmwk5xPNhjgAMu4HDHigtobu1s",
+   "value": 22.39842483,
+   "symbol": "BTC",
+   "direction": "out"
+  },
+  {
+   "txid": "f2750cd1feb60031d480add97c6a1e6644105538642c2f8e04a78bd0c28625c5",
+   "time": 1590656610000,
+   "from": "1NnRR6rkvA8kaNj37rNdkByoQ5SAXtoffF",
+   "to": "12HQDsicffSBaYdJ6BhnE22sfjTESmmzKx",
+   "value": 6,
+   "symbol": "BTC",
+   "direction": "in"
+  },
+  {
+   "txid": "7c4d5341f6013d46598791a0b4cc9a131dffa733ae126b8ba83002c6e4cb1b3e",
+   "time": 1590595453000,
+   "from": "12HQDsicffSBaYdJ6BhnE22sfjTESmmzKx",
+   "to": "1NDyJtNTjmwk5xPNhjgAMu4HDHigtobu1s",
+   "value": 84.562558,
+   "symbol": "BTC",
+   "direction": "out"
+  },
+  {
+   "txid": "7c4d5341f6013d46598791a0b4cc9a131dffa733ae126b8ba83002c6e4cb1b3e",
+   "time": 1590595453000,
+   "from": "12HQDsicffSBaYdJ6BhnE22sfjTESmmzKx",
+   "to": "3NcvmkHxq8KipxZqvn5y7wtm1vE2VYsBhQ",
+   "value": 0.01034956,
+   "symbol": "BTC",
+   "direction": "out"
+  },
+  {
+   "txid": "bf96b902d864105f9ffd59ff537fffe79832947262845083b1263ad439087fdd",
+   "time": 1590590145000,
+   "from": "1CsHZbLjgvWDPd7zknBwQBhbTprbRT9ynC",
+   "to": "12HQDsicffSBaYdJ6BhnE22sfjTESmmzKx",
+   "value": 27.4957629,
+   "symbol": "BTC",
+   "direction": "in"
+  },
+  {
+   "txid": "0d8f575fd966d36b7639b14374aacdf5b36ee6881dcaed2e9857e88425a16534",
+   "time": 1590580941000,
+   "from": "12HQDsicffSBaYdJ6BhnE22sfjTESmmzKx",
+   "to": "1NDyJtNTjmwk5xPNhjgAMu4HDHigtobu1s",
+   "value": 100,
+   "symbol": "BTC",
+   "direction": "out"
+  },
+  {
+   "txid": "0d8f575fd966d36b7639b14374aacdf5b36ee6881dcaed2e9857e88425a16534",
+   "time": 1590580941000,
+   "from": "12HQDsicffSBaYdJ6BhnE22sfjTESmmzKx",
+   "to": "3QkSz8ucTePob8g1QkT6RdqgL95jh4N8Gm",
+   "value": 0.00944625,
+   "symbol": "BTC",
+   "direction": "out"
+  },
+  {
+   "txid": "db265658fd8e952d86645cbb42b5eae2601e150bc8204e66492ae316704c1292",
+   "time": 1590578818000,
+   "from": "1HskscSe9KQft8DuFYaxUm5DS7ccmVZJuQ",
+   "to": "12HQDsicffSBaYdJ6BhnE22sfjTESmmzKx",
+   "value": 25,
+   "symbol": "BTC",
+   "direction": "in"
+  },
+  {
+   "txid": "2064697e9096e8e54da62d36daa36f32f1c788dc65c18bc35dca4d1722c3461b",
+   "time": 1590574113000,
+   "from": "12HQDsicffSBaYdJ6BhnE22sfjTESmmzKx",
+   "to": "36fbzqW8YBuU1grY3gPQiMsEBvWU24mp7K",
+   "value": 0.0106778,
+   "symbol": "BTC",
+   "direction": "out"
+  },
+  {
+   "txid": "2064697e9096e8e54da62d36daa36f32f1c788dc65c18bc35dca4d1722c3461b",
+   "time": 1590574113000,
+   "from": "12HQDsicffSBaYdJ6BhnE22sfjTESmmzKx",
+   "to": "1NDyJtNTjmwk5xPNhjgAMu4HDHigtobu1s",
+   "value": 74.91494465,
+   "symbol": "BTC",
+   "direction": "out"
+  },
+  {
+   "txid": "4ce552b6b326e037548badec38ac1d2025dbd8847bc969dedc1bb662855a962c",
+   "time": 1590570361000,
+   "from": "1GhBAn4EzEyPxxXmEGoUxrJTjT9Gdb2K9i",
+   "to": "12HQDsicffSBaYdJ6BhnE22sfjTESmmzKx",
+   "value": 25,
+   "symbol": "BTC",
+   "direction": "in"
+  },
+  {
+   "txid": "d78c74ee0420efe18ca7fdb75bb9030a08df9c76bdc66bc0864597d9d1785b7f",
+   "time": 1590432161000,
+   "from": "12HQDsicffSBaYdJ6BhnE22sfjTESmmzKx",
+   "to": "3BpHfZnjqWVjezCKu3QBnkZnXube8auE7N",
+   "value": 0.00993808,
+   "symbol": "BTC",
+   "direction": "out"
+  },
+  {
+   "txid": "d78c74ee0420efe18ca7fdb75bb9030a08df9c76bdc66bc0864597d9d1785b7f",
+   "time": 1590432161000,
+   "from": "12HQDsicffSBaYdJ6BhnE22sfjTESmmzKx",
+   "to": "1NDyJtNTjmwk5xPNhjgAMu4HDHigtobu1s",
+   "value": 89.77143712,
+   "symbol": "BTC",
+   "direction": "out"
+  },
+  {
+   "txid": "83e65f61b7272da90aac0f9977c2341ffebeedf610cb991a4bb34d40695e5d6b",
+   "time": 1590422887000,
+   "from": "1LGHC2uRSBXUnxH7bsr1NyPsajXnQCb9yk",
+   "to": "12HQDsicffSBaYdJ6BhnE22sfjTESmmzKx",
+   "value": 17.19755519,
+   "symbol": "BTC",
+   "direction": "in"
+  },
+  {
+   "txid": "cbc2b4674926bf4f08828ff366966efa75d6b1e1a672bb035abf22aa41bac135",
+   "time": 1590171050000,
+   "from": "12HQDsicffSBaYdJ6BhnE22sfjTESmmzKx",
+   "to": "3FbnyfBRTomovYVkJmdd5qXt1GFHyCzUB9",
+   "value": 0.01118374,
+   "symbol": "BTC",
+   "direction": "out"
+  },
+  {
+   "txid": "cbc2b4674926bf4f08828ff366966efa75d6b1e1a672bb035abf22aa41bac135",
+   "time": 1590171050000,
+   "from": "12HQDsicffSBaYdJ6BhnE22sfjTESmmzKx",
+   "to": "1NDyJtNTjmwk5xPNhjgAMu4HDHigtobu1s",
+   "value": 100,
+   "symbol": "BTC",
+   "direction": "out"
+  },
+  {
+   "txid": "4069c04439419687711d2c02022a966d5afa8fdecc5a6aea21faefc0ec95f4c5",
+   "time": 1590161914000,
+   "from": "16pLf4FVuWV2q8XoomTri8VdkCXwM4g1Yx",
+   "to": "12HQDsicffSBaYdJ6BhnE22sfjTESmmzKx",
+   "value": 16.43092848,
+   "symbol": "BTC",
+   "direction": "in"
+  },
+  {
+   "txid": "ac651296a3474a5fd7b1df1a8b9e90cefef933e18d018b2393f61dd71512f3d6",
+   "time": 1590098644000,
+   "from": "12HQDsicffSBaYdJ6BhnE22sfjTESmmzKx",
+   "to": "1NDyJtNTjmwk5xPNhjgAMu4HDHigtobu1s",
+   "value": 27.75846525,
+   "symbol": "BTC",
+   "direction": "out"
+  },
+  {
+   "txid": "ac651296a3474a5fd7b1df1a8b9e90cefef933e18d018b2393f61dd71512f3d6",
+   "time": 1590098644000,
+   "from": "12HQDsicffSBaYdJ6BhnE22sfjTESmmzKx",
+   "to": "3Fc8xEdECPnNT3u1fB72Jp3ZmbE28TU4TX",
+   "value": 0.01218215,
+   "symbol": "BTC",
+   "direction": "out"
+  },
+  {
+   "txid": "b5346823638aa2529351c69087c12b9dbf31ebe127448f99a58f826a3072e54c",
+   "time": 1590091245000,
+   "from": "1EZd2ULuseFbHgZJTjD8NmBdzAqdrMNxhn",
+   "to": "12HQDsicffSBaYdJ6BhnE22sfjTESmmzKx",
+   "value": 5.00788,
+   "symbol": "BTC",
+   "direction": "in"
+  }
+ ],
+ "txCount": 1335,
+ "receivedTotal": 5254.26320627,
+ "symbol": "BTC",
+ "capturedAt": "2026-09-08",
+ "note": "snapshot of a dormant OFAC-listed wallet (last activity 2020), used as the first paint when the live lookup has not answered; the client refreshes from the chain afterwards"
+}

@@ -359,7 +359,19 @@ function TraceInner() {
 
       {!res && !tx && (
         <div className="flex-1 min-h-0 overflow-y-auto">
-          {error && <div className="mx-8 mt-6 border border-[#652225] bg-[#1a0c0e] text-red px-4 py-3 text-[13px] max-w-xl">{error}</div>}
+          {error && /not a recognisable/i.test(error) ? (
+            <div className="mx-8 mt-6 border border-line bg-panel px-5 py-4 text-[13px] max-w-2xl">
+              <div className="flex items-center gap-2 mb-2"><Chip tone="mut">not a public-chain address</Chip></div>
+              <p className="c-body">This string is not a valid BTC, ETH or TRON address, so there is nothing to fetch from a public chain. Wallets from the demonstration case (2026-CHD-0417) are synthetic: they exist only in that case&apos;s narrative and are labelled so wherever they appear.</p>
+              <div className="mt-3 flex items-center gap-2 flex-wrap">
+                <Link href="/bridge?demo=1" className="mono text-[10.5px] tracking-[0.12em] uppercase font-extrabold text-amber border border-amber/50 px-3 py-1.5 hover:bg-amber hover:text-[#12100c]">open the case in Bridge →</Link>
+                <Link href="/intercept?demo=1" className="mono text-[10.5px] tracking-[0.12em] uppercase font-bold text-mut border border-line px-3 py-1.5 hover:text-ink">Intercept</Link>
+                <Link href="/cases?id=2026-CHD-0417" className="mono text-[10.5px] tracking-[0.12em] uppercase font-bold text-mut border border-line px-3 py-1.5 hover:text-ink">case timeline</Link>
+              </div>
+            </div>
+          ) : error ? (
+            <div className="mx-8 mt-6 border border-[#652225] bg-[#1a0c0e] text-red px-4 py-3 text-[13px] max-w-xl">{error}</div>
+          ) : null}
           {loading && <div className="px-8 pt-6 mono text-[12px] text-faint">querying chain — {depth} hop{depth > 1 ? "s" : ""}, up to {fanout} counterparties each…</div>}
           {!error && !loading && (
             <div className="px-8 py-8 max-w-[1100px]">

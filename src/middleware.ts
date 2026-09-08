@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 const SECRET = process.env.AUTH_SECRET ?? "offramp-eval-build-secret";
-const PUBLIC_PATHS = new Set(["/", "/login", "/api/auth/login", "/api/auth/logout", "/api/demo-trace", "/favicon.ico"]);
+const PUBLIC_PATHS = new Set(["/", "/login", "/verify", "/api/verify", "/api/auth/login", "/api/auth/logout", "/api/demo-trace", "/favicon.ico"]);
 
 async function verify(token: string): Promise<boolean> {
   const [payload, sig] = token.split(".");
