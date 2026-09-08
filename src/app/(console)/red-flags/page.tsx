@@ -80,7 +80,7 @@ function Inner() {
         subtitle="FATF indicator suite · 10 explainable rules"
         secondRow={
           <>
-            <Seg label="trace depth" value={String(depth)} options={[["1", "1"], ["2", "2"], ["3", "3"]]} onChange={(v) => setDepth(Number(v))} />
+            <Seg label="trace depth" value={String(depth)} options={[["1", "1"], ["2", "2"], ["3", "3"]]} onChange={(v) => { setDepth(Number(v)); if (rep) run(undefined, Number(v)); }} />
             <span className="ml-auto c-note">every flag names the rule that fired and why · presumptive — corroborate before acting</span>
           </>
         }

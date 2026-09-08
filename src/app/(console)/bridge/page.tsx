@@ -32,14 +32,14 @@ function Inner() {
   const fileRef = useRef<HTMLInputElement>(null);
 
   const run = useCallback(
-    async (m = mode, a = address, t = tol, w = win, c = csv) => {
+    async (m = mode, a = address, t = tol, w = win, c = csv, sm = sample) => {
       setLoading(true);
       setError(null);
       try {
         const r = await fetch("/api/bridge", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ mode: m, sample, address: a.trim() || undefined, statementCsv: c ?? undefined, tolerancePct: t, windowHours: w }),
+          body: JSON.stringify({ mode: m, sample: sm, address: a.trim() || undefined, statementCsv: c ?? undefined, tolerancePct: t, windowHours: w }),
         });
         const body = await r.json();
         if (!r.ok) throw new Error(body.error ?? "bridge failed");
@@ -52,7 +52,7 @@ function Inner() {
         setLoading(false);
       }
     },
-    [mode, address, tol, win, csv],
+    [mode, address, tol, win, csv, sample],
   );
 
   useEffect(() => {
@@ -83,10 +83,10 @@ function Inner() {
         subtitle="on-chain → INR · amount × FX × time window"
         secondRow={
           <>
-            <Seg label="statement" value={csv ? "upload" : sample} options={[...samples.map((x) => [x.name, `${x.name.replace(".csv", "")} · ${x.rows} rows`] as [string, string]), ["upload", csvName ? csvName.slice(0, 22) : "upload CSV"]]} onChange={(v) => (v === "upload" ? fileRef.current?.click() : (setCsv(null), setCsvName(null), setSample(v)))} />
+            <Seg label="statement" value={csv ? "upload" : sample} options={[...samples.map((x) => [x.name, `${x.name.replace(".csv", "")} · ${x.rows} rows`] as [string, string]), ["upload", csvName ? csvName.slice(0, 22) : "upload CSV"]]} onChange={(v) => (v === "upload" ? fileRef.current?.click() : (setCsv(null), setCsvName(null), setSample(v), res ? run(mode, address, tol, win, null, v) : undefined))} />
             <input ref={fileRef} type="file" accept=".csv,text/csv" className="hidden" onChange={(e) => onFile(e.target.files?.[0])} />
-            <Seg label="tolerance" value={String(tol)} options={[["2", "2%"], ["5", "5%"], ["10", "10%"]]} onChange={(v) => setTol(Number(v))} />
-            <Seg label="window" value={String(win)} options={[["2", "2 h"], ["6", "6 h"], ["24", "24 h"]]} onChange={(v) => setWin(Number(v))} />
+            <Seg label="tolerance" value={String(tol)} options={[["2", "2%"], ["5", "5%"], ["10", "10%"]]} onChange={(v) => { setTol(Number(v)); if (res) run(mode, address, Number(v), win, csv, sample); }} />
+            <Seg label="window" value={String(win)} options={[["2", "2 h"], ["6", "6 h"], ["24", "24 h"]]} onChange={(v) => { setWin(Number(v)); if (res) run(mode, address, tol, Number(v), csv, sample); }} />
             <span className="ml-auto c-note">a match is a candidate linkage, not proof the funds are the same</span>
           </>
         }
