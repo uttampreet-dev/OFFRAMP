@@ -10,8 +10,20 @@ export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string 
   const { id } = await ctx.params;
   const format = req.nextUrl.searchParams.get("format") ?? "json";
   const pack = packById(id);
-  if (!pack) return NextResponse.json({ error: "pack not found" }, { status: 404 });
-  const m = JSON.parse(pack.manifest) as PackManifest;
+  let m: PackManifest | null = pack ? (JSON.parse(pack.manifest) as PackManifest) : null;
+  if (!m) {
+    // the caller may carry the manifest (hosts whose functions do not share a disk); accept it only if its chain still verifies
+    const carried = req.nextUrl.searchParams.get("m");
+    if (carried) {
+      try {
+        const cm = JSON.parse(Buffer.from(carried, "base64url").toString("utf8")) as PackManifest;
+        if (Array.isArray(cm.artefacts) && Array.isArray(cm.chain) && typeof cm.rootHash === "string" && verifyManifest(cm).ok) m = cm;
+      } catch {
+        /* fall through */
+      }
+    }
+  }
+  if (!m) return NextResponse.json({ error: "pack not found" }, { status: 404 });
   const s = await getSession();
   if (s) audit(s.u, "pack.exported", `case=${m.caseId} pack=${id} format=${format}`);
   const v = verifyManifest(m);

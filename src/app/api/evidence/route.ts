@@ -20,7 +20,8 @@ export async function GET(req: NextRequest) {
       demo,
       artefacts: artefacts.map(({ body: _b, ...r }) => r),
       packets: st.packets.map((p) => ({ id: p.id, sha256: p.sha256, by: p.created_by, at: p.created_at, address: p.address, approvedBy: p.approved_by ?? null, approvedAt: p.approved_at ?? null })),
-      packs: st.packs.map((p) => ({ id: p.id, rootHash: p.root_hash, by: p.created_by, at: p.created_at, artefacts: (JSON.parse(p.manifest).artefacts as unknown[]).length })),
+      // m: the manifest itself, so a document can be rendered by a server that never stored this pack
+      packs: st.packs.map((p) => ({ id: p.id, rootHash: p.root_hash, by: p.created_by, at: p.created_at, artefacts: (JSON.parse(p.manifest).artefacts as unknown[]).length, m: Buffer.from(p.manifest).toString("base64url") })),
       audit: st.audit,
     });
   } catch (err) {

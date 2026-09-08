@@ -9,7 +9,7 @@ interface Ev {
   demo: boolean;
   artefacts: Art[];
   packets: { id: string; sha256: string; by: string; at: number; address: string; approvedBy: string | null; approvedAt: number | null }[];
-  packs: { id: string; rootHash: string; by: string; at: number; artefacts: number }[];
+  packs: { id: string; rootHash: string; by: string; at: number; artefacts: number; m?: string }[];
   audit: { at: number; username: string; action: string; detail: string }[];
 }
 const ist = (ts: number) => new Date(ts + 5.5 * 3600_000).toISOString().replace("T", " ").slice(0, 19) + " IST";
@@ -78,7 +78,8 @@ function Inner() {
     await load();
   }
   async function verifyPack(id: string) {
-    const r = await fetch(`/api/evidence/${id}/export?format=json`);
+    const m = ev?.packs.find((p) => p.id === id)?.m;
+    const r = await fetch(`/api/evidence/${id}/export?format=json${m ? `&m=${m}` : ""}`);
     const body = await r.json();
     setVerify((v) => ({ ...v, [id]: body.verification }));
   }
@@ -176,9 +177,9 @@ function Inner() {
                 <div className="mono text-[10.5px] text-mut mt-1">root {p.rootHash.slice(0, 20)}…</div>
                 <div className="mono text-[10.5px] text-faint">sealed {ist(p.at)} · {p.by}</div>
                 <div className="mt-3 flex flex-col gap-2">
-                  <a href={`/api/evidence/${p.id}/export?format=json`} target="_blank" rel="noreferrer" className="mono text-[11px] tracking-[0.1em] uppercase font-bold text-ink border border-line px-3 py-2 hover:border-[#2c3a4c]">JSON bundle · manifest + verification ↗</a>
-                  <a href={`/api/evidence/${p.id}/export?format=str`} target="_blank" rel="noreferrer" className="mono text-[11px] tracking-[0.1em] uppercase font-bold text-amber border border-amber/50 px-3 py-2 hover:bg-amber hover:text-[#12100c]">STR draft · FIU-IND format ↗</a>
-                  <a href={`/api/evidence/${p.id}/export?format=bsa63`} target="_blank" rel="noreferrer" className="mono text-[11px] tracking-[0.1em] uppercase font-bold text-amber border border-amber/50 px-3 py-2 hover:bg-amber hover:text-[#12100c]">s.63 certificate · BSA 2023 ↗</a>
+                  <a href={`/api/evidence/${p.id}/export?format=json${p.m ? `&m=${p.m}` : ""}`} target="_blank" rel="noreferrer" className="mono text-[11px] tracking-[0.1em] uppercase font-bold text-ink border border-line px-3 py-2 hover:border-[#2c3a4c]">JSON bundle · manifest + verification ↗</a>
+                  <a href={`/api/evidence/${p.id}/export?format=str${p.m ? `&m=${p.m}` : ""}`} target="_blank" rel="noreferrer" className="mono text-[11px] tracking-[0.1em] uppercase font-bold text-amber border border-amber/50 px-3 py-2 hover:bg-amber hover:text-[#12100c]">STR draft · FIU-IND format ↗</a>
+                  <a href={`/api/evidence/${p.id}/export?format=bsa63${p.m ? `&m=${p.m}` : ""}`} target="_blank" rel="noreferrer" className="mono text-[11px] tracking-[0.1em] uppercase font-bold text-amber border border-amber/50 px-3 py-2 hover:bg-amber hover:text-[#12100c]">s.63 certificate · BSA 2023 ↗</a>
                   <a href={`/verify?pack=${p.id}&root=${p.rootHash}`} target="_blank" rel="noreferrer" className="mono text-[11px] tracking-[0.1em] uppercase font-bold text-teal border border-[#1f4a56] px-3 py-2 hover:border-teal">public verification page · no login ↗</a>
                   <button onClick={() => verifyPack(p.id)} className="mono text-[11px] tracking-[0.1em] uppercase font-bold text-mut border border-line px-3 py-2 hover:text-ink text-left">
                     {verify[p.id] ? (verify[p.id].ok ? "✓ verified — chain intact" : `✗ broken at artefact ${verify[p.id].brokenAt}`) : "verify integrity · recompute hashes"}
