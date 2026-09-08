@@ -1,4 +1,19 @@
-import { getCase, auditForCase, packetsForCase, packsForCase, alertsForCase, type CaseRow } from "../db";
+import { getCase, auditForCase, packetsForCase, packsForCase, alertsForCase, createCase, type CaseRow, type CaseStatus } from "../db";
+
+/* Hosts whose functions do not share a disk: the screen carries the case row it listed, base64 JSON,
+ * and an instance that has never seen the case adopts it before answering. Nothing is trusted beyond
+ * the row's own fields; the timeline, chain events and artefacts are recomputed here. */
+export function adoptCarriedCase(id: string, carried: string | null): void {
+  if (!carried || getCase(id)) return;
+  try {
+    const r = JSON.parse(Buffer.from(carried, "base64").toString("utf8")) as Partial<CaseRow>;
+    if (r.id !== id || typeof r.seed !== "string" || typeof r.chain !== "string") return;
+    const statuses: CaseStatus[] = ["intake", "tracing", "cash-out", "escalated", "closed"];
+    createCase({ id, title: String(r.title ?? ""), status: statuses.includes(r.status as CaseStatus) ? (r.status as CaseStatus) : "intake", chain: r.chain, seed: r.seed, officer: String(r.officer ?? "unknown"), synthetic: r.synthetic ? 1 : 0, notes: String(r.notes ?? "") });
+  } catch {
+    /* ignore a malformed carrier */
+  }
+}
 import { lookupAddress } from "../chains";
 import { DEMO_CHAIN_EVENTS, DEMO_CASHOUT_WALLET, DEMO_STATEMENT_CSV } from "../bridge/sample";
 

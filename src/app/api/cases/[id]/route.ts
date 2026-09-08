@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { updateCase, audit, type CaseStatus } from "@/lib/db";
-import { caseDetail } from "@/lib/cases";
+import { caseDetail, adoptCarriedCase } from "@/lib/cases";
 import { getSession } from "@/lib/auth";
 
 export const runtime = "nodejs";
@@ -8,8 +8,9 @@ export const maxDuration = 60;
 export const dynamic = "force-dynamic";
 const STATUSES: CaseStatus[] = ["intake", "tracing", "cash-out", "escalated", "closed"];
 
-export async function GET(_req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
+export async function GET(req: NextRequest, ctx: { params: Promise<{ id: string }> }) {
   const { id } = await ctx.params;
+  adoptCarriedCase(id, req.nextUrl.searchParams.get("c"));
   const d = await caseDetail(id);
   return d ? NextResponse.json(d) : NextResponse.json({ error: "case not found" }, { status: 404 });
 }

@@ -48,8 +48,10 @@ function Inner() {
     setCases(b.cases ?? []);
     return (b.cases ?? []) as CaseListRow[];
   }, []);
-  const loadDetail = useCallback(async (id: string) => {
-    const r = await fetch(`/api/cases/${id}`, { cache: "no-store" });
+  // the listed row travels with the request, so a host instance that never stored the case can still answer
+  const carry = (row?: CaseRow | null) => (row ? `?c=${encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(row)))))}` : "");
+  const loadDetail = useCallback(async (id: string, row?: CaseRow | null) => {
+    const r = await fetch(`/api/cases/${id}${carry(row)}`, { cache: "no-store" });
     if (!r.ok) return setDetail(null);
     const d = (await r.json()) as CaseDetail;
     setDetail(d);
@@ -62,7 +64,7 @@ function Inner() {
     loadList().then((l) => {
       const id = params.get("id") ?? l[0]?.id ?? null;
       setSel(id);
-      if (id) loadDetail(id);
+      if (id) loadDetail(id, l.find((x) => x.id === id) ?? null);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -78,7 +80,7 @@ function Inner() {
       setTitle("");
       await loadList();
       setSel(b.id);
-      loadDetail(b.id);
+      loadDetail(b.id, b as CaseRow);
       setMsg(`opened ${b.id}`);
     } catch (e) {
       setMsg(e instanceof Error ? e.message : "could not open case");
@@ -91,7 +93,7 @@ function Inner() {
     const r = await fetch(`/api/cases/${sel}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify(p) });
     if (!r.ok) setMsg((await r.json()).error ?? "update failed");
     await loadList();
-    loadDetail(sel);
+    loadDetail(sel, cases.find((x) => x.id === sel) ?? null);
   }
 
   const c = detail?.c;
@@ -150,7 +152,7 @@ function Inner() {
               key={k.id}
               onClick={() => {
                 setSel(k.id);
-                loadDetail(k.id);
+                loadDetail(k.id, k);
               }}
               className={`w-full text-left px-6 py-4 border-b border-line2 hover:bg-panel ${sel === k.id ? "bg-panel shadow-[inset_2px_0_0_#e8b23a]" : ""}`}
             >
@@ -175,7 +177,7 @@ function Inner() {
                 <div className="mt-4 flex items-center gap-4 flex-wrap">
                   <Seg label="status" value={c.status} options={STATUSES} onChange={(s) => patch({ status: s as CaseStatus })} />
                   <span className="c-note">opened {ist(c.created_at)} by {c.officer}</span>
-                  <a href={`/api/cases/${c.id}/report`} target="_blank" rel="noreferrer" className="ml-auto mono text-[10.5px] tracking-[0.12em] uppercase font-extrabold text-amber border border-amber/50 px-3 py-1.5 hover:bg-amber hover:text-[#12100c]">investigation report ↗</a>
+                  <a href={`/api/cases/${c.id}/report${carry(c)}`} target="_blank" rel="noreferrer" className="ml-auto mono text-[10.5px] tracking-[0.12em] uppercase font-extrabold text-amber border border-amber/50 px-3 py-1.5 hover:bg-amber hover:text-[#12100c]">investigation report ↗</a>
                 </div>
               </div>
               <div className="grid grid-cols-[1fr_1fr]">
